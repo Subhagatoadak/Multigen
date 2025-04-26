@@ -162,7 +162,175 @@ This document details Multigen’s design rationale, architectural components, w
 Use the following PlantUML definition to render the UML class diagram:
 
 ```plantuml
-//www.plantuml.com/plantuml/png/b5RRKYCt47tdA_IKbIlc1wPIMp464b8uK1wgyjpMDBPYZQIqD0DEAlyUNJIs86I3zy4hjLf7fqzVXX-T1_93how-NFx_luilR6a8sGE97JfFuANHdxif53XNNJJ4_hfWx99rab24xQ5XIx2maKhwm_LaJ2xFohpSwAtKsB3RupeTRGRNi1Kw1rky6booMQEa273h-yUq2iRlsGvqft2DVmpeFAVy_omTIJsQFJuPexWFFxz2ZtDcWQ1tiuk_BpBrZyYL251xaXXvWFsX3MkzdP-yL-YX0mzVqrk4M-ay4k-3kM7_TikKb37xmN8DVGWvGyu-yaxE8vAJHcEtDafjGEnviKnNJr5KyXNoBuRsKT-6_LPMr-rzWiLN58D7FddSTNCcZFRuMdIpC3YyDRImbim8YZkFzgxBXuHkwB6OvWoAppgObQy8dN8N22NKOQEast5lh1HJ17FMk-qnqVa5DsoS8Bd1zwuvrLGzCbL2YRat7Qg6PTigRZ8WAXH-8M9H1-BWCMYUj-byi5smSS8NeEuQFCGNFjitjn1BHg9Ztx5rAeBpksUnHUqpqA6e5ImOW30TSMSnwF2BCxeLE-oXaY2MzyTNuycY0-kHlWLGaswHHYcm08Lz6YAMErJFgsyMDlRIrqWVzy5vscPTeh0b37UEg5VWidgbEEgUIuOu4q9ptmVEfRk_bh3lz6X43aFgiM6dVIYSDJfhjCEtRLy9Mkd-Nq_dT3nOr8l7kmGaG2bUPbDEr3lyCsJxoOn86hJ0S_IQkhsQ8k7zF4_VJ8BJH6d3Bh2TJf_C7YVQ0kM8arJSnvDtZdFMeP1vd5q5oH1q9UAD2ueaoLUWOOjK2FL6Is_e4NKNnEIb-BBpD9Lg6293F-UvKH3o54a778cQx7CpeYxZZymGc-VXHIDn4ty3v1dojnuyXg9TOH-QyfmKBFCKpXTRRsXAWuCHMmtMxOpdmhysqNL4SacXPJsyGxxeK2myRKuVcbphD_q6kowM-nb1FMmSqbXwEGItDBrLyjmQUqHwDjJ7QmiDwl3dCIk13heGUM0g7EyRbfSvfWuz2dzDyjdpsR5QJbdE0_yUWVGHaD0JICqxY7FeAQx36rVWnMvMJVryjMxVfGaySfKLg00azj7CKVkeProlKHZgIltf49N0gw7Reg--gnLgYsAW85qhG5Sa1zqksYSkJ8Thj6OsMQ-Z5NLdZTI-9hS3us9soIXLYVSx2dyBW_BS0mKIfu-cFrXiM3fx2iiAQp5uumISOD8cSEcjqQWhZ3xbOih9ERsmnjp4RYVj9wVtcpybBo-__bDt6UH03C8myEvNxVzVjOrKDTEfELAFW01nqjez6cBxQ8rjfBNj9SCYF58hZ66rFJ4f7u-1P3S-Z5nOwjSL3T3laWrynAs84bYnaeVosO6o5AxRT-f8YzbfwGAa6CYmRmS8HhVEUp_EukoAncKcc4NPXvD-23wp2k299SXH7RcKlTlVPHlpt_S7
+@startuml
+'-----------------------------------
+' Core Orchestration
+'-----------------------------------
+class Orchestrator {
+  - directory: CapabilityDirectory
+  - flowEngine: FlowEngine
+  - bus: MessageBus
+  - policy: RLPolicy
+  + handleRequest(request)
+  + invokeTool(toolName, params)
+}
+
+class CapabilityDirectory {
+  - entries: Map<String,CapabilityMetadata>
+  + register(meta: CapabilityMetadata)
+  + lookup(name: String): CapabilityMetadata
+  + versionedRollback(version: String)
+}
+
+class FlowEngine {
+  - workflow: WorkflowDSL
+  + execute(workflowId, context)
+  + pauseForApproval(stepId)
+  + resume(stepId, approvalResult)
+}
+
+class MessageBus {
+  + publish(topic: String, msg: Message)
+  + subscribe(topic: String, handler)
+}
+
+class RLPolicy {
+  - model: PolicyModel
+  + selectAction(state): Action
+  + update(rewardData)
+}
+
+'-----------------------------------
+' Factories & Registration
+'-----------------------------------
+class AgentFactory {
+  + generateAgent(spec: JsonSchema)
+}
+
+class ToolFactory {
+  + generateToolAdapter(spec: JsonSchema)
+}
+
+class RegistrationService {
+  + onStartup(selfMeta: CapabilityMetadata)
+  + emitRegistration(meta: CapabilityMetadata)
+}
+
+'-----------------------------------
+' Agents & Adapters
+'-----------------------------------
+class BaseAgent {
+  - name: String
+  - tools: List<String>
+  + onInvocation(inv: Invocation): Response
+  + register()
+}
+
+class ToolAdapter {
+  - name: String
+  - spec: OpenAPI
+  + call(params): Json
+  + register()
+}
+
+'-----------------------------------
+' Governance
+'-----------------------------------
+class ApprovalEngine {
+  + requestApproval(step: WorkflowStep): ApprovalToken
+  + receiveResponse(token: ApprovalToken, decision: Boolean)
+}
+
+class EscalationManager {
+  + monitorPending()
+  + escalate(stepId)
+}
+
+class ErrorHandler {
+  + handleError(err: ErrorEvent)
+  + routeToOwner(ownerId)
+}
+
+'-----------------------------------
+' State & Memory
+'-----------------------------------
+class ContextMemoryStore {
+  + saveSnapshot(ctx: ConversationContext)
+  + queryContext(query: String): List<Embedding>
+}
+
+'-----------------------------------
+' Observability & Compliance
+'-----------------------------------
+class PerformanceAnalyzer {
+  + ingestMetrics(m: Metric)
+  + detectDrift(): Boolean
+}
+
+class PolicyLearner {
+  + retrain(data: TrainingBatch)
+  + updatePolicy()
+}
+
+class CostMonitor {
+  + trackCost(entry: CostRecord)
+  + enforceBudget(workflowId)
+}
+
+class SecurityScanner {
+  + runSAST(codeRepo)
+  + runDAST(endpoint)
+}
+
+class ChaosController {
+  + injectFault(target: String, type: FaultType)
+}
+
+class Autoscaler {
+  + scale(component: String, metric: Metric)
+}
+
+'-----------------------------------
+' Relationships
+'-----------------------------------
+Orchestrator --> CapabilityDirectory
+Orchestrator --> FlowEngine
+Orchestrator --> MessageBus
+Orchestrator --> RLPolicy
+
+AgentFactory --> RegistrationService
+ToolFactory --> RegistrationService
+
+RegistrationService --> CapabilityDirectory
+
+FlowEngine --> ApprovalEngine
+FlowEngine --> EscalationManager
+FlowEngine --> ErrorHandler
+
+MessageBus --> BaseAgent
+MessageBus --> ToolAdapter
+
+BaseAgent --> MessageBus
+ToolAdapter --> MessageBus
+
+ErrorHandler --> EscalationManager
+
+FlowEngine --> ContextMemoryStore
+BaseAgent --> ContextMemoryStore
+
+PerformanceAnalyzer --> PolicyLearner
+PolicyLearner --> Orchestrator
+
+PerformanceAnalyzer --> ChaosController
+ChaosController --> Orchestrator
+
+CostMonitor --> PolicyLearner
+SecurityScanner --> AgentFactory
+SecurityScanner --> ToolFactory
+
+Autoscaler --> MessageBus
+Autoscaler --> BaseAgent
+@enduml
 ```
 
 ---
