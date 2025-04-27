@@ -1,0 +1,220 @@
+@startuml
+skinparam entityStyle rectangle
+skinparam linetype ortho
+
+entity Agent {
+  * agent_id : UUID
+  --
+  name         : String
+  version      : String
+  owner        : String
+  registered_at: DateTime
+}
+
+entity ToolAdapter {
+  * adapter_id   : UUID
+  --
+  name          : String
+  spec          : JSON
+  owner         : String
+  registered_at : DateTime
+}
+
+entity WorkflowDefinition {
+  * workflow_id : UUID
+  --
+  name          : String
+  dsl           : Text
+  version       : String
+  created_at    : DateTime
+  updated_at    : DateTime
+}
+
+entity WorkflowInstance {
+  * instance_id  : UUID
+  --
+  workflow_id   : UUID
+  status        : String
+  started_at    : DateTime
+  ended_at      : DateTime
+}
+
+entity WorkflowStep {
+  * step_id     : UUID
+  --
+  instance_id  : UUID
+  name         : String
+  status       : String
+  started_at   : DateTime
+  ended_at     : DateTime
+}
+
+entity InvocationRecord {
+  * invocation_id : UUID
+  --
+  step_id        : UUID
+  agent_id       : UUID
+  adapter_id     : UUID
+  params         : JSON
+  timestamp      : DateTime
+}
+
+entity ResponseRecord {
+  * response_id  : UUID
+  --
+  invocation_id : UUID
+  payload       : JSON
+  timestamp     : DateTime
+}
+
+entity ApprovalRequest {
+  * approval_id  : UUID
+  --
+  step_id       : UUID
+  level         : String
+  status        : String
+  requested_at  : DateTime
+  responded_at  : DateTime
+  decision      : Boolean
+  approver      : String
+}
+
+entity ErrorEvent {
+  * error_id     : UUID
+  --
+  invocation_id : UUID
+  error_type    : String
+  error_message : Text
+  timestamp     : DateTime
+}
+
+entity FeedbackRecord {
+  * feedback_id   : UUID
+  --
+  invocation_id  : UUID
+  step_id        : UUID
+  original_prompt: Text
+  model_output   : Text
+  human_output   : Text
+  feedback_type  : String
+  timestamp      : DateTime
+}
+
+entity ContextSnapshot {
+  * snapshot_id : UUID
+  --
+  instance_id  : UUID
+  summary      : Text
+  timestamp    : DateTime
+}
+
+entity MetricRecord {
+  * metric_id   : UUID
+  --
+  instance_id  : UUID
+  metric_type  : String
+  value        : Float
+  timestamp    : DateTime
+}
+
+entity CostRecord {
+  * cost_id     : UUID
+  --
+  instance_id  : UUID
+  cost_type    : String
+  amount       : Float
+  timestamp    : DateTime
+}
+
+entity PolicyRecord {
+  * policy_id   : UUID
+  --
+  instance_id  : UUID
+  state        : JSON
+  action       : JSON
+  reward       : Float
+  timestamp    : DateTime
+}
+
+entity RewardLog {
+  * log_id      : UUID
+  --
+  policy_id    : UUID
+  reward       : Float
+  context      : JSON
+  timestamp    : DateTime
+}
+
+entity TestCase {
+  * test_id     : UUID
+  --
+  feedback_id  : UUID
+  definition   : Text
+  status       : String
+  created_at   : DateTime
+}
+
+entity UserProfile {
+  * user_id     : UUID
+  --
+  preferences  : JSON
+  created_at   : DateTime
+  updated_at   : DateTime
+}
+
+entity ConsentRecord {
+  * consent_id  : UUID
+  --
+  user_id      : UUID
+  record_context : JSON
+  consent_type : String
+  timestamp    : DateTime
+}
+
+entity DriftEvent {
+  * drift_id    : UUID
+  --
+  instance_id  : UUID
+  score        : Float
+  timestamp    : DateTime
+}
+
+entity RuleDefinition {
+  * rule_id     : UUID
+  --
+  name         : String
+  content      : Text
+  created_at   : DateTime
+  updated_at   : DateTime
+}
+
+entity AuditLog {
+  * log_id      : UUID
+  --
+  event_type   : String
+  payload      : JSON
+  timestamp    : DateTime
+}
+
+'-----------------------------------
+' Associations
+'-----------------------------------
+WorkflowDefinition -- WorkflowInstance : defines
+WorkflowInstance   -- WorkflowStep     : includes
+WorkflowStep       -- InvocationRecord : makes
+InvocationRecord   -- ResponseRecord   : returns
+WorkflowStep       -- ApprovalRequest  : requests
+InvocationRecord   -- ErrorEvent       : logs
+InvocationRecord   -- FeedbackRecord   : collects
+WorkflowInstance   -- ContextSnapshot  : snapshots
+WorkflowInstance   -- MetricRecord     : records
+WorkflowInstance   -- CostRecord       : costs
+PolicyRecord       -- RewardLog       : logs
+FeedbackRecord     -- TestCase         : tests
+Agent               -- InvocationRecord : executes
+ToolAdapter         -- InvocationRecord : services
+UserProfile         -- ConsentRecord    : gives
+WorkflowInstance   -- DriftEvent        : drifts
+RuleDefinition     -- AuditLog         : audited_by
+AuditLog           -- WorkflowInstance  : references
+@enduml
