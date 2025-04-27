@@ -16,7 +16,7 @@
 | **11**| • Observability (Prometheus exporters, Grafana dashboards, Jaeger tracing)                            | End-to-end visibility and SLOs                         |
 | **12**| • Python SDK / CLI (multigen-sdk, multigen-cli)                                                        | DSL-as-code + workflow management from the terminal    |
 
-You can stop after any phase to have a minimal viable demo, then iterate.
+
 
 ---
 
