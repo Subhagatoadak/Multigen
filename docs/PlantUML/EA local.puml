@@ -1,0 +1,189 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam linetype ortho
+title Multigen Local Docker-Based Enterprise Architecture
+
+'========================
+' User & Entry Points
+'========================
+actor Developer
+component "Web UI\n(React, shadcn/ui)"           as UI
+component "CLI & SDK\n(multigen-cli + Python SDK)" as SDK
+
+Developer --> UI  : Browser
+Developer --> SDK : Build & Deploy
+
+'========================
+' Local API Gateway
+'========================
+component "Traefik\n(Local API Gateway)" as APIGW
+UI  --> APIGW : REST/GraphQL
+SDK --> APIGW : HTTP/gRPC
+
+'========================
+' Orchestration Core Services
+'========================
+component "Orchestrator\n(FastAPI/Go)"     as ORCH
+component "Flow Engine\n(Temporal/Argo)"   as FLOW
+component "Guardrails Engine\n(OPA)"       as GRD
+component "Approval Engine\n(Node.js)"     as APR
+component "Error Handler\n(Python)"        as ERR
+
+APIGW --> ORCH : routeRequest()
+ORCH  --> GRD  : checkPolicy()
+ORCH  --> FLOW : startWorkflow()
+FLOW  --> APR  : requestApproval()
+FLOW  --> ERR  : handleError()
+
+'========================
+' Messaging Broker
+'========================
+component "Kafka\n(Local MSK-Compatible)" as BUS
+ORCH --> BUS  : publish(invocations)
+FLOW --> BUS  : publish(invocations)
+BUS  --> FLOW : deliver(responses)
+BUS  --> ORCH : deliver(errors, approvals)
+
+'========================
+' Agents & Adapters
+'========================
+component "Base Agents\n(Python/Node.js)"          as AGT
+component "Tool Adapters\n(Go/Python)"             as ADP
+component "DynamicSpawnerAgent\n(Python)"          as DYN
+component "LangChainAgent\n(Python)"               as LCA
+component "LlamaIndexAgent\n(Python)"              as LIA
+
+BUS --> AGT   : invokeAgent()
+BUS --> ADP   : invokeAdapter()
+AGT --> BUS   : agentResponse()
+ADP --> BUS   : adapterResponse()
+
+AGT --> DYN   : dynamic_subtree invocation
+AGT --> LCA   : LangChain calls
+AGT --> LIA   : LlamaIndex queries
+
+'========================
+' LLM Providers (External)
+'========================
+component "OpenAI / Azure / Anthropic\n(Cloud)" as LLM
+AGT --> LLM  : LLM API calls
+"LlamaIndexAgent" --> LLM : auxiliary model calls
+
+'========================
+' Capability & Metadata Stores
+'========================
+database "Capability Directory\nMongoDB"      as MDB
+database "Graph Store (optional)\nNeo4j"      as NEO
+component "Registration Service\n(Python)"    as REG
+
+ORCH --> MDB : lookup/register  
+REG  --> MDB : register(meta)  
+REG  --> NEO : register(graph entries)  
+
+'========================
+' Context & Memory Store
+'========================
+database "Redis\n(Context Snapshots)"         as REDIS
+component "PII Detector\n(Python)"            as PII
+component "Consent Manager\n(Python)"         as CONS
+
+FLOW --> REDIS : saveSnapshot()
+REDIS --> PII  : maskPII()
+REDIS --> CONS : enforceConsent()
+
+'========================
+' Feedback Pipeline
+'========================
+database "Feedback Store\n(PostgreSQL)"       as PG
+component "Feedback Collector\n(Node.js)"     as FC
+
+FLOW --> FC   : collectFeedback()
+FC  --> PG    : storeFeedback()
+
+'========================
+' Observability & Resilience
+'========================
+component "Prometheus\n(Metrics)"            as PROM
+component "Grafana\n(Dashboards)"            as GRAF
+component "Jaeger\n(Tracing)"                as JAEG
+component "Chaos Mesh\n(Fault Injection)"    as CMESH
+component "K8s HPA\n(Autoscaler)"            as HPA
+
+ORCH --> PROM : emitMetrics()
+FLOW --> PROM : emitMetrics()
+PROM --> GRAF : visualize
+ORCH --> JAEG : traceSpans()
+CMESH --> ORCH : injectFaults()
+PROM --> HPA  : scaleDecisions()
+
+'========================
+' Feedback-Driven Learning
+'========================
+component "Feedback Rewarder\n(Python)"       as FR
+component "Policy Learner\n(PyTorch)"         as PL
+component "RLHF Trainer\n(SageMaker Local)"   as RT
+component "Prompt & Flow Optimizers\n(Node.js)" as OPT
+component "Rule Miner\n(Python)"              as RM
+component "TestCase Generator\n(Python)"      as TG
+
+PG --> FR  : feedbackRecords
+FR --> PL  : rewardSignals
+PL --> ORCH: updatePolicy
+
+PG --> RT  : humanCorrections
+RT --> PL  : fineTuneModels
+
+PG --> OPT : feedbackData
+OPT --> FLOW: updateDSL
+OPT --> ORCH: updatePrompts
+
+PG --> RM  : patterns
+RM --> GRD  : proposeRules
+
+PG --> TG  : feedbackRecords
+TG --> SDK : generateTests
+
+'========================
+' Dynamic Codegen Factories
+'========================
+component "AgentFactory\n(LLM Scaffold)"      as AF
+component "ToolFactory\n(LLM + OpenAPI)"       as TF
+
+ORCH --> AF  : needAgent()
+ORCH --> TF  : needTool()
+AF  --> REG  : emitRegistration()
+TF  --> REG  : emitRegistration()
+
+'========================
+' Local Vector & Graph Alternatives
+'========================
+component "Milvus\n(Local Vector DB)"          as MILV
+MILV --> LIA  : index/query
+MILV --> LCA  : contextMemory
+
+'========================
+' CI/CD & Orchestration
+'========================
+component "Docker Compose\n(Local Dev)"        as DC
+component "GitHub Actions\n(CI)"               as GH
+component "Terraform\n(Local Provisioning)"    as TFRC
+
+DC  --> ORCH : deployServices
+DC  --> BUS  : deployServices
+DC  --> MDB  : deploy
+DC  --> REDIS: deploy
+DC  --> PG   : deploy
+DC  --> PROM : deploy
+DC  --> GRAF : deploy
+DC  --> JAEG : deploy
+DC  --> CMESH: deploy
+DC  --> AF   : deploy
+DC  --> TF   : deploy
+DC  --> FC   : deploy
+DC  --> AGT  : deploy
+DC  --> ADP  : deploy
+
+GH  --> DC   : triggerOnCommit
+TFRC --> DC  : provisionNetworks
+
+@enduml

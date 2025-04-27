@@ -105,3 +105,102 @@ Every approval, rejection, or human edit translates into a structured feedback r
 
 Bottom Line
 Multigen is as “reasoning-capable” as the agents you plug into it—and its own orchestration, guardrails, and feedback loops layer learned and rule-based reasoning on top. You can confidently build chatbots, analytic pipelines, recommenders, content factories, or compliance workflows—and have the system dynamically choose, verify, and improve its logic over time.
+1. Divide Responsibilities
+Orchestration in DSL
+
+YAML/JSON remains your canonical “source of truth” for workflow structure (steps, parallels, conditionals, approvals).
+
+This ensures static validation, visual rendering, and policy checks happen early.
+
+Business Logic in Python Modules
+
+Package all non-trivial transformations, model invocations, API calls, etc. as standalone Python functions or classes.
+
+These live inside your Agent containers (e.g. a DataProcessorAgent that imports your process_data.py library).
+
+Python-First Wrapper
+
+Provide a small Python DSL builder that emits the same YAML. Users write:
+
+python
+Copy
+Edit
+from multigen_sdk import WorkflowBuilder
+
+wf = (
+  WorkflowBuilder("my_workflow")
+  .step("fetch_data", agent="DataFetcher", params={"source":"s3://…"})
+  .parallel("process_batches", [
+      {"name":"batchA", "agent":"DataProcessor", "params":{"batch":"A"}},
+      {"name":"batchB", "agent":"DataProcessor", "params":{"batch":"B"}}
+  ])
+  .conditional("decide_path",
+    when="fetch_data.output.count > 100",
+    then={"agent":"HighPriorityAgent"},
+    otherwise={"agent":"LowPriorityAgent"}
+  )
+  .step("finalize", agent="ReportGenerator")
+)
+# This generates the exact YAML you’d hand to the Flow Engine:
+wf.to_yaml("workflows/my_workflow.yaml")
+Pros: IDE autocomplete, refactoring, unit-testable builder logic.
+
+Cons: You still get a static DSL file under version control.
+
+2. How Agents Consume Python Logic
+Custom Agent Template
+
+python
+Copy
+Edit
+# agents/data_processor.py
+from multigen_agent import BaseAgent
+from my_lib.process import normalize_records, enrich_with_metadata
+
+class DataProcessorAgent(BaseAgent):
+    def onInvocation(self, inv):
+        records = inv.params["batch"]
+        normalized = normalize_records(records)
+        enriched  = enrich_with_metadata(normalized)
+        return {"processed": enriched}
+This agent container simply plugs into Multigen; orchestration via DSL doesn’t change.
+
+3. Tooling & Validation
+Lint & Schema-Validate
+
+After wf.to_yaml(), run multigen-cli validate workflows/my_workflow.yaml to catch missing fields or policy violations.
+
+Visual Preview
+
+The DSL file feeds directly into your visual workflow designer, so any Python-written flow shows up graphically.
+
+4. Versioning & Collaboration
+Git Repo Structure
+
+pgsql
+Copy
+Edit
+/workflows/            # DSL files (YAML)
+/agents/               # Python agent implementations
+/sdk/                  # Python wrapper library
+/lib/                  # Shared business-logic modules
+CI Steps
+
+sdk build & tests
+
+lib build & tests
+
+Agent container build & tests
+
+DSL validation & policy checks
+
+5. Summary
+Safety & Governance via DSL
+
+Developer Productivity via Python SDK + modules
+
+Visual & Automated Validation remain friction-free
+
+No sacrifice in dynamic reasoning, parallelism, or policy enforcement
+
+This hybrid pattern lets you evolve toward a Python-first experience without giving up the declarative guarantees that make Multigen robust, auditable, and enterprise-ready.
