@@ -1,0 +1,167 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam linetype ortho
+title Multigen Enterprise-Level Architecture & Tech Stack
+
+' Users & Entry Points
+actor User
+component "Web UI\n(React, shadcn/ui)" as UI
+component "CLI\n(multigen-cli)"         as CLI
+User --> UI  : Browser
+User --> CLI : Terminal
+
+' API Surface
+component "API Gateway\n(AWS API Gateway / Kong)" as APIGW
+UI  --> APIGW : REST/GraphQL
+CLI --> APIGW : HTTP/gRPC
+
+' Orchestration Core
+component "Orchestrator\n(FastAPI/Go on EKS)"   as ORCH
+component "Flow Engine\n(Temporal/Argo)"        as FLOW
+component "Guardrails Engine\n(Open Policy Agent)" as GRD
+component "Approval Engine\n(Node.js + React)"  as APR
+component "Error Handler\n(Python Service)"     as ERR
+
+APIGW --> ORCH : routeRequest()
+ORCH  --> FLOW : startWorkflow()
+ORCH  --> GRD  : checkPolicy()
+FLOW  --> APR  : requestApproval()
+FLOW  --> ERR  : handleError()
+
+' Messaging
+component "Message Bus\n(Apache Kafka/AWS MSK)" as BUS
+ORCH --> BUS : publish(invocations)
+FLOW --> BUS : publish(invocations)
+BUS  --> FLOW : deliver(responses)
+BUS  --> ORCH : deliver(errors,approvals)
+
+' Agents & Adapters
+component "Agents\n(Docker on EKS)"        as AGT
+component "Tool Adapters\n(OpenAPI + Docker)" as ADP
+BUS --> AGT : invokeAgent()
+BUS --> ADP : invokeAdapter()
+AGT --> BUS : agentResponse()
+ADP --> BUS : adapterResponse()
+
+' LLM Providers
+component "OpenAI API" as OpenAI
+component "Azure OpenAI" as AzureLLM
+component "Anthropic API" as Anthropic
+component "RLHF Trainer\n(AWS SageMaker)" as RT
+
+AGT --> OpenAI   : LLM call
+AGT --> AzureLLM : LLM call
+AGT --> Anthropic: LLM call
+RT  --> OpenAI   : fine-tune
+RT  --> Anthropic: fine-tune
+
+' Capability & Registration
+database "Capability Directory\n(DynamoDB)" as DIR
+component "Registration Service\n(Python Lambda)" as REG
+component "AgentFactory\n(GHA + Terraform)"    as AF
+component "ToolFactory\n(GHA + OpenAPI spec)"  as TF
+
+ORCH --> DIR : lookup/register
+AF   --> REG : emitRegistration()
+TF   --> REG : emitRegistration()
+REG  --> DIR : register(meta)
+
+' State, Memory & Privacy
+database "Context Store\n(Pinecone/Redis)"   as CMS
+component "PII Detector\n(Python Library)"    as PII
+component "Consent Manager\n(Custom Service)" as CONS
+
+FLOW --> CMS : saveSnapshot()
+CMS  --> PII : maskPII()
+CMS  --> CONS: enforceConsent()
+
+database "Feedback Store\n(PostgreSQL)"    as FS
+component "Feedback Collector\n(Node.js)" as FC
+FLOW --> FC : collectFeedback()
+FC   --> FS : storeFeedback()
+
+' Observability & Scaling
+component "Performance Analyzer\n(Prometheus + Grafana)" as PA
+component "Cost Monitor\n(AWS Cost Explorer)"           as CM
+component "Security Scanner\n(Trivy, Snyk, SonarQube)"  as SS
+component "Chaos Controller\n(Chaos Mesh)"              as CC
+component "Autoscaler\n(K8s HPA)"                      as AS
+
+ORCH --> PA  : emitMetrics()
+PA   --> CM  : costInsights
+PA   --> CC  : scheduleDrills
+CM   --> AS  : costAlerts
+PA   --> AS  : scaleDecisions
+SS   --> AF  : scanGeneratedCode
+SS   --> TF  : scanGeneratedCode
+
+' Feedback-Driven Learning
+component "Feedback Rewarder\n(Python RL Service)" as FR
+component "Policy Learner\n(PyTorch/SageMaker)"      as PL
+component "Active Learner\n(Custom Service)"         as AL
+component "Drift Monitor\n(Custom Service)"          as DM
+component "Prompt Optimizer\n(Node.js + LLM)"        as PO
+component "Flow Optimizer\n(Node.js + LLM)"          as FO
+component "Rule Miner\n(Python Service)"             as RM
+component "Agent Prioritizer\n(RL Module)"           as AP
+component "Test Case Generator\n(Python Scripts)"    as TG
+component "User Profile Manager\n(Auth0 + DB)"       as UPM
+component "Compliance Auditor\n(Splunk)"             as CA
+component "Feedback Marketplace\n(Internal Portal)"  as FM
+
+FS --> FR : feedbackRecords
+FR --> PL : rewardSignals
+PL --> ORCH : updatePolicy
+
+FS --> RT : humanCorrections
+RT --> PL : fineTunedModel
+
+FS --> AL : selectUncertain
+AL --> FC : requestLabels
+
+FS --> DM : storeMetrics
+DM --> PO : driftAlerts
+PO --> ORCH : updatePrompts
+
+FS --> FO : insights
+FO --> FLOW : updateWorkflow
+
+FS --> RM : patterns
+RM --> GRD: proposeRules
+
+FS --> AP : agentScores
+AP --> ORCH: biasRouting
+
+FS --> TG : generateTests
+TG --> AF : integrateTests
+
+FS --> UPM: userPrefs
+UPM --> ORCH: personalize
+
+FS --> CA : auditData
+FS --> FM : publishData
+
+' CI/CD & Infra
+component "CI/CD Pipeline\n(GitHub Actions, ArgoCD)"      as CICD
+component "Infrastructure as Code\n(Terraform)"           as IAC
+component "Kubernetes Cluster\n(EKS/GKE/AKS)"             as K8S
+
+AF   --> CICD : pushAgentCode
+TF   --> CICD : pushAdapterCode
+CICD --> K8S  : deployServices
+IAC  --> K8S  : provisionInfra
+CICD --> SS   : runSecurityScans
+
+' User Tools
+component "Dashboard\n(React + Grafana)"               as DASH
+component "Visual Workflow Designer\n(React, Mermaid)" as VWD
+component "Sandbox Simulator\n(Local K8s)"             as SIM
+
+DASH --> ORCH : monitor
+DASH --> PA   : viewMetrics
+DASH --> CA   : viewAudit
+
+VWD  --> FLOW : designDSL
+SIM  --> FLOW : testWorkflows
+
+@enduml
