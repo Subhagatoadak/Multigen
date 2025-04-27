@@ -1,0 +1,139 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam linetype ortho
+
+' External Interface
+[API Gateway] as APIGW
+
+' Core Orchestration Components
+[Orchestrator] as ORCH
+[Capability Directory] as DIR
+[Flow Engine] as FLOW
+[Message Bus] as BUS
+[RL Policy] as POLICY
+
+' Factories & Registration
+[AgentFactory] as AF
+[ToolFactory] as TF
+[Registration Service] as REG
+
+' Agents & Adapters
+[BaseAgent] as AGT
+[ToolAdapter] as ADP
+
+' Governance & Guardrails
+[Guardrails Engine] as GRD
+[Approval Engine] as APR
+[Escalation Manager] as ESC
+[Error Handler] as ERR
+
+' State, Memory & Privacy
+[Context Memory Store] as CMS
+[PII Detector] as PII
+[Consent Manager] as CONS
+
+' Observability & Scaling
+[Performance Analyzer] as PA
+[Policy Learner] as PL
+[Cost Monitor] as CM
+[Security Scanner] as SS
+[Chaos Controller] as CC
+[Autoscaler] as AS
+
+' Feedback‐Driven Modules
+[Feedback Collector] as FC
+[Feedback Store] as FS
+[Feedback Rewarder] as FR
+[RLHF Trainer] as RT
+[Active Learner] as AL
+[Drift Monitor] as DM
+[Rule Miner] as RM
+[Agent Prioritizer] as AP
+[Test Case Generator] as TG
+[User Profile Manager] as UPM
+[Compliance Auditor] as CA
+[Feedback Marketplace] as FM
+[Prompt Optimizer] as PO
+[Flow Optimizer] as FO
+
+' UI & Dev Tools
+[Dashboard] as DB
+[Visual Workflow Designer] as VWD
+[Sandbox Simulator] as SSIM
+
+'-----------------------------------
+' Relationships
+'-----------------------------------
+APIGW --> ORCH
+ORCH --> DIR
+ORCH --> FLOW
+ORCH --> BUS
+ORCH --> POLICY
+
+AF --> REG
+TF --> REG
+REG --> DIR
+
+FLOW --> GRD
+FLOW --> APR
+FLOW --> ESC
+FLOW --> ERR
+
+BUS --> AGT
+BUS --> ADP
+
+FLOW --> CMS
+CMS --> PII
+CMS --> CONS
+
+PA --> PL
+PL --> ORCH
+
+PA --> CC
+CC --> ORCH
+
+CM --> PL
+SS --> AF
+SS --> TF
+
+AS --> BUS
+AS --> AGT
+
+FLOW --> FC
+FC --> FS
+
+FS --> FR
+FR --> PL
+
+FS --> RT
+FS --> TG
+FS --> AL
+AL --> FC
+
+FS --> DM
+DM --> PO
+
+FS --> RM
+RM --> GRD
+
+FS --> AP
+AP --> POLICY
+
+FS --> UPM
+UPM --> ORCH
+
+FS --> CA
+FS --> FM
+
+FS --> PO
+PO --> ORCH
+
+FS --> FO
+FO --> FLOW
+
+FLOW --> SSIM
+VWD --> FLOW
+DB --> PA
+DB --> CA
+
+@enduml
