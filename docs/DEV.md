@@ -97,7 +97,23 @@ multigen/
 └── docs/                   # Architecture docs, PlantUML, ERDs  
 ```
 
----
+
+## Branchs
+
+| Phase | Branch                                  | Components to Build                                                                                   | Key Goals                                             |
+|-------|-----------------------------------------|-------------------------------------------------------------------------------------------------------|-------------------------------------------------------|
+| 1     | `feature/api-orchestrator-core`         | API Gateway (FastAPI + Traefik) <br> Orchestrator core (FastAPI) <br> DSL parser                      | Stand up public API, basic “start workflow” endpoint, parse YAML/JSON into an in-memory graph |
+| 2     | `feature/flow-messaging-integration`    | Flow Engine integration (Temporal Python SDK) <br> Message Bus wiring (Kafka + confluent-kafka)       | Execute a simple sequence of steps via Kafka topics and Temporal workflows |
+| 3     | `feature/base-agent-framework`          | BaseAgent framework (Python abstract class) <br> Simple demo agent (EchoAgent)                       | Define agent interface, test end-to-end invocation over Kafka |
+| 4     | `feature/capability-directory`          | Capability Directory (MongoDB) <br> RegistrationService (FastAPI)                                     | Agents self-register their metadata; orchestrator can look them up |
+| 5     | `feature/opa-guardrails`                | Guardrails Engine (OPA server + Python client) <br> Pre-invoke policy hooks in Orchestrator          | Enforce “allow/deny/pause” on each step                |
+| 6     | `feature/approval-error-handling`       | Approval Engine (Node.js + React UI) <br> Error Handler (Python)                                      | Human-in-the-loop gate and retry/dead-letter logic      |
+| 7     | `feature/feedback-reward`               | Feedback Collector (Python/Node.js) <br> Feedback Store (Postgres) <br> FeedbackRewarder              | Capture approvals & corrections, generate reward signals |
+| 8     | `feature/rl-policy-integration`         | RL Policy module (PyTorch + PPO) <br> Plug-in into Orchestrator for `selectAction`                    | Learn to pick the best agent over time                 |
+| 9     | `feature/prompt-flow-optimizers`        | Prompt & Flow Optimizers (Node.js + LLM API) <br> RLHF Trainer (SageMaker Local)                     | Automate prompt-tuning and small DSL tweaks via feedback |
+| 10    | `feature/agent-tool-factory-codegen`    | AgentFactory & ToolFactory (Python + OpenAI) <br> GitHub Actions CI for auto-build/deploy             | LLM-driven codegen, CI/CD integration                   |
+| 11    | `feature/observability-chaos`           | Observability (Prometheus exporters, Grafana dashboards, Jaeger tracing) <br> Chaos Mesh integration   | End-to-end visibility and resilience drills            |
+| 12    | `feature/python-sdk-cli`                | Python SDK / CLI (multigen-sdk, multigen-cli)                                                          | DSL-as-code + workflow management from the terminal    |
 
 
 
