@@ -2,3 +2,8 @@ fastapi
 uvicorn[standard]
 pydantic
 pytest
+confluent-kafka
+temporalio
+prometheus-client
+asyncio
+httpx

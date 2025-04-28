@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from orchestrator.controllers.workflow import router as workflow_router
+from orchestrator.controller.workflow import router as workflow_router
 
 app = FastAPI(title="Multigen Orchestrator")
 
