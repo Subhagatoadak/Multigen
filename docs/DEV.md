@@ -117,3 +117,19 @@ multigen/
 
 
 
+Client (CLI / UI)
+     │   POST /v1/workflows/run  {DSL + payload}
+     ▼
+FastAPI Controller
+     ├─> parse_workflow(dsl)  (in-memory graph)
+     └─> KafkaClient.publish("flow-requests", parsedMessage)
+              │
+              ▼
+flow_messaging.py (Kafka consumer)
+     ├─> poll "flow-requests"
+     ├─> run_simple_workflow(steps, payload)
+     └─> publish("flow-responses", results)
+              │
+              ▼
+(Optionally) FastAPI or UI polls/subscribes
+     └─> GET /v1/workflows/{id}/status or WebSocket
