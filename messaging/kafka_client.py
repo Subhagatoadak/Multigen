@@ -8,16 +8,18 @@ import orchestrator.services.config as config
 
 logger = logging.getLogger(__name__)
 
+
 class KafkaClient:
-    def __init__(self, brokers: str):
+    """
+    Thin wrapper around confluent_kafka Producer and Consumer for JSON messages.
+    """
+    def __init__(self, brokers: str) -> None:
         common_conf: Dict[str, Any] = {
             'bootstrap.servers': brokers,
         }
-        # Producer configuration
         self.producer = Producer(common_conf)
 
-        # Consumer configuration\ n
-        consumer_conf = {
+        consumer_conf: Dict[str, Any] = {
             **common_conf,
             'group.id': 'multigen-flow',
             'auto.offset.reset': 'earliest',
@@ -37,20 +39,23 @@ class KafkaClient:
         msg = self.consumer.poll(timeout)
         if msg is None:
             return None
-        if msg.error():
-            if msg.error().code() != KafkaError._PARTITION_EOF:
-                logger.error(f"Kafka error: {msg.error()}")
+        err = msg.error()
+        if err:
+            # Handle native KafkaError objects and integer error codes
+            code = err.code() if hasattr(err, 'code') else err
+            if code != KafkaError._PARTITION_EOF:
+                logger.error(f"Kafka error: {err}")
             return None
         try:
             return json.loads(msg.value().decode('utf-8'))
-        except Exception as e:
+        except Exception:
             logger.exception("Failed to decode Kafka message")
             return None
 
     def commit(self) -> None:
         try:
             self.consumer.commit()
-        except Exception as e:
+        except Exception:
             logger.exception("Failed to commit Kafka offset")
 
     def close(self) -> None:

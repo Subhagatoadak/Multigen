@@ -6,3 +6,4 @@ confluent-kafka
 temporalio
 prometheus-client
 asyncio
+httpx

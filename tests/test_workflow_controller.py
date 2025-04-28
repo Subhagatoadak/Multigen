@@ -1,7 +1,8 @@
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from orchestrator.controllers.workflow import router, _serialize_steps
+
+from orchestrator.controller.workflow import router, _serialize_steps
 from orchestrator.services.dsl_parser import DSLParseError
 from orchestrator.models.workflow import RunRequest, RunResponse
 from confluent_kafka import KafkaError
@@ -18,13 +19,13 @@ def app_and_client(monkeypatch):
     def fake_parse(dsl):
         return [DummyStep('A'), DummyStep('B')]
     monkeypatch.setattr(
-        'orchestrator.controllers.workflow.parse_workflow', fake_parse
+        'orchestrator.controller.workflow.parse_workflow', fake_parse
     )
     # Fake KafkaClient
     class FakeKafka:
         def __init__(self, broker): pass
         def publish(self, topic, msg): self.published = (topic, msg)
-    monkeypatch.setattr('orchestrator.controllers.workflow.KafkaClient', FakeKafka)
+    monkeypatch.setattr('orchestrator.controller.workflow.KafkaClient', FakeKafka)
 
     app = FastAPI()
     app.include_router(router)
@@ -63,7 +64,7 @@ def test_run_workflow_success(app_and_client):
 
 def test_run_workflow_parse_error(monkeypatch):
     def bp(dsl): raise DSLParseError('bad', node=None)
-    monkeypatch.setattr('orchestrator.controllers.workflow.parse_workflow', bp)
+    monkeypatch.setattr('orchestrator.controller.workflow.parse_workflow', bp)
     app = FastAPI()
     app.include_router(router)
     client = TestClient(app)
@@ -73,13 +74,18 @@ def test_run_workflow_parse_error(monkeypatch):
 
 def test_run_workflow_kafka_error(monkeypatch):
     def fake_parse(dsl): return [DummyStep('A')]
-    monkeypatch.setattr('orchestrator.controllers.workflow.parse_workflow', fake_parse)
-    class FK:
+    monkeypatch.setattr('orchestrator.controller.workflow.parse_workflow', fake_parse)
+
+    class FK: # Fake Kafka Client
         def __init__(self, b): pass
-        def publish(self, t, m): raise KafkaError('fail')
-    monkeypatch.setattr('orchestrator.controllers.workflow.KafkaClient', FK)
+        # Corrected publish method:
+        def publish(self, t, m):
+            # Raise KafkaError with an integer code and optional message
+            raise KafkaError(KafkaError._FAIL, 'Mock Kafka publish failure')
+
+    monkeypatch.setattr('orchestrator.controller.workflow.KafkaClient', FK)
     app = FastAPI()
     app.include_router(router)
     client = TestClient(app)
     resp = client.post('/run', json={'dsl': {'steps': []}})
-    assert resp.status_code == 500
+    assert resp.status_code == 500 # Should still expect 500 for internal server error

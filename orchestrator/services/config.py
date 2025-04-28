@@ -12,3 +12,4 @@ TEMPORAL_TASK_QUEUE = os.getenv("TEMPORAL_TASK_QUEUE", "flow-task-queue")
 
 # Metrics HTTP server port
 METRICS_PORT = int(os.getenv("METRICS_PORT", "8000"))
+KAFKA_BROKER_URL = os.getenv("KAFKA_BROKER_URL", "localhost:9092")
