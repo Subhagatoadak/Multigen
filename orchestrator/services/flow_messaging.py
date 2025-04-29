@@ -1,12 +1,16 @@
+# File: orchestrator/services/flow_messaging.py
+
 import asyncio
 import logging
 import signal
 import time
 from typing import Dict, Any
+
 from prometheus_client import Counter, Histogram, start_http_server
-from flow_engine.workflows.sequence import run_complex_workflow
-from messaging.kafka_client import KafkaClient
+
 import orchestrator.services.config as config
+from messaging.kafka_client import KafkaClient
+import flow_engine.workflows.sequence as seq  # import module to allow monkeypatch
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -35,18 +39,25 @@ def _shutdown() -> None:
     shutdown_flag = True
 
 async def handle_message(kafka: KafkaClient, msg: Dict[str, Any]) -> None:
-    """Process one Kafka message: run workflow and publish result or error."""
+    """
+    Process one Kafka message: run workflow and publish result or error.
+    """
     workflow_id = msg.get('workflow_id')
     steps = msg.get('steps', [])
     payload = msg.get('payload', {})
     start = time.time()
     try:
         logger.info(f"Starting workflow {workflow_id} with steps {steps}")
-        results = await run_complex_workflow(steps, payload, workflow_id)
+        # This now picks up any monkeypatch on flow_engine.workflows.sequence.run_complex_workflow
+        results = await seq.run_complex_workflow(steps, payload, workflow_id)
         latency = time.time() - start
         WORKFLOW_LATENCY.observe(latency)
 
-        response = {'workflow_id': workflow_id, 'status': 'completed', 'results': results}
+        response = {
+            'workflow_id': workflow_id,
+            'status': 'completed',
+            'results': results,
+        }
         kafka.publish(config.FLOW_RESPONSE_TOPIC, response)
         kafka.commit()
         MESSAGE_PROCESSED.inc()
@@ -54,12 +65,17 @@ async def handle_message(kafka: KafkaClient, msg: Dict[str, Any]) -> None:
     except Exception as exc:
         logger.exception(f"Workflow {workflow_id} failed")
         MESSAGE_FAILED.inc()
-        error_payload = {'workflow_id': workflow_id, 'error': str(exc)}
+        error_payload = {
+            'workflow_id': workflow_id,
+            'error': str(exc),
+        }
         kafka.publish(config.FLOW_DLQ_TOPIC, error_payload)
         kafka.commit()
 
 async def main_loop() -> None:
-    """Main event loop: poll Kafka and dispatch workflow tasks."""
+    """
+    Main event loop: poll Kafka and dispatch workflow tasks.
+    """
     kafka = KafkaClient(config.KAFKA_BROKER_URL)
     kafka.subscribe([config.FLOW_REQUEST_TOPIC])
     loop = asyncio.get_running_loop()

@@ -14,6 +14,11 @@ import orchestrator.services.config as config
 from orchestrator.services.agent_registry import get_agent
 
 
+if not hasattr(workflow, "WorkflowError"):
+    class WorkflowError(Exception):
+        """Aggregated workflow‐level error for failed steps."""
+    setattr(workflow, "WorkflowError", WorkflowError)
+
 @activity.defn
 async def agent_activity(
     agent_name: str,

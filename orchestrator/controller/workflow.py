@@ -1,12 +1,33 @@
+# File: orchestrator/controllers/workflow.py
+
 from uuid import uuid4
 from fastapi import APIRouter, HTTPException
 from confluent_kafka import KafkaError
+
 from orchestrator.models.workflow import RunRequest, RunResponse
 from orchestrator.services.dsl_parser import parse_workflow, DSLParseError
+from orchestrator.services.llm_service import text_to_dsl
 from messaging.kafka_client import KafkaClient
 import orchestrator.services.config as config
 
 router = APIRouter()
+
+async def _prepare_dsl(req: RunRequest) -> dict:
+    """
+    If the request includes a DSL dictionary, return it directly.
+    Otherwise, if it provides plain-text, use the LLM preprocessor to generate the DSL.
+    """
+    if getattr(req, 'dsl', None):
+        return req.dsl
+    if getattr(req, 'text', None):
+        try:
+            return await text_to_dsl(req.text)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed generating DSL from text: {e}")
+    raise HTTPException(
+        status_code=400,
+        detail="Request must include either a 'dsl' field or a 'text' field."
+    )
 
 
 def _serialize_steps(steps):
@@ -17,35 +38,36 @@ def _serialize_steps(steps):
     serialized = []
     for step in steps:
         if step.parallel:
-            # group parallel branches
-            branches = [ { 'name': p.name, 'params': p.params } for p in step.parallel ]
-            serialized.append({ 'parallel_with': branches })
+            branches = [{'name': p.name, 'params': p.params} for p in step.parallel]
+            serialized.append({'parallel_with': branches})
         else:
-            serialized.append({ 'name': step.name, 'params': step.params })
+            serialized.append({'name': step.name, 'params': step.params})
     return serialized
 
 
 @router.post("/run", response_model=RunResponse)
-def run_workflow(req: RunRequest):
+async def run_workflow(req: RunRequest):
     """
     Start a new workflow execution:
-      1. Parse the DSL
-      2. Serialize into step list
-      3. Publish to Kafka
+      1. Optional LLM preprocessing of plain-text to DSL
+      2. Parse the DSL
+      3. Serialize steps
+      4. Publish to Kafka
     """
-    # 1) Parse & validate the DSL
+    # 1) Prepare or generate DSL
+    dsl = await _prepare_dsl(req)
+
+    # 2) Parse & validate DSL
     try:
-        steps = parse_workflow(req.dsl)
+        steps = parse_workflow(dsl)
     except DSLParseError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    # 2) Serialize steps (supports parallel groups)
+    # 3) Serialize steps (parallel groups supported)
     serialized_steps = _serialize_steps(steps)
-
-    # Optional extra payload, default empty dict
     payload = getattr(req, 'payload', {})
 
-    # 3) Build and send message
+    # 4) Dispatch to Kafka
     workflow_id = str(uuid4())
     message = {
         'workflow_id': workflow_id,

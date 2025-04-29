@@ -7,3 +7,5 @@ temporalio
 prometheus-client
 asyncio
 httpx
+pytest-asyncio
+openai
