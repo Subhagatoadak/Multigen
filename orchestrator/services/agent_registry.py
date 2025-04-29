@@ -1,25 +1,30 @@
-"""
-Agent Registry for Multigen Orchestrator
 
-Provides dynamic registration and retrieval of agent implementations.
-"""
 from typing import Type, Dict
 
 from agents.base_agent import BaseAgent
+
+
+class AgentRegistryError(Exception):
+    """
+    Raised when agent registration or lookup fails.
+
+    Attributes:
+        message: Explanation of the failure.
+        name: The agent name involved in the failure.
+    """
+    def __init__(self, message: str, name: str = None) -> None:
+        self.name = name
+        full_message = message
+        if name:
+            full_message = f"AgentRegistryError[{name}]: {message}"
+        super().__init__(full_message)
 
 
 # Internal registry mapping agent names to their classes
 _registry: Dict[str, Type[BaseAgent]] = {}
 
 
-class AgentRegistryError(Exception):
-    """
-    Raised when agent registration or lookup fails.
-    """
-    pass
-
-
-def register_agent(name: str):  # type: ignore
+def register_agent(name: str):
     """
     Decorator to register a BaseAgent subclass under a unique name.
 
@@ -29,10 +34,12 @@ def register_agent(name: str):  # type: ignore
     """
     def decorator(cls: Type[BaseAgent]) -> Type[BaseAgent]:
         if name in _registry:
-            raise AgentRegistryError(f"Agent '{name}' is already registered")
+            raise AgentRegistryError(
+                f"Agent '{name}' is already registered", name
+            )
         if not issubclass(cls, BaseAgent):
             raise AgentRegistryError(
-                f"Can only register subclasses of BaseAgent, got {cls.__name__}"
+                f"Can only register subclasses of BaseAgent, got {cls.__name__}", name
             )
         _registry[name] = cls
         return cls
@@ -48,9 +55,9 @@ def get_agent(name: str) -> BaseAgent:
     """
     cls = _registry.get(name)
     if cls is None:
-        available = ', '.join(_registry.keys()) or 'none'
+        available = ', '.join(sorted(_registry.keys())) or 'none'
         raise AgentRegistryError(
-            f"No agent registered under name '{name}'. Available: {available}"
+            f"No agent registered under name '{name}'. Available: {available}", name
         )
     return cls()
 
