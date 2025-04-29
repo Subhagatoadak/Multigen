@@ -79,3 +79,92 @@
 - **Automation:** End-to-end you never touch a cloud console—Multigen agents manage jobs, polls, and registrations.  
 - **Feedback‐Driven:** You can combine synthetic + human-curated data in the same pipeline, then feed back correction signals into an RLHF loop.
 
+---------------------------------------------------
+
+## 1. Built-in “Standard” Agents
+
+**Pros**  
+- **Immediate availability** — LangChain and LlamaIndex support “just works” as soon as someone installs the repository.  
+- **Consistent versioning** — You pin exactly which LLM, LangChain and LlamaIndex versions your orchestrator is tested against.  
+- **Simpler wiring** — You “hard-wire” them in `agents/langchain_agent` and `agents/llamaindex_agent` (as we scaffolded above), and they can self-register on import.
+
+**Cons**  
+- **Grow your core** — Every additional SDK dependency (LangChain, llama_index, Milvus, etc.) goes into your main `requirements.txt` and CI matrix.  
+- **Limited customization** — To tweak their internals, you need to patch your core code rather than regenerate a tailored agent.
+
+---
+
+## 2. Dynamic Generation via AgentFactory / ToolFactory
+
+**Pros**  
+- **On-demand codegen** — When a workflow references an agent name your orchestrator doesn’t know, the **AgentFactory** could scaffold a new `agents/my_special_agent.py` (complete with LangChain or LlamaIndex imports), register it, and deploy it.  
+- **No heavy core dependencies** — Your base repo stays lightweight; only the agents you actually need pull in big SDKs.  
+- **Extreme flexibility** — You can generate very specialized prompt-chains or retrieval pipelines based on tenant- or project-specific configs.
+
+**Cons**  
+- **Slower first‐call latency** — You’ll need to hot-reload the newly generated Python module or spin up a sidecar container.  
+- **Testing overhead** — You’ll need to bake tests into your codegen templates and CI to ensure the factory output is valid.  
+- **Security surface** — Generating and executing new code at runtime requires stricter sandboxing or review controls.
+
+---
+
+### Recommendation
+
+1. **Core / “Standard” Tier**  
+   - Keep *EchoAgent*, *BaseAgent*, maybe a *SpawnerAgent* in your repo.  
+   - Include one or two “reference” implementations of LangChainAgent and LlamaIndexAgent so teams have blueprints to follow.
+
+2. **Extend via Factory**  
+   - For project-specific or tenant-specific variations, route unknown agent names to your **AgentFactory**, which can scaffold a custom LangChain or LlamaIndex wrapper on the fly.  
+   - ToolAdapters (wrapping OpenAPI specs) can live in **ToolFactory**, following the same pattern.
+
+In our current setup, the “LLM” itself lives entirely inside the agent layer—there’s no standalone LLM service in the orchestrator core.  Concretely:
+
+1. **LangChainAgent**  
+   ```python
+   @register_agent("LangChainAgent")
+   class LangChainAgent(BaseAgent):
+       def __init__(self) -> None:
+           super().__init__()
+           template = PromptTemplate(
+               input_variables=["input_text"],
+               template="You are a helpful assistant. Process: {input_text}"
+           )
+           # ← The LLMChain wraps whatever LLM you wire in here
+           self.chain = LLMChain(llm=None, prompt=template)
+   ```
+   - The `llm` argument to `LLMChain` is where you plug in your actual model (OpenAI, Anthropic, etc.).  
+   - Today we left it as `None` because we assume you’ll inject it from config or your AgentFactory.
+
+2. **Configuration / Injection**  
+   You typically provide your model settings via environment variables and a small “LLM client” helper. For example, you might add to `orchestrator/services/config.py`:
+   ```python
+   # orchestrator/services/config.py
+   OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+   LLM_MODEL      = os.getenv("LLM_MODEL", "gpt-4")
+   ```
+   And then an `llm_client.py`:
+   ```python
+   # orchestrator/services/llm_client.py
+   import os
+   from openai import OpenAI  # or anthropic, etc.
+   import orchestrator.services.config as config
+
+   llm = OpenAI(api_key=config.OPENAI_API_KEY, model=config.LLM_MODEL)
+   ```
+   Finally your agent’s constructor would become:
+   ```python
+   from orchestrator.services.llm_client import llm
+   self.chain = LLMChain(llm=llm, prompt=template)
+   ```
+
+3. **Dynamic AgentFactory**  
+   If you’re using your AgentFactory to generate agents on the fly, you’d similarly have it scaffold new agent code that imports and constructs this same `llm_client.llm` instance.
+
+---
+
+### So in summary
+
+- **No central “LLMService”** lives in the orchestrator: every LLM call is made by an Agent.  
+- **LangChainAgent** (and any future RAG or vector‐retrieval agents) hold the LLM reference in their constructor.  
+- You wire the real model via your **config + llm_client** module, which you then import into those agents.

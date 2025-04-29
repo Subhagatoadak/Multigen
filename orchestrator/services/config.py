@@ -13,3 +13,5 @@ TEMPORAL_TASK_QUEUE = os.getenv("TEMPORAL_TASK_QUEUE", "flow-task-queue")
 # Metrics HTTP server port
 METRICS_PORT = int(os.getenv("METRICS_PORT", "8000"))
 KAFKA_BROKER_URL = os.getenv("KAFKA_BROKER_URL", "localhost:9092")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY","XXX")
+LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4o")
