@@ -22,3 +22,7 @@ LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4o")
 MONGODB_URI = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
 CAPABILITY_DB_NAME = os.getenv("CAPABILITY_DB_NAME", "multigen")
 CAPABILITY_COLLECTION_NAME = os.getenv("CAPABILITY_COLLECTION_NAME", "capabilities")
+
+# Capability Directory HTTP API (same service)
+CAPABILITY_SERVICE_URL     = os.getenv("CAPABILITY_SERVICE_URL", "http://localhost:8000")
+

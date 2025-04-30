@@ -6,6 +6,7 @@ from confluent_kafka import KafkaError
 
 from orchestrator.models.workflow import RunRequest, RunResponse
 from orchestrator.services.dsl_parser import parse_workflow, DSLParseError
+from orchestrator.services.capability_directory_client import validate_agent
 from orchestrator.services.llm_service import text_to_dsl
 from messaging.kafka_client import KafkaClient
 import orchestrator.services.config as config
@@ -62,6 +63,10 @@ async def run_workflow(req: RunRequest):
         steps = parse_workflow(dsl)
     except DSLParseError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    
+    # Validate each step’s agent against the capability directory
+    for step in steps:
+        await validate_agent(step.agent, step.agent_version)
 
     # 3) Serialize steps (parallel groups supported)
     serialized_steps = _serialize_steps(steps)

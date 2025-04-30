@@ -11,7 +11,7 @@ from orchestrator.services.agent_registry import AgentRegistryError
 
 router = APIRouter(prefix="/capabilities", tags=["Capabilities"])
 
-@router.post("/", response_model=Capability, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=Capability, status_code=status.HTTP_201_CREATED)
 async def register(cap_req: Capability):
     """Register a new agent/tool capability."""
     try:
@@ -20,7 +20,7 @@ async def register(cap_req: Capability):
     except AgentRegistryError as e:
         raise HTTPException(status_code=409, detail=str(e))
 
-@router.get("/", response_model=List[Capability])
+@router.get("", response_model=List[Capability])
 async def list_all() -> List[Capability]:
     """List all registered capabilities."""
     return await list_capabilities()
