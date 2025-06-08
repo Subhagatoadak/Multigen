@@ -45,4 +45,4 @@ async def text_to_dsl(problem: str) -> Dict[str, Any]:
         return dsl
     except Exception as exc:
         logger.exception("Failed to generate DSL from text")
-        raise
+        raise RuntimeError("DSL generation failed") from exc
