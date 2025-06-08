@@ -64,9 +64,15 @@ async def run_workflow(req: RunRequest):
     except DSLParseError as e:
         raise HTTPException(status_code=400, detail=str(e))
     
-    # Validate each step’s agent against the capability directory
+    # Validate each step’s agent against the capability directory.
+    # Some parsed steps (e.g. parallel parents) may not specify an agent and
+    # the DSL parser currently does not attach a version attribute.  Guard
+    # against missing attributes so dynamic dummy steps used in tests work
+    # correctly.
     for step in steps:
-        await validate_agent(step.agent, step.agent_version)
+        if getattr(step, "agent", None):
+            version = getattr(step, "agent_version", None)
+            await validate_agent(step.agent, version)
 
     # 3) Serialize steps (parallel groups supported)
     serialized_steps = _serialize_steps(steps)
