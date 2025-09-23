@@ -1,5 +1,6 @@
 from fastapi import FastAPI
-from orchestrator.controllers.registration import router as reg_router
+# The registration routes live under orchestrator.controller
+from orchestrator.controller.registration import router as reg_router
 
 app = FastAPI(
     title="Capability Directory",

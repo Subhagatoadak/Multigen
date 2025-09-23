@@ -11,3 +11,4 @@ class EchoAgent(BaseAgent):
 
     async def run(self, params: Dict[str, Any]) -> Dict[str, Any]:
         return {"echo": params}
+
