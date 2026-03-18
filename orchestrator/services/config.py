@@ -1,5 +1,14 @@
 import os
-from typing import List
+import logging
+
+# Load .env file if present (no-op if absent)
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
+logger = logging.getLogger(__name__)
 
 # Kafka configuration
 FLOW_REQUEST_TOPIC = os.getenv("FLOW_REQUEST_TOPIC", "flow-requests")
@@ -14,8 +23,12 @@ TEMPORAL_TASK_QUEUE = os.getenv("TEMPORAL_TASK_QUEUE", "flow-task-queue")
 # Metrics HTTP server port
 METRICS_PORT = int(os.getenv("METRICS_PORT", "8000"))
 
-# OpenAI configuration
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY","XXX")
+# OpenAI configuration — OPENAI_API_KEY must be set when using LLM features
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+if not OPENAI_API_KEY:
+    logger.warning(
+        "OPENAI_API_KEY is not set. LLM text-to-DSL preprocessing will be unavailable."
+    )
 LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4o")
 
 # MongoDB configuration
@@ -23,6 +36,6 @@ MONGODB_URI = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
 CAPABILITY_DB_NAME = os.getenv("CAPABILITY_DB_NAME", "multigen")
 CAPABILITY_COLLECTION_NAME = os.getenv("CAPABILITY_COLLECTION_NAME", "capabilities")
 
-# Capability Directory HTTP API (same service)
-CAPABILITY_SERVICE_URL     = os.getenv("CAPABILITY_SERVICE_URL", "http://localhost:8000")
+# Capability Directory HTTP API
+CAPABILITY_SERVICE_URL = os.getenv("CAPABILITY_SERVICE_URL", "http://localhost:8000")
 

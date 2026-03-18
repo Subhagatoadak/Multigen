@@ -6,7 +6,7 @@ from typing import Optional
 from orchestrator.models.capability import Capability
 from orchestrator.services.agent_registry import AgentRegistryError
 
-BASE_URL = os.getenv("CAPABILITY_SERVICE_URL", "http://localhost:8001")
+BASE_URL = os.getenv("CAPABILITY_SERVICE_URL", "http://localhost:8000")
 
 async def validate_agent(name: str, version: Optional[str] = None) -> Capability:
     """Ensures the agent is present in the Capability Directory."""
