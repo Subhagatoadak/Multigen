@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multigen — Architecture</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --bg:        #0a0a0f;
+      --bg2:       #111118;
+      --bg3:       #1a1a24;
+      --border:    #2a2a38;
+      --text:      #e2e2f0;
+      --muted:     #8888aa;
+      --accent:    #6366f1;
+      --accent2:   #818cf8;
+      --green:     #22c55e;
+      --orange:    #f97316;
+      --purple:    #a855f7;
+      --blue:      #3b82f6;
+      --red:       #ef4444;
+      --radius:    10px;
+      --sidebar-w: 260px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── Sidebar ─────────────────────────────────────────────── */
+    #sidebar {
+      width: var(--sidebar-w);
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+
+    .sidebar-header {
+      padding: 24px 20px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+
+    .logo-icon {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--accent), var(--purple));
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+
+    .logo-text { font-size: 17px; font-weight: 700; letter-spacing: -.3px; }
+    .logo-sub  { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .section-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      color: var(--muted);
+      text-transform: uppercase;
+      padding: 18px 20px 8px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 0;
+      font-size: 13.5px;
+      color: var(--muted);
+      transition: all .15s;
+      border-left: 3px solid transparent;
+      user-select: none;
+    }
+
+    .nav-item:hover { background: var(--bg3); color: var(--text); }
+
+    .nav-item.active {
+      background: var(--bg3);
+      color: var(--accent2);
+      border-left-color: var(--accent);
+    }
+
+    .nav-icon {
+      width: 20px; height: 20px;
+      border-radius: 5px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+
+    .badge {
+      margin-left: auto;
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .badge.green  { background: rgba(34,197,94,.15);  color: var(--green);  }
+    .badge.orange { background: rgba(249,115,22,.15); color: var(--orange); }
+    .badge.purple { background: rgba(168,85,247,.15); color: var(--purple); }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* ── Main ────────────────────────────────────────────────── */
+    #main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    #topbar {
+      height: 58px;
+      padding: 0 28px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      background: var(--bg2);
+    }
+
+    .topbar-title { font-size: 15px; font-weight: 600; }
+    .topbar-desc  { font-size: 12px; color: var(--muted); margin-top: 1px; }
+
+    .topbar-actions { display: flex; gap: 8px; }
+
+    .btn {
+      padding: 7px 14px;
+      border-radius: 7px;
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--bg3);
+      color: var(--text);
+      display: flex; align-items: center; gap: 6px;
+      transition: all .15s;
+      font-family: inherit;
+    }
+
+    .btn:hover { border-color: var(--accent); color: var(--accent2); }
+
+    .btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .btn.primary:hover { background: var(--accent2); }
+
+    #canvas {
+      flex: 1;
+      overflow: auto;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .diagram-wrap {
+      display: none;
+      width: 100%;
+      animation: fadeIn .2s ease;
+    }
+
+    .diagram-wrap.active { display: block; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+    .diagram-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+
+    .diagram-card h2 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .diagram-card p {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    .mermaid {
+      overflow-x: auto;
+    }
+
+    /* mermaid svg inside cards */
+    .diagram-card svg { max-width: 100%; height: auto; }
+
+    /* ── Legend ──────────────────────────────────────────────── */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .legend-dot {
+      width: 10px; height: 10px;
+      border-radius: 3px;
+    }
+
+    /* ── Status strip ────────────────────────────────────────── */
+    .status-strip {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .status-chip {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg3);
+      font-size: 12.5px;
+    }
+
+    .status-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+    }
+
+    /* ── Zoom controls ───────────────────────────────────────── */
+    .zoom-controls {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      gap: 4px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 4px;
+    }
+
+    .zoom-btn {
+      width: 30px; height: 30px;
+      border-radius: 5px;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      font-size: 15px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .1s;
+    }
+
+    .zoom-btn:hover { background: var(--bg3); }
+
+    /* ── Fullscreen ──────────────────────────────────────────── */
+    .diagram-card:fullscreen,
+    .diagram-card:-webkit-full-screen {
+      background: var(--bg2);
+      padding: 40px;
+      overflow: auto;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Sidebar ─────────────────────────────────────────────────── -->
+<aside id="sidebar">
+  <div class="sidebar-header">
+    <div class="logo">
+      <div class="logo-icon">⬡</div>
+      <span class="logo-text">Multigen</span>
+    </div>
+    <div class="logo-sub">Architecture Reference · v0.1</div>
+  </div>
+
+  <div class="section-label">Diagrams</div>
+
+  <div class="nav-item active" data-target="system" onclick="switchDiagram(this)">
+    <div class="nav-icon" style="background:rgba(99,102,241,.2);color:#818cf8">⬡</div>
+    System Architecture
+    <span class="badge green">Live</span>
+  </div>
+
+  <div class="nav-item" data-target="flow" onclick="switchDiagram(this)">
+    <div class="nav-icon" style="background:rgba(59,130,246,.2);color:#60a5fa">→</div>
+    Request Flow
+  </div>
+
+  <div class="nav-item" data-target="execution" onclick="switchDiagram(this)">
+    <div class="nav-icon" style="background:rgba(34,197,94,.2);color:#4ade80">◈</div>
+    Step Execution Model
+  </div>
+
+  <div class="nav-item" data-target="registry" onclick="switchDiagram(this)">
+    <div class="nav-icon" style="background:rgba(249,115,22,.2);color:#fb923c">◎</div>
+    Agent Registry
+  </div>
+
+  <div class="nav-item" data-target="dsl" onclick="switchDiagram(this)">
+    <div class="nav-icon" style="background:rgba(168,85,247,.2);color:#c084fc">{}</div>
+    DSL Reference
+  </div>
+
+  <div class="nav-item" data-target="enterprise" onclick="switchDiagram(this)">
+    <div class="nav-icon" style="background:rgba(239,68,68,.2);color:#f87171">⊞</div>
+    Enterprise Target
+    <span class="badge purple">Roadmap</span>
+  </div>
+
+  <div class="section-label">Stack</div>
+
+  <div class="nav-item" data-target="stack" onclick="switchDiagram(this)">
+    <div class="nav-icon" style="background:rgba(99,102,241,.15);color:#a5b4fc">≡</div>
+    Tech Stack
+  </div>
+
+  <div class="sidebar-footer">
+    Open source · Apache 2.0
+  </div>
+</aside>
+
+<!-- ── Main ────────────────────────────────────────────────────── -->
+<div id="main">
+  <div id="topbar">
+    <div>
+      <div class="topbar-title" id="topbar-title">System Architecture</div>
+      <div class="topbar-desc" id="topbar-desc">All services, communication paths, and data stores</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+      <button class="btn primary" onclick="exportSVG()">↓ Export SVG</button>
+    </div>
+  </div>
+
+  <div id="canvas">
+
+    <!-- ── 1. System Architecture ── -->
+    <div id="view-system" class="diagram-wrap active">
+      <div class="status-strip">
+        <div class="status-chip"><div class="status-dot" style="background:var(--green)"></div>Orchestrator :8000</div>
+        <div class="status-chip"><div class="status-dot" style="background:var(--green)"></div>Capability Service :8001</div>
+        <div class="status-chip"><div class="status-dot" style="background:var(--blue)"></div>Kafka 3 topics</div>
+        <div class="status-chip"><div class="status-dot" style="background:var(--orange)"></div>Temporal :7233</div>
+        <div class="status-chip"><div class="status-dot" style="background:var(--purple)"></div>OTel Tracing</div>
+      </div>
+      <div class="diagram-card" id="card-system">
+        <h2>⬡ System Architecture</h2>
+        <p>End-to-end view of all Multigen services, their communication paths, messaging infrastructure, and observability layer.</p>
+        <div class="mermaid">
+%%{init:{"theme":"dark","themeVariables":{"primaryColor":"#1a1a2e","primaryTextColor":"#e2e2f0","primaryBorderColor":"#6366f1","lineColor":"#6366f1","secondaryColor":"#16213e","tertiaryColor":"#0f3460","edgeLabelBackground":"#1a1a2e","clusterBkg":"#111118","clusterBorder":"#2a2a38","titleColor":"#e2e2f0","nodeBorder":"#6366f1","nodeTextColor":"#e2e2f0"}}}%%
+graph TB
+    subgraph CLI["🖥️  Clients"]
+        C1["CLI / SDK"]
+        C2["Web UI (roadmap)"]
+    end
+
+    subgraph ORCH_SVC["🔵  Orchestrator  :8000"]
+        O1["FastAPI<br/>POST /workflows/run"]
+        O2["DSL Parser"]
+        O3["LLM Service<br/>text → DSL"]
+        O4["Capability Validator"]
+        O5["OTel Tracer"]
+    end
+
+    subgraph CAP_SVC["🟠  Capability Service  :8001"]
+        CS1["Registration API<br/>POST /capabilities"]
+        CS2[("MongoDB<br/>capability store")]
+    end
+
+    subgraph KAFKA["🟡  Apache Kafka"]
+        K1["flow-requests"]
+        K2["flow-responses"]
+        K3["flow-dead-letter"]
+    end
+
+    subgraph WORKER["🟢  Flow Worker"]
+        W1["Kafka Consumer"]
+        W2["Prometheus<br/>Metrics"]
+    end
+
+    subgraph TEMPORAL["⚙️  Temporal Workflow Engine"]
+        T1["ComplexSequenceWorkflow"]
+        T2["Conditional Evaluator<br/>(AST safe-eval)"]
+        T3["Parallel Runner<br/>(asyncio.gather)"]
+        T4["Dynamic Subtree Exec"]
+    end
+
+    subgraph AGENTS["🟢  Agents"]
+        A1["EchoAgent"]
+        A2["LangChainAgent<br/>(GPT-4o LCEL)"]
+        A3["LlamaIndexAgent<br/>(vector retrieval)"]
+        A4["SpawnerAgent<br/>(dynamic steps)"]
+        A5["Custom Agents<br/>@register_agent(...)"]
+    end
+
+    subgraph OBS["🔮  Observability"]
+        P1["OTel Collector"]
+        P2["Jaeger / Grafana"]
+        P3["Prometheus"]
+    end
+
+    C1 & C2 --> O1
+    O1 --> O2 --> O3
+    O1 --> O4 --> CS1 --> CS2
+    O1 --> K1
+
+    K1 --> W1 --> T1
+    T1 --> T2 & T3 & T4
+    T1 -->|agent_activity| A1 & A2 & A3 & A4 & A5
+    T1 --> K2
+    T1 -->|error| K3
+
+    W1 --> W2 --> P3
+    O1 & T1 --> P1 --> P2
+        </div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#6366f1"></div>Core Services</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#f97316"></div>Capability Layer</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div>Agents</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Messaging</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#a855f7"></div>Observability</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 2. Request Flow ── -->
+    <div id="view-flow" class="diagram-wrap">
+      <div class="diagram-card" id="card-flow">
+        <h2>→ Request Flow</h2>
+        <p>Full lifecycle of a workflow request from client submission through Kafka, Temporal, and agent execution — including all 4 step types.</p>
+        <div class="mermaid">
+%%{init:{"theme":"dark","themeVariables":{"primaryColor":"#1a1a2e","primaryTextColor":"#e2e2f0","primaryBorderColor":"#3b82f6","lineColor":"#3b82f6","secondaryColor":"#16213e","activationBkgColor":"#1e293b","activationBorderColor":"#3b82f6","noteBkgColor":"#1e293b","noteTextColor":"#94a3b8","noteBorderColor":"#334155"}}}%%
+sequenceDiagram
+    autonumber
+    participant C as 🖥 Client
+    participant O as 🔵 Orchestrator
+    participant L as 🤖 LLM Service
+    participant D as 📐 DSL Parser
+    participant Cap as 🗄 Capability Dir
+    participant K as 📨 Kafka
+    participant FM as ⚙️ Flow Worker
+    participant T as ⏱ Temporal
+    participant A as 🟢 Agent
+
+    C->>O: POST /workflows/run {dsl | text}
+    rect rgb(30, 41, 59)
+        Note over O,L: optional — text input only
+        O->>L: text_to_dsl(text)
+        L-->>O: DSL dict
+    end
+    O->>D: parse_workflow(dsl)
+    D-->>O: List[Step]
+    loop validate each step
+        O->>Cap: GET /capabilities/{name}
+        Cap-->>O: ✓ registered
+    end
+    O->>K: publish(flow-requests, {workflow_id, steps})
+    O-->>C: {instance_id: "uuid"}
+
+    K->>FM: consume(flow-requests)
+    FM->>T: start_workflow(ComplexSequenceWorkflow)
+
+    rect rgb(20, 30, 48)
+        Note over T,A: step execution loop
+        alt sequential
+            T->>A: agent_activity(name, params)
+            A-->>T: {output}
+        else parallel
+            par branch A
+                T->>A: agent_activity(a)
+            and branch B
+                T->>A: agent_activity(b)
+            end
+        else conditional
+            Note over T: evaluate_condition(expr, context)
+            T->>A: agent_activity(chosen_branch)
+        else dynamic
+            T->>A: SpawnerAgent → spawned_steps
+            loop each spawned step
+                T->>A: agent_activity(spawned)
+            end
+        end
+        T->>T: context[name] = output
+    end
+
+    alt success
+        T->>K: publish(flow-responses)
+    else error
+        T->>K: publish(flow-dead-letter)
+    end
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 3. Step Execution ── -->
+    <div id="view-execution" class="diagram-wrap">
+      <div class="diagram-card" id="card-execution">
+        <h2>◈ Step Execution Model</h2>
+        <p>How the Temporal workflow engine routes each step to the correct executor based on its type, and how outputs are accumulated into the evaluation context.</p>
+        <div class="mermaid">
+%%{init:{"theme":"dark","themeVariables":{"primaryColor":"#1a1a2e","primaryTextColor":"#e2e2f0","primaryBorderColor":"#22c55e","lineColor":"#22c55e","edgeLabelBackground":"#111118","clusterBkg":"#111118","clusterBorder":"#2a2a38"}}}%%
+flowchart TD
+    START(["▶  Incoming Step"]):::entry --> TYPE{{"step.type ?"}}:::decision
+
+    TYPE -->|sequential| SEQ["🔵 Execute agent_activity\nname · agent · params"]:::svc
+    TYPE -->|parallel| PAR["🟡 asyncio.gather\nall parallel_with branches"]:::msg
+    TYPE -->|conditional| CE["🟠 Evaluate each condition\nast.safe_eval(expr, context)"]:::warn
+    TYPE -->|dynamic| DS["🟣 Run SpawnerAgent\nget spawned_steps list"]:::purple
+
+    CE --> MATCH{{"match ?"}}:::decision
+    MATCH -->|"condition true"| CR["Execute matched branch"]:::svc
+    MATCH -->|"next branch"| CE
+    MATCH -->|"else"| ER["Execute else branch"]:::svc
+
+    DS --> SUB["Loop: execute each\nspawned step in sequence"]:::purple
+
+    SEQ & PAR & CR & ER & SUB --> CTX["📦 Store in context\ncontext[step_name] = output"]:::store
+
+    CTX --> DONE(["✔  Next Step"]):::entry
+
+    classDef entry   fill:#22c55e,color:#000,stroke:none,rx:20
+    classDef decision fill:#1e293b,color:#94a3b8,stroke:#334155
+    classDef svc     fill:#1e3a5f,color:#93c5fd,stroke:#3b82f6
+    classDef msg     fill:#3b2f00,color:#fcd34d,stroke:#f59e0b
+    classDef warn    fill:#3b1f00,color:#fb923c,stroke:#f97316
+    classDef purple  fill:#2e1a47,color:#c084fc,stroke:#a855f7
+    classDef store   fill:#1a1a2e,color:#a5b4fc,stroke:#6366f1
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 4. Agent Registry ── -->
+    <div id="view-registry" class="diagram-wrap">
+      <div class="diagram-card" id="card-registry">
+        <h2>◎ Agent Registration &amp; Discovery</h2>
+        <p>Dual-layer registry: an in-memory <code style="font-family:JetBrains Mono;color:var(--accent2);font-size:12px">@register_agent</code> decorator for runtime dispatch, backed by a persistent MongoDB capability directory for cross-service validation.</p>
+        <div class="mermaid">
+%%{init:{"theme":"dark","themeVariables":{"primaryColor":"#1a1a2e","primaryTextColor":"#e2e2f0","primaryBorderColor":"#f97316","lineColor":"#f97316","edgeLabelBackground":"#111118","clusterBkg":"#111118","clusterBorder":"#2a2a38"}}}%%
+flowchart LR
+    subgraph AP["Agent Process"]
+        A1["@register_agent('Name')\nclass MyAgent(BaseAgent)"]:::agent
+        A2["self_register()\non startup"]:::agent
+    end
+
+    subgraph REG["Registry Layer"]
+        R1["In-Memory Registry\n_registry: Dict[str, Type]"]:::mem
+        R2[("MongoDB\nCapability Store")]:::db
+    end
+
+    subgraph ORC["Orchestrator"]
+        V["validate_agent(name)\nHTTP → capability-service"]:::svc
+        G["get_agent(name)\ninstantiate + run"]:::svc
+    end
+
+    A1 -->|"@register_agent decorator"| R1
+    A2 -->|"POST /capabilities"| R2
+
+    V -->|"GET /capabilities/{name}"| R2
+    R2 -->|"Capability metadata ✓"| V
+
+    G -->|"lookup + run(params)"| A1
+
+    classDef agent fill:#3b1f00,color:#fb923c,stroke:#f97316
+    classDef mem   fill:#1a1a2e,color:#a5b4fc,stroke:#6366f1
+    classDef db    fill:#1a2e1a,color:#86efac,stroke:#22c55e
+    classDef svc   fill:#1e3a5f,color:#93c5fd,stroke:#3b82f6
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 5. DSL Reference ── -->
+    <div id="view-dsl" class="diagram-wrap">
+      <div class="diagram-card" id="card-dsl">
+        <h2>{} DSL Reference</h2>
+        <p>Four valid step types in the Multigen workflow DSL — all are composable and nestable.</p>
+        <div class="mermaid">
+%%{init:{"theme":"dark","themeVariables":{"primaryColor":"#1a1a2e","primaryTextColor":"#e2e2f0","primaryBorderColor":"#a855f7","lineColor":"#a855f7","edgeLabelBackground":"#111118","clusterBkg":"#111118","clusterBorder":"#2a2a38"}}}%%
+flowchart LR
+    subgraph SEQ_BOX["  1 · Sequential  "]
+        S1["name: summarise\nagent: LangChainAgent\nparams:\n  text: '...'"]:::code
+    end
+    subgraph PAR_BOX["  2 · Parallel  "]
+        S2["name: gather\nparallel:\n  - name: fetch_wiki\n    agent: LlamaIndexAgent\n  - name: fetch_db\n    agent: EchoAgent"]:::code
+    end
+    subgraph COND_BOX["  3 · Conditional  "]
+        S3["name: route\nconditional:\n  - condition: \"score > 0.8\"\n    then: ApprovalAgent\nelse: ReviewAgent"]:::code
+    end
+    subgraph DYN_BOX["  4 · Dynamic Subtree  "]
+        S4["name: expand\nagent: SpawnerAgent\nparams:\n  count: 3\n  agent: EchoAgent\ndynamic_subtree: {}"]:::code
+    end
+
+    classDef code fill:#1a1a2e,color:#c4b5fd,stroke:#7c3aed,font-family:'JetBrains Mono'
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px">
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px">
+            <div style="font-size:12px;font-weight:600;color:var(--accent2);margin-bottom:8px">Condition Syntax</div>
+            <code style="font-family:'JetBrains Mono';font-size:12px;color:#86efac;line-height:2">
+              status == "approved"<br/>
+              score &gt; 0.8<br/>
+              count &gt;= 3<br/>
+              flag == True<br/>
+              a == 1 and b == 2
+            </code>
+          </div>
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px">
+            <div style="font-size:12px;font-weight:600;color:var(--accent2);margin-bottom:8px">Context Variables</div>
+            <div style="font-size:12px;color:var(--muted);line-height:2">
+              Conditions evaluate against <code style="color:#c084fc">context</code> — a dict of prior step outputs keyed by step name. Safe AST evaluator — no <code style="color:#ef4444">eval()</code>.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 6. Enterprise ── -->
+    <div id="view-enterprise" class="diagram-wrap">
+      <div class="diagram-card" id="card-enterprise">
+        <h2>⊞ Enterprise Target Architecture</h2>
+        <p>Production-scale Kubernetes deployment with managed infrastructure, RL feedback loop, AgentFactory, and full compliance/audit trail. Phases 5–12 of the roadmap.</p>
+        <div class="mermaid">
+%%{init:{"theme":"dark","themeVariables":{"primaryColor":"#1a1a2e","primaryTextColor":"#e2e2f0","primaryBorderColor":"#ef4444","lineColor":"#6366f1","edgeLabelBackground":"#111118","clusterBkg":"#0d0d18","clusterBorder":"#2a2a38"}}}%%
+graph TB
+    subgraph USERS["👥  Users"]
+        D["Developers\n(CLI / SDK)"]
+        O["Operators\n(Dashboard)"]
+        E["Enterprise Apps\n(REST / gRPC)"]
+    end
+
+    subgraph EDGE["🌐  Edge"]
+        GW["API Gateway\nKong / AWS API GW"]
+        AUTH["Auth\nJWT / mTLS"]
+    end
+
+    subgraph K8S["☸  Kubernetes Cluster  (EKS / GKE)"]
+        subgraph CP["Control Plane"]
+            ORC["Orchestrator\n(HPA)"]
+            GRD["Guardrails\n(OPA)"]
+            APR["Approval Engine\n(Human-in-loop)"]
+            ERR["Error Handler\n+ Escalation"]
+        end
+        subgraph DP["Data Plane"]
+            FLOW["Flow Workers\n(HPA)"]
+            AGT["Agent Pods\n(per-agent Deployments)"]
+        end
+        subgraph LEARN["Feedback & Learning"]
+            FC["Feedback\nCollector"]
+            RL["RL Policy Learner\n(PPO)"]
+            AF["AgentFactory\n(LLM + SAST + CI)"]
+        end
+    end
+
+    subgraph INFRA["☁  Managed Infrastructure"]
+        KFK["Kafka\n(MSK)"]
+        MDB[("MongoDB Atlas")]
+        TMP["Temporal Cloud"]
+        VEC[("Vector Store\nPinecone")]
+    end
+
+    subgraph OBS["🔮  Observability"]
+        OT["OTel Collector"]
+        GRF["Grafana"]
+        JAE["Jaeger"]
+        SPL["Splunk Audit"]
+    end
+
+    D & O & E --> GW --> AUTH --> ORC
+    ORC --> GRD --> FLOW
+    FLOW --> KFK --> AGT --> KFK --> FLOW
+    FLOW --> APR & ERR
+    FLOW --> FC --> RL --> ORC
+    AF --> AGT
+    ORC & FLOW & AGT --> OT --> GRF & JAE & SPL
+    ORC --> MDB & TMP
+    AGT --> VEC
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 7. Tech Stack ── -->
+    <div id="view-stack" class="diagram-wrap">
+      <div class="diagram-card" id="card-stack">
+        <h2>≡ Technology Stack</h2>
+        <p>Every dependency and its role in the system.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:4px">
+
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px">
+            <div style="font-size:11px;font-weight:600;letter-spacing:.8px;color:var(--accent2);text-transform:uppercase;margin-bottom:12px">Web Layer</div>
+            <div class="stack-row">FastAPI 0.115</div>
+            <div class="stack-row">Uvicorn</div>
+            <div class="stack-row">Pydantic v2</div>
+          </div>
+
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px">
+            <div style="font-size:11px;font-weight:600;letter-spacing:.8px;color:#fb923c;text-transform:uppercase;margin-bottom:12px">Messaging</div>
+            <div class="stack-row">Confluent Kafka 2.10</div>
+            <div class="stack-row">3 topics (req/res/dlq)</div>
+          </div>
+
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px">
+            <div style="font-size:11px;font-weight:600;letter-spacing:.8px;color:#4ade80;text-transform:uppercase;margin-bottom:12px">Workflow Engine</div>
+            <div class="stack-row">Temporal.io 1.11</div>
+            <div class="stack-row">RetryPolicy per step</div>
+            <div class="stack-row">asyncio.gather (parallel)</div>
+          </div>
+
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px">
+            <div style="font-size:11px;font-weight:600;letter-spacing:.8px;color:#fcd34d;text-transform:uppercase;margin-bottom:12px">Persistence</div>
+            <div class="stack-row">MongoDB (Motor async)</div>
+            <div class="stack-row">Capability directory</div>
+          </div>
+
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px">
+            <div style="font-size:11px;font-weight:600;letter-spacing:.8px;color:#c084fc;text-transform:uppercase;margin-bottom:12px">LLM / AI</div>
+            <div class="stack-row">OpenAI 1.76 (GPT-4o)</div>
+            <div class="stack-row">LangChain LCEL</div>
+            <div class="stack-row">LlamaIndex Core</div>
+          </div>
+
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px">
+            <div style="font-size:11px;font-weight:600;letter-spacing:.8px;color:#67e8f9;text-transform:uppercase;margin-bottom:12px">Observability</div>
+            <div class="stack-row">OpenTelemetry SDK</div>
+            <div class="stack-row">Prometheus Client</div>
+            <div class="stack-row">OTLP → Jaeger / Grafana</div>
+          </div>
+
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px">
+            <div style="font-size:11px;font-weight:600;letter-spacing:.8px;color:#f472b6;text-transform:uppercase;margin-bottom:12px">Infrastructure</div>
+            <div class="stack-row">Docker Compose (local)</div>
+            <div class="stack-row">Kubernetes / Helm (prod)</div>
+            <div class="stack-row">GitHub Actions CI</div>
+          </div>
+
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px">
+            <div style="font-size:11px;font-weight:600;letter-spacing:.8px;color:#a3e635;text-transform:uppercase;margin-bottom:12px">Dev Tools</div>
+            <div class="stack-row">pytest + pytest-asyncio</div>
+            <div class="stack-row">python-dotenv</div>
+            <div class="stack-row">ruff (lint)</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /canvas -->
+</div><!-- /main -->
+
+<!-- ── Zoom controls ────────────────────────────────────────────── -->
+<div class="zoom-controls">
+  <button class="zoom-btn" title="Zoom out" onclick="zoom(-0.1)">−</button>
+  <button class="zoom-btn" title="Reset"    onclick="zoom(0)">⊙</button>
+  <button class="zoom-btn" title="Zoom in"  onclick="zoom(+0.1)">+</button>
+</div>
+
+<style>
+  .stack-row {
+    font-size: 13px;
+    color: var(--muted);
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .stack-row:last-child { border-bottom: none; }
+</style>
+
+<script>
+  const META = {
+    system:     { title: 'System Architecture',        desc: 'All services, communication paths, and data stores' },
+    flow:       { title: 'Request Flow',                desc: 'End-to-end lifecycle from POST /run to agent execution' },
+    execution:  { title: 'Step Execution Model',        desc: 'How sequential, parallel, conditional and dynamic steps are executed' },
+    registry:   { title: 'Agent Registration',          desc: 'Decorator-based in-memory registry + MongoDB capability directory' },
+    dsl:        { title: 'DSL Reference',               desc: 'Four composable step types with syntax reference' },
+    enterprise: { title: 'Enterprise Target Architecture', desc: 'K8s-scale production deployment — phases 5–12 roadmap' },
+    stack:      { title: 'Technology Stack',            desc: 'Every dependency and its role in the system' },
+  };
+
+  let currentView = 'system';
+  let scale = 1;
+
+  function switchDiagram(el) {
+    const target = el.dataset.target;
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('.diagram-wrap').forEach(d => d.classList.remove('active'));
+    document.getElementById('view-' + target).classList.add('active');
+    document.getElementById('topbar-title').textContent = META[target].title;
+    document.getElementById('topbar-desc').textContent  = META[target].desc;
+    currentView = target;
+    scale = 1;
+    applyZoom();
+  }
+
+  function zoom(delta) {
+    if (delta === 0) { scale = 1; }
+    else { scale = Math.min(3, Math.max(0.3, scale + delta)); }
+    applyZoom();
+  }
+
+  function applyZoom() {
+    const el = document.querySelector('#view-' + currentView + ' .mermaid svg, #view-' + currentView + ' .mermaid');
+    if (!el) return;
+    el.style.transform = `scale(${scale})`;
+    el.style.transformOrigin = 'top left';
+  }
+
+  function toggleFullscreen() {
+    const card = document.getElementById('card-' + currentView);
+    if (!card) return;
+    if (!document.fullscreenElement) {
+      card.requestFullscreen && card.requestFullscreen();
+    } else {
+      document.exitFullscreen && document.exitFullscreen();
+    }
+  }
+
+  function exportSVG() {
+    const svg = document.querySelector('#view-' + currentView + ' svg');
+    if (!svg) { alert('No SVG diagram available for this view.'); return; }
+    const blob = new Blob([svg.outerHTML], { type: 'image/svg+xml' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'multigen-' + currentView + '.svg';
+    a.click();
+  }
+
+  // Init Mermaid
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'dark',
+    securityLevel: 'loose',
+    flowchart: { useMaxWidth: false, htmlLabels: true, curve: 'basis' },
+    sequence:  { useMaxWidth: false },
+    themeVariables: {
+      darkMode: true,
+      background: '#0a0a0f',
+      primaryColor: '#1a1a2e',
+      primaryTextColor: '#e2e2f0',
+      primaryBorderColor: '#6366f1',
+      lineColor: '#6366f1',
+      secondaryColor: '#111118',
+      tertiaryColor: '#1a1a24',
+      edgeLabelBackground: '#111118',
+      clusterBkg: '#0d0d18',
+      clusterBorder: '#2a2a38',
+      titleColor: '#e2e2f0',
+      fontFamily: 'Inter, sans-serif',
+    },
+  });
+</script>
+</body>
+</html>
