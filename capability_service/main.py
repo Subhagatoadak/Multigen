@@ -11,3 +11,8 @@ app = FastAPI(
 
 # Mount the /capabilities endpoints
 app.include_router(reg_router)
+
+
+@app.get("/health", tags=["ops"])
+def health_check():
+    return {"status": "ok"}

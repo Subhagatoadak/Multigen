@@ -74,21 +74,21 @@ services:
       - POSTGRES_USER=temporal
       - POSTGRES_PWD=temporal
       - POSTGRES_SEEDS=temporal-db
-    healthcheck:
-      test: ["CMD", "temporal", "workflow", "list", "--address", "localhost:7233"]
-      interval: 15s
-      timeout: 10s
-      retries: 10
+    # No healthcheck — the auto-setup image runs DB migrations before
+    # binding port 7233, and none of the standard check tools (nc, curl)
+    # are available in the Alpine base image. Downstream services use
+    # restart: unless-stopped to retry until Temporal is ready.
+    restart: on-failure
 
   temporal-ui:
     image: temporalio/ui:2.26.2
     depends_on:
-      temporal:
-        condition: service_healthy
+      - temporal
     ports:
       - "8080:8080"
     environment:
       - TEMPORAL_ADDRESS=temporal:7233
+    restart: on-failure
 
   # ─── Multigen Services ─────────────────────────────────────────────────────
 
@@ -128,18 +128,52 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
-      temporal:
-        condition: service_healthy
       mongodb:
         condition: service_healthy
       capability-service:
         condition: service_healthy
+      temporal:
+        condition: service_started
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 15s
       timeout: 5s
       retries: 5
+
+  # Kafka consumer: reads flow-requests and triggers Temporal workflows
+  flow-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.orchestrator
+    command: python -m orchestrator.services.flow_messaging
+    environment:
+      - KAFKA_BROKER_URL=kafka:29092
+      - TEMPORAL_SERVER_URL=temporal:7233
+      - METRICS_PORT=8001
+    env_file:
+      - .env
+    depends_on:
+      kafka:
+        condition: service_healthy
+      temporal:
+        condition: service_started
+    restart: unless-stopped
+
+  # Temporal worker: registers and executes ComplexSequenceWorkflow + agent_activity
+  temporal-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.orchestrator
+    command: python -m workers.temporal_worker
+    environment:
+      - TEMPORAL_SERVER_URL=temporal:7233
+    env_file:
+      - .env
+    depends_on:
+      temporal:
+        condition: service_started
+    restart: unless-stopped
 
 volumes:
   mongodb_data:

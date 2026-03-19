@@ -140,8 +140,7 @@ class ComplexSequenceWorkflow:
             try:
                 return await workflow.execute_activity(
                     agent_activity,
-                    agent_name,
-                    params,
+                    args=[agent_name, params],
                     start_to_close_timeout=timedelta(seconds=30),
                     retry_policy=policy,
                 )
@@ -250,8 +249,7 @@ async def run_complex_workflow(
     client = await Client.connect(config.TEMPORAL_SERVER_URL)
     handle = await client.start_workflow(
         ComplexSequenceWorkflow.run,
-        steps,
-        payload,
+        args=[steps, payload],
         id=workflow_id,
         task_queue=config.TEMPORAL_TASK_QUEUE,
     )

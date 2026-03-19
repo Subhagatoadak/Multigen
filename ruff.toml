@@ -1,0 +1,7 @@
+[lint]
+select = ["E", "F", "W"]
+# E101 catches mixed indentation, W191 tabs — both prevent smart-quote-style issues
+ignore = []
+
+[format]
+quote-style = "double"

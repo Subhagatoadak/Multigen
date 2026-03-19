@@ -1,5 +1,3 @@
-# File: orchestrator/controllers/workflow.py
-
 from uuid import uuid4
 from fastapi import APIRouter, HTTPException
 from confluent_kafka import KafkaError
@@ -15,21 +13,22 @@ import orchestrator.services.config as config
 router = APIRouter()
 _tracer = trace.get_tracer(__name__)
 
+
 async def _prepare_dsl(req: RunRequest) -> dict:
     """
     If the request includes a DSL dictionary, return it directly.
     Otherwise, if it provides plain-text, use the LLM preprocessor to generate the DSL.
     """
-    if getattr(req, 'dsl', None):
+    if getattr(req, "dsl", None):
         return req.dsl
-    if getattr(req, 'text', None):
+    if getattr(req, "text", None):
         try:
             return await text_to_dsl(req.text)
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Failed generating DSL from text: {e}")
     raise HTTPException(
         status_code=400,
-        detail="Request must include either a 'dsl' field or a 'text' field."
+        detail="Request must include either a 'dsl' field or a 'text' field.",
     )
 
 
@@ -42,43 +41,43 @@ def _serialize_steps(steps):
     for step in steps:
         if step.parallel:
             branches = [
-                {'name': p.name, 'agent': p.agent, 'params': p.params}
+                {"name": p.name, "agent": p.agent, "params": p.params}
                 for p in step.parallel
             ]
             serialized.append({
-                'type': 'parallel',
-                'name': step.name,
-                'parallel_with': branches,
+                "type": "parallel",
+                "name": step.name,
+                "parallel_with": branches,
             })
         elif step.conditional:
             branches = [
                 {
-                    'condition': b.condition,
-                    'name': b.step.name,
-                    'agent': b.step.agent,
-                    'params': b.step.params,
+                    "condition": b.condition,
+                    "name": b.step.name,
+                    "agent": b.step.agent,
+                    "params": b.step.params,
                 }
                 for b in step.conditional
             ]
             serialized.append({
-                'type': 'conditional',
-                'name': step.name,
-                'branches': branches,
+                "type": "conditional",
+                "name": step.name,
+                "branches": branches,
             })
         elif step.dynamic_subtree:
             serialized.append({
-                'type': 'dynamic',
-                'name': step.name,
-                'agent': step.agent,
-                'params': step.params,
-                'subtree_config': step.dynamic_subtree,
+                "type": "dynamic",
+                "name": step.name,
+                "agent": step.agent,
+                "params": step.params,
+                "subtree_config": step.dynamic_subtree,
             })
         else:
             serialized.append({
-                'type': 'sequential',
-                'name': step.name,
-                'agent': step.agent,
-                'params': step.params,
+                "type": "sequential",
+                "name": step.name,
+                "agent": step.agent,
+                "params": step.params,
             })
     return serialized
 
@@ -121,13 +120,13 @@ async def run_workflow(req: RunRequest):
 
         # 4) Serialize steps
         serialized_steps = _serialize_steps(steps)
-        payload = getattr(req, ‘payload’, {})
+        payload = getattr(req, "payload", {})
 
         # 5) Dispatch to Kafka
         message = {
-            ‘workflow_id’: workflow_id,
-            ‘steps’: serialized_steps,
-            ‘payload’: payload,
+            "workflow_id": workflow_id,
+            "steps": serialized_steps,
+            "payload": payload,
         }
 
         with _tracer.start_as_current_span("workflow.kafka_publish"):
