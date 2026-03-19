@@ -1,230 +1,441 @@
-# Multigen: Autonomous, Self‑Expanding Multi‑Agent Framework
+# Multigen
 
-> **Abstract:** We present **Multigen**, an enterprise‑grade multi‑agent orchestration framework that seamlessly integrates dynamic capability discovery, hierarchical governance, and continuous learning within a decentralized, event‑driven ecosystem. By leveraging autonomic computing principles—self‑registration, self‑healing, self‑expansion—and a reinforcement‑learning feedback loop, Multigen autonomously recruits new agents and tools, optimizes orchestration policies under resource and governance constraints, and maintains high resilience and correctness standards as requirements evolve.
+**Autonomous, self-expanding multi-agent orchestration framework.**
 
----
+Multigen lets you compose AI agents into workflows using a declarative DSL — with built-in support for parallel execution, conditional branching, dynamic step generation, durable execution via Temporal, and a reinforcement-learning feedback loop that continuously optimises orchestration policy.
 
-## 1. Introduction
-
-The proliferation of AI-driven services in modern enterprises demands architectures that can scale, adapt, and self‑govern. Traditional monolithic or statically configured multi‑agent systems face limitations in capability onboarding, error handling, human‑in‑the‑loop decision making, and continuous optimization. **Multigen** addresses these gaps by providing:
-
-1. **Autonomous Discovery & Recruitment:** Agents and ToolAdapters self‑register; missing capabilities trigger **AgentFactory** or **ToolFactory** to generate, test, and deploy new services via LLM‑driven code generation and CI/CD pipelines.
-2. **Hierarchical Governance:** Declarative DSL steps support multi‑level approvals, SLAs, and audit trails enforced by **ApprovalEngine** and **EscalationManager**.
-3. **Robust Orchestration & Resilience:** A **FlowEngine** executes sequential, parallel, conditional, retry, and approval steps; **ChaosController** injects faults; **Autoscaler** dynamically scales components based on load and latency.
-4. **Continuous Learning & Optimization:** **PerformanceAnalyzer** ingests metrics (latency, errors, cost, correctness); **PolicyLearner** applies Proximal Policy Optimization (PPO) to refine routing, retry, and recruitment policies in an ongoing RL loop.
-5. **Comprehensive Observability & Security:** End‑to‑end OpenTelemetry tracing, Prometheus metrics, real‑time Dashboard with Explainability Engine, mTLS, JWT scopes, ACL policies, and immutable audit logs.
-
-This document details Multigen’s design rationale, architectural components, workflows (including response evaluation and fact‑checking without golden answers), class model, comprehensive flow, gap analysis, evaluation plan, and a development roadmap.
+[![CI](https://github.com/Subhagatoadak/Multigen/actions/workflows/ci.yml/badge.svg)](https://github.com/Subhagatoadak/Multigen/actions/workflows/ci.yml)
+[![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue)](https://www.python.org)
+[![License](https://img.shields.io/badge/license-Apache%202.0-green)](LICENSE)
+[![Version](https://img.shields.io/badge/version-0.1.0--dev-orange)](CHANGELOG.md)
 
 ---
 
-## 2. Related Work
+## Why Multigen?
 
-- **Event‑Driven Orchestration:** Kafka Streams and RabbitMQ offer scalable pub/sub but lack governance, self‑management, and continuous optimization layers.
-- **Agentic AI Frameworks:** Microsoft AutoGen and CrewAI facilitate LLM‑based agent coordination but require manual registration and do not incorporate RL‑based policy adaptation or autonomic code generation.
-- **Autonomic Computing:** IBM’s autonomic model inspires Multigen’s self‑configuring, self‑optimizing, and self‑protecting system behaviors.
+| Feature | LangGraph | CrewAI | AutoGen | **Multigen** |
+| --------- | ----------- | ------ | ------- | ------------ |
+| Declarative DSL | ✗ | ✗ | ✗ | ✅ |
+| Durable execution (Temporal) | ✗ | ✗ | ✗ | ✅ |
+| Parallel + conditional steps | Partial | ✗ | ✗ | ✅ |
+| Dynamic agent generation | ✗ | ✗ | ✗ | ✅ *(roadmap)* |
+| RL policy optimisation | ✗ | ✗ | ✗ | ✅ *(roadmap)* |
+| Self-registering agents | ✗ | ✗ | ✗ | ✅ |
+| OpenTelemetry tracing | ✗ | ✗ | ✗ | ✅ |
 
 ---
 
-## 3. System Architecture
+## Quickstart
+
+**Requirements:** Docker, Docker Compose, Python 3.11+
+
+```bash
+git clone https://github.com/Subhagatoadak/Multigen.git
+cd Multigen
+
+# Copy and fill in your environment variables
+cp .env.example .env
+# Required: set OPENAI_API_KEY in .env (only needed for text-to-DSL feature)
+
+# Start all services
+docker-compose up -d --build
+
+# Wait ~60s for Temporal to initialise, then check health
+curl http://localhost:8000/health   # {"status":"ok"}
+curl http://localhost:8001/health   # {"status":"ok"}
+```
+
+**Register an agent and run your first workflow:**
+
+```bash
+# 1. Register EchoAgent with the capability directory
+curl -X POST http://localhost:8001/capabilities \
+  -H "Content-Type: application/json" \
+  -d '{"name":"EchoAgent","version":"1.0.0","description":"Echoes input","metadata":{}}'
+
+# 2. Submit a workflow
+curl -X POST http://localhost:8000/workflows/run \
+  -H "Content-Type: application/json" \
+  -d '{
+    "dsl": {
+      "steps": [
+        {"name":"step1","agent":"EchoAgent","params":{"msg":"hello multigen"}}
+      ]
+    }
+  }'
+# → {"instance_id": "..."}
+
+# 3. Watch it execute in the Temporal UI
+open http://localhost:8080
+```
+
+---
+
+## Services
+
+| Service | URL | Description |
+| --------- | ----- | ------------- |
+| Orchestrator | `http://localhost:8000` | FastAPI — submit workflows, register agents |
+| Capability Service | `http://localhost:8001` | Agent capability directory (MongoDB-backed) |
+| Temporal UI | `http://localhost:8080` | Workflow execution dashboard |
+| Temporal gRPC | `localhost:7233` | Workflow engine |
+| Kafka | `localhost:9092` | Message bus |
+| MongoDB | `localhost:27017` | Capability + feedback store |
+
+---
+
+## Architecture
 
 ```text
-+------------------+    +---------------+    +----------------+    +----------------+
-|   API Gateway    |──▶| Orchestrator  |──▶|  Flow Engine   |──▶|  MessageBus    |
-| (AuthN/AuthZ,    |    | (RL Policy,   |    | (DSL Executor) |    | (Kafka/Rabbit) |
-|  Rate Limiting)  |    |  Directory)   |    +----------------+    +----------------+
-+--------┬---------+    +-------┬-------+           │                 │
-         │                    │                   ▼                 ▼
-         ▼                    ▼        [Agents & ToolAdapters]↔[ContextMemoryStore]
-   +-----------+         +-----------+         Supporting Modules:
-   | Factories |<───────▶| Registration|        • AgentFactory / ToolFactory
-   | (Agent/   |         | Service     |        • CapabilityDirectory
-   |  Tool)    |         +-------------+        • ApprovalEngine
-   +-----------+                                • EscalationManager
-                                                 • ErrorHandler
-                                                 • PerformanceAnalyzer & PolicyLearner
-                                                 • ChaosController & Autoscaler
-                                                 • CostMonitor & SecurityScanner
-                                                 • Explainability Engine & Dashboard
+┌─────────────────────────────────────────────────────────────┐
+│  Client (curl / SDK / CLI)                                   │
+└─────────────────────┬───────────────────────────────────────┘
+                      │ POST /workflows/run
+┌─────────────────────▼───────────────────────────────────────┐
+│  Orchestrator  :8000  (FastAPI)                              │
+│  • DSL Parser  • LLM text→DSL  • Capability Validator        │
+│  • OTel Tracer                                               │
+└──────┬──────────────────────────────────┬───────────────────┘
+       │ validate                          │ publish
+       ▼                                   ▼
+┌─────────────────┐              ┌─────────────────────────────┐
+│ Capability Svc  │              │  Kafka: flow-requests        │
+│ :8001 (MongoDB) │              └──────────────┬──────────────┘
+└─────────────────┘                             │ consume
+                                   ┌────────────▼────────────┐
+                                   │  Flow Worker             │
+                                   │  (Kafka Consumer)        │
+                                   └────────────┬────────────┘
+                                                │ start_workflow
+                                   ┌────────────▼────────────┐
+                                   │  Temporal               │
+                                   │  ComplexSequenceWorkflow │
+                                   │  • sequential            │
+                                   │  • parallel              │
+                                   │  • conditional (AST eval)│
+                                   │  • dynamic subtrees      │
+                                   └────────────┬────────────┘
+                                                │ agent_activity
+                                   ┌────────────▼────────────┐
+                                   │  Temporal Worker         │
+                                   │  • EchoAgent             │
+                                   │  • LangChainAgent        │
+                                   │  • LlamaIndexAgent       │
+                                   │  • SpawnerAgent          │
+                                   │  • Custom agents         │
+                                   └─────────────────────────┘
 ```
 
-### 3.1 Component Summary
-
-- **API Gateway:** Terminates mTLS, validates JWT scopes, enforces rate limits.
-- **Orchestrator:** Loads RL policies, resolves capability lookups, and dispatches invocation messages.
-- **FlowEngine:** Parses YAML/JSON DSL, executes steps (seq/parallel/conditional/approval/retry), interfaces with ErrorHandler.
-- **MessageBus:** Durable, partitioned topics (`multigen.invocations`, `multigen.responses`, `multigen.error`, `multigen.approval`, etc.) with DLQ support.
-- **Agents & ToolAdapters:** Encapsulate logic (LLM calls, DB queries, API interactions); base classes generate and register themselves automatically.
-- **AgentFactory / ToolFactory:** LLM‑driven code generators that output scaffold code, run SAST/DAST in CI, and deploy via Helm to K8s.
-- **CapabilityDirectory:** Version‑controlled registry of available agents/tools; supports rollback to prior versions.
-- **ApprovalEngine & EscalationManager:** Implements hierarchical approvals, timeouts, and escalations with immutable audit logs.
-- **ErrorHandler:** Orchestrates retries, circuit breakers, and routes unresolvable errors to dead‑letter queues and owners.
-- **ContextMemoryStore:** Vector DB + periodic LLM summarization captures long‑term context, with PII detection and masking.
-- **PerformanceAnalyzer & PolicyLearner:** Collects metrics, emits rewards, and retrains orchestration policies (PPO) to optimize cost, latency, and correctness.
-- **ChaosController & Autoscaler:** Executes fault‑injection drills and scales agent deployments based on topic lag and resource usage.
-- **CostMonitor & SecurityScanner:** Integrates cloud‑billing data, enforces budget quotas, and runs automated security scans on generated code.
-- **Explainability Engine & Dashboard:** Generates human‑readable rationales for RL decisions and displays real‑time flow traces, pending approvals, and SLA metrics.
+See [`docs/architecture.html`](docs/architecture.html) for the full interactive architecture diagram (open in browser).
 
 ---
 
-## 4. Design Methodology
+## DSL Reference
 
-### 4.1 Dynamic Discovery & Recruitment
-- **Self‑Registration:** On startup, each agent/adapter emits a `multigen.registration` event with metadata and schema.
-- **Capability Lookup:** Orchestrator queries the CapabilityDirectory; absent capabilities trigger AgentFactory or ToolFactory.
-- **Autogen Code:** LLM prompts produce OpenAPI or JSON‑Schema specs; CLI scaffolds adapters or FastAPI agent stubs; CI/CD builds, tests, and deploys to K8s.
+Workflows are defined as a JSON/YAML `steps` array. Four step types are supported:
 
-### 4.2 Governance & Accountability
-- **Declarative DSL:** Steps may include `approval` clauses with levels (Analyst → Lead → Manager → Auditor).
-- **Approval Lifecycle:** ApprovalEngine issues tokens, EscalationManager enforces timeouts/escalations, all decisions logged to `multigen.audit`.
-- **Error Ownership:** ErrorHandler publishes `multigen.error`; routes tasks to designated owners with SLA tracking and dead‑letter fallback.
+### Sequential
 
-### 4.3 Continuous Learning & Optimization
-- **Metric Ingestion:** PerformanceAnalyzer gathers latency, error, cost, and correctness data from traces and dashboards.
-- **RL Loop:** PolicyLearner consumes state–action–reward tuples, retrains PPO models, and updates orchestration policies in real time.
-- **Adaptive Behavior:** Policies may spawn new agents/tools, reroute tasks, adjust retry/backoff parameters, or escalate approvals based on learned rewards.
+```json
+{
+  "name": "summarise",
+  "agent": "LangChainAgent",
+  "params": {"text": "..."}
+}
+```
 
-### 4.4 Resilience & Scalability
-- **Chaos Engineering:** ChaosController injects faults (latency, crashes) to validate recovery and MTTR.
-- **Autoscaling:** K8s HPA rules scale agent replicas by consumer lag and CPU/memory usage.
-- **Parallelism:** FlowEngine supports parallel branches; MessageBus partitions distribute load; autoscaling ensures throughput under spikes.
+### Parallel
 
-### 4.5 Security & Compliance
-- **mTLS & JWT:** Enforced on all broker connections; JWT scopes restrict topic publishes/subscribes.
-- **ACL & OPA:** Fine‑grained, attribute‑based access control on data fields.
-- **SAST/DAST:** SecurityScanner runs static and dynamic analysis on AgentFactory/ToolFactory outputs before deployment.
-- **Data Privacy:** PII Detector/Masker redacts sensitive data from logs and memory stores; ConsentManager enforces retention policies.
+```json
+{
+  "name": "evaluate",
+  "parallel": [
+    {"name": "skill_check",   "agent": "SkillMatcherAgent",   "params": {}},
+    {"name": "culture_check", "agent": "CultureFitAgent",     "params": {}}
+  ]
+}
+```
 
-### 4.6 Developer Experience & Collaboration
-- **Visual Workflow Designer:** Drag‑and‑drop canvas generates DSL under the hood for non‑technical users.
-- **Marketplace & Registry UI:** Browse, rate, and subscribe to shared agents, tool adapters, and workflows.
-- **Sandbox & Simulation:** Ephemeral Kafka topics and stub agents for pre‑prod flow testing and scenario simulations.
+### Conditional
 
----
+Conditions are evaluated against accumulated step outputs using a safe AST evaluator — no `eval()`.
 
-## 5. Usage: Evaluation & Fact‑Checking Workflows
+```json
+{
+  "name": "route",
+  "conditional": [
+    {
+      "condition": "score >= 70",
+      "then": {"name": "interview", "agent": "InterviewSchedulerAgent", "params": {}}
+    }
+  ],
+  "else": {"name": "reject", "agent": "RejectionAgent", "params": {}}
+}
+```
 
-### 5.1 Response Evaluation Pipeline
-```yaml
-- name: collect_responses
-  agent: ResponseCollector
-- name: score_quality
-  agent: RubricAgent
-  parallel:
-    - rubric: "correctness"
-    - rubric: "relevance"
-    - rubric: "clarity"
-- name: aggregate_scores
-  agent: ScoringAggregator
-- name: human_review
-  agent: ApprovalEngine
-  approval:
-    level: reviewer
-    timeout: 1h
-    condition: "aggregate_scores.score < 0.7"
-- name: generate_feedback
-  agent: FeedbackAgent
-- name: persist_results
-  agent: ReportGenerator
-- name: emit_metrics
-  agent: MetricsAgent
-```  
+**Supported condition syntax:** `==`, `!=`, `<`, `<=`, `>`, `>=`, `and`, `or`, `not`, subscript access (`result["key"]`), attribute access.
 
-### 5.2 Factual Correctness Workflow (No Golden Answer)
-```yaml
-- name: extract_facts
-  agent: FactExtractionAgent
-- name: retrieve_evidence
-  agent: KnowledgeRetrieverAgent
-  parallel:
-    - source: wikipedia
-    - source: wikidata
-    - source: internal_db
-- name: verify_sources
-  agent: SourceVerifierAgent
-- name: judge_factuality
-  agent: FactCheckerAgent
-- name: consensus_round
-  agent: ConsensusAgent
-- name: aggregate_factual_score
-  agent: FactualScoreAggregator
-- name: human_review_factuality
-  agent: ApprovalEngine
-  approval:
-    level: subject_matter_expert
-    condition: "aggregate_factual_score.score < 0.8"
+### Dynamic Subtree
+
+Runs a spawner agent whose output is a list of steps, then executes those steps.
+
+```json
+{
+  "name":  "expand",
+  "agent": "SpawnerAgent",
+  "params": {"count": 3, "agent": "EchoAgent"},
+  "dynamic_subtree": {}
+}
 ```
 
 ---
 
-## 6. Class Diagram
+## Building an Agent
 
-Use the following PlantUML definition to render the UML class diagram:
+1. **Implement** — subclass `BaseAgent`:
 
-![UML for Framework](https://github.com/user-attachments/assets/89f5a87f-cd0d-46bd-bc8d-9a798f42d3af)
+```python
+# agents/my_agent/my_agent.py
+from agents.base_agent import BaseAgent
+from orchestrator.services.agent_registry import register_agent
+
+@register_agent("MyAgent")
+class MyAgent(BaseAgent):
+    async def run(self, params: dict) -> dict:
+        # your logic here
+        return {"result": params.get("input", "") + " processed"}
+```
+
+1. **Import** in the Temporal worker so the decorator fires:
+
+```python
+# workers/temporal_worker.py
+import agents.my_agent.my_agent  # noqa: F401
+```
+
+1. **Register** with the capability directory:
+
+```bash
+curl -X POST http://localhost:8001/capabilities \
+  -H "Content-Type: application/json" \
+  -d '{"name":"MyAgent","version":"1.0.0","description":"...","metadata":{}}'
+```
+
+1. **Rebuild** the worker container:
+
+```bash
+docker-compose up -d --build temporal-worker
+```
+
+That's it — your agent is now available in any workflow DSL.
 
 ---
 
-## 7. Comprehensive Flow Diagram
+## Example: Resume Screening Pipeline
+
+A complete end-to-end example that exercises all four step types.
+
+**Pipeline:**
 
 ```text
-[User]→API Gateway→Orchestrator→CapabilityDirectory→(Agent/Tool Exists?)→FlowEngine→MessageBus→Agents→Responses→FlowEngine→Final Response
-[Orchestrator]↔PolicyLearner↔PerformanceAnalyzer
-[Factories]→CI/CD→RegistrationService→CapabilityDirectory
-[FlowEngine]→ErrorHandler/ApprovalEngine/EscalationManager→DeadLetter/ApprovalPath
-[ChaosController] & [Autoscaler] operate continuously
+Resume Input
+    │
+    ▼ sequential
+ResumeParserAgent          — normalise raw input
+    │
+    ▼ parallel (3 concurrent)
+SkillMatcherAgent          — score skill match vs. job requirements
+ExperienceEvaluatorAgent   — score seniority & years
+CultureFitAgent            — score values alignment
+    │
+    ▼ sequential
+ScoreAggregatorAgent       — weighted overall score (skill 50%, exp 30%, culture 20%)
+    │
+    ▼ conditional  (score >= 70 ?)
+InterviewSchedulerAgent    — book interview slot        ← YES
+RejectionAgent             — polite rejection           ← NO
+    │
+    ▼ sequential
+ReportCompilerAgent        — final screening report
+```
+
+**Run it:**
+
+```bash
+# Register all 8 screening agents
+# Submit a strong candidate (score ~98 → interview)
+python examples/resume_screening.py --candidate strong
+
+# Submit a weak candidate (score ~10 → reject)
+python examples/resume_screening.py --candidate weak
+
+# Show the full DSL before submitting
+python examples/resume_screening.py --candidate borderline --show-dsl
+```
+
+**Expected outcomes:**
+
+| Profile | Skills | Experience | Culture | Overall | Decision |
+| --------- | -------- | ------------ | ------- | ------- | ---------- |
+| `strong` | 96 | 100 | 100 | **98** | ✅ Interview |
+| `borderline` | 73 | 100 | 67 | **79** | ✅ Interview |
+| `weak` | 0 | 33 | 0 | **10** | ❌ Reject |
+
+Watch execution live at `http://localhost:8080` (Temporal UI).
+
+---
+
+## Running Tests
+
+```bash
+pip install -r requirements.txt -r requirement_dev.txt
+pytest tests/ -v
 ```
 
 ---
 
-## 8. Gap Analysis & Future Enhancements
+## Project Structure
 
-| Domain                        | Remaining Gap                               | Potential Feature                                                  |
-|-------------------------------|--------------------------------------------|--------------------------------------------------------------------|
-| Drift Detection               | No explicit monitoring of prompt drift     | DriftMonitor: BLEU/ROUGE alerts, A/B prompt testing               |
-| Cost Management               | AI API spends unmanaged                   | BudgetController: quotas, cost‑aware routing                      |
-| Privacy & Compliance          | Data lineage not fully tracked             | DataLineageTracker, ConsentManager                                |
-| Workflow Testing              | Lack of end‑to‑end sandboxing              | ScenarioSimulator, FlowSandbox                                     |
-| Versioning & Rollback         | Workflow & RL policy versioning limited    | WorkflowRegistry: immutable versions + one‑click rollback         |
-| Collaboration & Marketplace   | Shared assets discovery missing            | Team Registry UI, rating/review system                            |
-| Hybrid Edge Deployment        | Edge/offline not fully supported           | EdgeSyncAgents, LocalQueue buffers                                 |
-| Continuous Security Scanning  | Post‑deployment vulnerability detection    | RuntimeSentinel: continuous pentesting                            |
+```text
+Multigen/
+├── agents/
+│   ├── base_agent.py              # BaseAgent abstract class
+│   ├── echo_agent/                # Demo agent
+│   ├── langchain_agent/           # LangChain LCEL agent
+│   ├── llamaindex_agent/          # LlamaIndex retrieval agent
+│   ├── spawner_agent/             # Dynamic step generator
+│   └── screening_agents/          # Resume screening example agents
+├── orchestrator/
+│   ├── main.py                    # FastAPI app + OTel setup
+│   ├── controller/
+│   │   ├── workflow.py            # POST /workflows/run
+│   │   └── registration.py        # POST /capabilities
+│   ├── services/
+│   │   ├── config.py              # Environment config
+│   │   ├── agent_registry.py      # @register_agent decorator
+│   │   ├── dsl_parser.py          # DSL → Step objects
+│   │   ├── capability_directory.py
+│   │   ├── capability_directory_client.py
+│   │   ├── flow_messaging.py      # Kafka consumer worker
+│   │   └── llm_service.py         # text → DSL via OpenAI
+│   └── telemetry.py               # OpenTelemetry setup
+├── flow_engine/
+│   └── workflows/sequence.py      # ComplexSequenceWorkflow (Temporal)
+├── capability_service/
+│   └── main.py                    # Capability directory FastAPI app
+├── workers/
+│   └── temporal_worker.py         # Temporal worker process
+├── messaging/
+│   └── kafka_client.py            # Confluent Kafka wrapper
+├── examples/
+│   └── resume_screening.py        # End-to-end pipeline demo
+├── tests/                         # pytest test suite
+├── docs/
+│   ├── architecture.html          # Interactive architecture diagram
+│   ├── architecture.md            # Mermaid diagrams
+│   └── ...
+├── docker-compose.yml
+├── Dockerfile.orchestrator
+├── Dockerfile.capability
+├── requirements.txt
+└── .env.example
+```
 
 ---
 
-## 9. Preliminary Evaluation Plan
+## Configuration
 
-1. **Scalability:** 1,000 concurrent workflows; measure 99th‑percentile latency and resource cost.
-2. **Resilience:** Inject faults via ChaosController; track MTTR and SLA compliance.
-3. **Governance:** Simulate approval denials; verify audit completeness and correct escalations.
-4. **Policy Learning:** Evaluate reward improvement over 50 iterative runs on mixed‑load scenarios.
+Copy `.env.example` to `.env` and set the values:
+
+| Variable | Default | Description |
+| ---------- | --------- | ------------- |
+| `OPENAI_API_KEY` | — | Required for text-to-DSL preprocessing |
+| `LLM_MODEL` | `gpt-4o` | OpenAI model to use |
+| `KAFKA_BROKER_URL` | `localhost:9092` | Kafka broker |
+| `TEMPORAL_SERVER_URL` | `localhost:7233` | Temporal gRPC address |
+| `MONGODB_URI` | `mongodb://localhost:27017` | MongoDB connection |
+| `CAPABILITY_SERVICE_URL` | `http://localhost:8000` | Capability service base URL |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | — | OTLP collector (Jaeger/Grafana). Console if unset |
+| `OTEL_SERVICE_NAME` | `multigen-orchestrator` | Service name in traces |
+| `LLAMAINDEX_DOCS_PATH` | `./data/docs` | Document directory for LlamaIndexAgent |
 
 ---
 
-## 10. Roadmap & To Do
+## Roadmap
 
-- [ ] Formalize benchmark scenarios and synthetic data generators
-- [ ] Implement core services: RegistrationService, FlowEngine, MessageBus
-- [ ] Develop AgentFactory & ToolFactory prototypes with OpenAI integration
-- [ ] Set up CI/CD pipelines with SAST/DAST gates
-- [ ] Integrate Observability: OpenTelemetry, Prometheus, Dashboard
-- [ ] Build ApprovalEngine, EscalationManager, and ErrorHandler
-- [ ] Author sample workflows (evaluation, fact‑checking, SQLAgent recruitment)
-- [ ] Render and verify Class and Flow diagrams
-- [ ] Conduct initial scalability and resilience tests
-- [ ] Implement backup features: DriftMonitor, BudgetController, EdgeSync
+### v0.1 — Foundation ✅
+
+- [x] FastAPI orchestrator with DSL parsing
+- [x] Sequential, parallel, conditional, dynamic step execution
+- [x] Temporal workflow engine integration
+- [x] Kafka message bus (request / response / DLQ)
+- [x] MongoDB capability directory
+- [x] `@register_agent` decorator system
+- [x] OpenTelemetry tracing
+- [x] Prometheus metrics
+- [x] Docker Compose local dev stack
+- [x] GitHub Actions CI
+
+### v0.2 — Developer Experience
+
+- [ ] Python SDK (`pip install multigen-sdk`)
+- [ ] CLI (`multigen run workflow.yaml`)
+- [ ] Output variable interpolation between steps (`{{steps.step1.output.key}}`)
+- [ ] Per-step timeout configuration
+- [ ] Agent input/output schema validation
+
+### v0.3 — Enterprise
+
+- [ ] JWT authentication on orchestrator
+- [ ] OPA (Open Policy Agent) guardrails
+- [ ] Human-in-the-loop approval engine (Temporal signals)
+- [ ] Error handler with escalation policies
+- [ ] Helm chart for Kubernetes deployment
+- [ ] Multi-tenancy (namespaced capability directories)
+
+### v0.4 — Intelligence
+
+- [ ] Feedback collector (structured outcome events per workflow)
+- [ ] RL policy learner (PPO — optimise agent routing + retry policy)
+- [ ] AgentFactory (LLM-driven agent code generation + SAST + CI deploy)
+- [ ] Drift monitor + prompt optimiser
+
+---
+
+## Contributing
+
+1. Fork the repo and create a branch: `git checkout -b feature/my-agent`
+2. Build a new agent (see [Building an Agent](#building-an-agent) above)
+3. Add tests in `tests/`
+4. Open a PR — CI runs automatically
+
+See `CONTRIBUTING.md` for full guidelines.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+| ------- | ----------- |
+| API | FastAPI 0.115, Pydantic v2, Uvicorn |
+| Workflow engine | Temporal.io 1.11 |
+| Message bus | Apache Kafka (confluent-kafka 2.10) |
+| Persistence | MongoDB (Motor async driver) |
+| LLM / AI | OpenAI 1.76, LangChain, LlamaIndex |
+| Observability | OpenTelemetry, Prometheus |
+| Infrastructure | Docker Compose, Kubernetes / Helm *(roadmap)* |
+| CI | GitHub Actions, ruff |
 
 ---
 
 ## References
 
-1. IBM Research, “Autonomic Computing: IBM’s Perspective on the State of Information Technology,” 2003.
-2. Microsoft Research, “AutoGen: A Framework for Agentic AI,” 2024.
-3. Brown, T. et al., “Language Models are Few‑Shot Learners,” NeurIPS 2020.
-4. OpenAI, “Reinforcement Learning from Human Feedback,” 2021.
-5. Kreps, J. et al., “Kafka: a Distributed Messaging System for Log Processing,” 2011.
+1. IBM Research, "Autonomic Computing," 2003
+2. Microsoft Research, "AutoGen: A Framework for Agentic AI," 2024
+3. Kreps et al., "Kafka: a Distributed Messaging System for Log Processing," 2011
+4. Schulman et al., "Proximal Policy Optimization Algorithms," 2017
+5. [Temporal.io Documentation](https://docs.temporal.io)
 
 ---
 
-*Version: 0.1‑dev*
-
+Version: 0.1.0-dev · Apache 2.0 License
