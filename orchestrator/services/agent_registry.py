@@ -34,9 +34,15 @@ def register_agent(name: str):
     """
     def decorator(cls: Type[BaseAgent]) -> Type[BaseAgent]:
         if name in _registry:
-            raise AgentRegistryError(
-                f"Agent '{name}' is already registered", name
-            )
+            # Idempotent: allow re-registration of the same class (e.g. module
+            # imported under two different sys.path roots).  Raise only on
+            # genuine name collision between different classes.
+            if _registry[name] is not cls and _registry[name].__qualname__ != cls.__qualname__:
+                raise AgentRegistryError(
+                    f"Agent '{name}' is already registered by a different class "
+                    f"({_registry[name].__name__})", name
+                )
+            return cls
         if not issubclass(cls, BaseAgent):
             raise AgentRegistryError(
                 f"Can only register subclasses of BaseAgent, got {cls.__name__}", name

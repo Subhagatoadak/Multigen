@@ -158,6 +158,28 @@ class MultigenClient:
         _raise_for(resp, "start workflow")
         return RunResponse.model_validate(resp.json())
 
+    async def run_graph(
+        self,
+        graph_def: Dict[str, Any],
+        payload: Optional[Dict[str, Any]] = None,
+        workflow_id: Optional[str] = None,
+    ) -> RunResponse:
+        """
+        Start a new GraphWorkflow execution directly.
+
+        graph_def must contain: nodes, edges, entry, and optionally max_cycles
+        and circuit_breaker config.
+        """
+        body: Dict[str, Any] = {
+            "graph_def": graph_def,
+            "payload": payload or {},
+        }
+        if workflow_id:
+            body["workflow_id"] = workflow_id
+        resp = await self._http.post("/workflows/run-graph", json=body)
+        _raise_for(resp, "run_graph")
+        return RunResponse.model_validate(resp.json())
+
     # ── Graph control signals ──────────────────────────────────────────────────
 
     async def interrupt(self, workflow_id: str) -> Dict[str, Any]:
@@ -274,6 +296,67 @@ class MultigenClient:
         resp = await self._http.get(f"/workflows/{workflow_id}/pending")
         _raise_for(resp, "get_pending_count")
         return resp.json().get("pending_count", 0)
+
+    # ── Epistemic transparency ─────────────────────────────────────────────────
+
+    async def get_epistemic_report(self, workflow_id: str) -> Dict[str, Any]:
+        """
+        Return the full epistemic transparency report.
+
+        Shows per-node confidence, uncertainty sources, known unknowns,
+        propagated uncertainty, epistemic debt, and overall trustworthiness.
+        """
+        resp = await self._http.get(f"/workflows/{workflow_id}/epistemic")
+        _raise_for(resp, "get_epistemic_report")
+        return resp.json()
+
+    # ── Human approval gates ───────────────────────────────────────────────────
+
+    async def get_pending_approvals(self, workflow_id: str) -> List[Dict[str, Any]]:
+        """
+        Return all dynamic agent specs currently awaiting human approval.
+        The workflow is paused until each approval is resolved.
+        """
+        resp = await self._http.get(f"/workflows/{workflow_id}/pending-approvals")
+        _raise_for(resp, "get_pending_approvals")
+        return resp.json().get("pending_approvals", [])
+
+    async def approve_agent(
+        self,
+        workflow_id: str,
+        spec: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        """
+        Approve a pending dynamic agent spec.
+        Pass the spec dict exactly as returned by get_pending_approvals
+        (you may edit system_prompt or known_limitations before approving).
+        """
+        resp = await self._http.post(
+            f"/workflows/{workflow_id}/approve-agent",
+            json={"spec": spec},
+        )
+        _raise_for(resp, "approve_agent")
+        return resp.json()
+
+    async def reject_agent(
+        self,
+        workflow_id: str,
+        agent_name: str,
+        reason: str = "rejected by human reviewer",
+    ) -> Dict[str, Any]:
+        """Reject a pending dynamic agent spec; the node is skipped."""
+        resp = await self._http.post(
+            f"/workflows/{workflow_id}/reject-agent",
+            json={"agent_name": agent_name, "reason": reason},
+        )
+        _raise_for(resp, "reject_agent")
+        return resp.json()
+
+    async def get_dynamic_agents(self, workflow_id: str) -> Dict[str, Any]:
+        """Return info on all dynamically created agents in this run."""
+        resp = await self._http.get(f"/workflows/{workflow_id}/dynamic-agents")
+        _raise_for(resp, "get_dynamic_agents")
+        return resp.json()
 
     # ── Capability directory ───────────────────────────────────────────────────
 

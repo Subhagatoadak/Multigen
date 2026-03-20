@@ -99,6 +99,15 @@ class PruneRequest(BaseModel):
     node_id: str
 
 
+# ── Request models (start) ─────────────────────────────────────────────────────
+
+class GraphRunRequest(BaseModel):
+    """Start a new GraphWorkflow execution."""
+    graph_def: Dict[str, Any]
+    payload: Dict[str, Any] = Field(default_factory=dict)
+    workflow_id: Optional[str] = None  # custom ID; auto-generated if omitted
+
+
 # ── Temporal client helpers ────────────────────────────────────────────────────
 
 async def _get_temporal_client():
@@ -115,6 +124,40 @@ async def _get_graph_state_col():
 async def _handle(workflow_id: str):
     client = await _get_temporal_client()
     return client.get_workflow_handle(workflow_id)
+
+
+# ── Start ──────────────────────────────────────────────────────────────────────
+
+@router.post("/run-graph", tags=["graph"])
+async def start_graph_workflow(req: GraphRunRequest):
+    """
+    Start a new GraphWorkflow execution.
+
+    POST /workflows/run-graph
+    {
+      "graph_def": { "nodes": [...], "edges": [...], "entry": "...", "max_cycles": 5 },
+      "payload":   { "company_name": "Acme", ... },
+      "workflow_id": "my-run-001"   // optional
+    }
+
+    Returns instance_id to use with all control/state endpoints.
+    """
+    import uuid
+    from flow_engine.graph.engine import GraphWorkflow
+
+    workflow_id = req.workflow_id or f"graph-{uuid.uuid4().hex[:12]}"
+    try:
+        client = await _get_temporal_client()
+        handle = await client.start_workflow(
+            GraphWorkflow.run,
+            args=[req.graph_def, req.payload],
+            id=workflow_id,
+            task_queue=config.TEMPORAL_TASK_QUEUE,
+        )
+        return {"instance_id": handle.id, "status": "running"}
+    except Exception as exc:
+        logger.exception("start_graph_workflow failed")
+        raise HTTPException(status_code=500, detail=str(exc))
 
 
 # ── Interrupt / Resume ─────────────────────────────────────────────────────────
@@ -397,4 +440,121 @@ async def get_pending_count(workflow_id: str):
         return {"workflow_id": workflow_id, "pending_count": count}
     except Exception as exc:
         logger.exception("get_pending_count query failed: %s", workflow_id)
+        raise HTTPException(status_code=404, detail=str(exc))
+
+
+# ── Epistemic Transparency ──────────────────────────────────────────────────────
+
+@router.get("/{workflow_id}/epistemic", tags=["graph", "transparency"])
+async def get_epistemic_report(workflow_id: str):
+    """
+    Return the full epistemic transparency report for this workflow.
+
+    Shows per-node confidence, uncertainty sources, assumptions, known
+    unknowns, propagated uncertainty, epistemic debt, and an overall
+    trustworthiness assessment. Designed for human review before acting
+    on workflow results.
+    """
+    try:
+        handle = await _handle(workflow_id)
+        report = await handle.query("get_epistemic_report")
+        return {"workflow_id": workflow_id, **report}
+    except Exception as exc:
+        logger.exception("get_epistemic_report query failed: %s", workflow_id)
+        raise HTTPException(status_code=404, detail=str(exc))
+
+
+# ── Human Approval Gates ────────────────────────────────────────────────────────
+
+@router.get("/{workflow_id}/pending-approvals", tags=["graph", "autonomy"])
+async def get_pending_approvals(workflow_id: str):
+    """
+    Return all dynamic agent specs currently awaiting human approval.
+
+    The workflow pauses until each pending approval is resolved via
+    POST /approve-agent or POST /reject-agent.
+    """
+    try:
+        handle = await _handle(workflow_id)
+        approvals = await handle.query("get_pending_approvals")
+        return {
+            "workflow_id": workflow_id,
+            "pending_count": len(approvals),
+            "pending_approvals": approvals,
+        }
+    except Exception as exc:
+        logger.exception("get_pending_approvals query failed: %s", workflow_id)
+        raise HTTPException(status_code=404, detail=str(exc))
+
+
+class ApproveAgentRequest(BaseModel):
+    """Approve a dynamically proposed agent spec."""
+    spec: Dict[str, Any]  # the full AgentSpec dict returned by pending-approvals
+
+
+class RejectAgentRequest(BaseModel):
+    """Reject a dynamically proposed agent spec."""
+    agent_name: str
+    reason: str = "rejected by human reviewer"
+
+
+@router.post("/{workflow_id}/approve-agent", tags=["graph", "autonomy"])
+async def approve_agent(workflow_id: str, req: ApproveAgentRequest):
+    """
+    Approve a pending dynamic agent spec.
+
+    The workflow will create the agent and continue execution.
+    Copy the spec exactly from GET /pending-approvals — you may modify
+    the system_prompt or known_limitations before approving.
+    """
+    try:
+        handle = await _handle(workflow_id)
+        await handle.signal("approve_agent", json.dumps(req.spec))
+        return {
+            "status": "approved",
+            "workflow_id": workflow_id,
+            "agent_name": req.spec.get("agent_name"),
+        }
+    except Exception as exc:
+        logger.exception("approve_agent failed: %s", workflow_id)
+        raise HTTPException(status_code=404, detail=str(exc))
+
+
+@router.post("/{workflow_id}/reject-agent", tags=["graph", "autonomy"])
+async def reject_agent(workflow_id: str, req: RejectAgentRequest):
+    """
+    Reject a pending dynamic agent spec.
+
+    The workflow will skip the node and add it to dead_letters with the
+    rejection reason. You can then inject an alternative node or resume.
+    """
+    try:
+        handle = await _handle(workflow_id)
+        await handle.signal(
+            "reject_agent",
+            json.dumps({"agent_name": req.agent_name, "reason": req.reason}),
+        )
+        return {
+            "status": "rejected",
+            "workflow_id": workflow_id,
+            "agent_name": req.agent_name,
+            "reason": req.reason,
+        }
+    except Exception as exc:
+        logger.exception("reject_agent failed: %s", workflow_id)
+        raise HTTPException(status_code=404, detail=str(exc))
+
+
+@router.get("/{workflow_id}/dynamic-agents", tags=["graph", "autonomy"])
+async def get_dynamic_agents(workflow_id: str):
+    """
+    Return info on all dynamically created agents in this workflow run:
+    created, pending approval, approved, rejected.
+    """
+    try:
+        handle = await _handle(workflow_id)
+        info = await handle.query("get_dynamic_agents")
+        return {"workflow_id": workflow_id, **info}
+    except Exception as exc:
+        logger.exception("get_dynamic_agents query failed: %s", workflow_id)
         raise HTTPException(status_code=404, detail=str(exc))

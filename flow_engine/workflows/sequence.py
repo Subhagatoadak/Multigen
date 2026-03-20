@@ -4,6 +4,7 @@ with support for parallel execution, conditional branching, dynamic subtrees,
 and error resilience.
 """
 import ast
+import logging
 import operator
 import re
 from datetime import timedelta

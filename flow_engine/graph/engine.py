@@ -13,6 +13,24 @@ SIGNAL / RUNTIME CONTROL
   fan_out <json>          run N nodes in parallel + consensus selection
   prune_branch <node_id>  cancel node and all reachable descendants
 
+AUTONOMY + HUMAN APPROVAL
+  approve_agent <json>    human approves a pending dynamic agent spec
+  reject_agent <json>     human rejects spec; node skipped or retried
+  approve_plan            human approves the full task decomposition plan
+  (workflow pauses automatically when it encounters an unregistered agent)
+
+EPISTEMIC TRANSPARENCY
+  Every node output is wrapped with an epistemic envelope:
+    confidence, reasoning, uncertainty_sources, assumptions,
+    known_limitations, known_unknowns, evidence_quality, flags
+  Uncertainty propagates through edges (upstream gaps widen downstream).
+  get_epistemic_report query returns full transparency report.
+  Nodes with confidence < 0.6 are automatically flagged for human review.
+
+DYNAMIC AGENT LIFECYCLE
+  Unregistered agents → spec generated → human approves → BlueprintAgent created
+  All dynamic agents are deregistered at workflow completion (clean registry)
+
 REASONING QUALITY
   confidence scoring      every node output scored 0-1
   reflection loops        low-confidence outputs auto-trigger critic nodes
@@ -20,14 +38,10 @@ REASONING QUALITY
   circuit breakers        per-node CLOSED/OPEN/HALF_OPEN with fallback routing
   self-healing            fallback_agent field; dead-letter capture on total failure
 
-DYNAMIC AGENT CREATION
-  blueprint nodes         nodes with 'blueprint' field instead of 'agent'
-                          spawn a new agent class at runtime via activity
-
 OBSERVABILITY
   OTel span per node      with node_id, agent, iteration, circuit_state, confidence
   Prometheus counters     nodes_total, errors_total, reflections_total, circuit_open
-  Temporal query API      get_health, get_metrics, get_pending_count
+  Temporal query API      get_health, get_metrics, get_pending_count, get_epistemic_report
   MongoDB CQRS            each node output persisted after execution
 
 DSL shape (graph field of a step):
@@ -54,7 +68,6 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-import time
 from collections import deque
 from datetime import timedelta
 from typing import Any, Deque, Dict, List, Optional
@@ -73,6 +86,13 @@ from flow_engine.graph.reasoning import (
     should_reflect,
 )
 from flow_engine.graph.telemetry import GraphTelemetry
+from flow_engine.graph.epistemic import EpistemicStateTracker, extract_epistemic, default_epistemic
+from flow_engine.graph.autonomy import (
+    is_agent_registered,
+    make_agent_spec,
+    spec_to_blueprint,
+    cleanup_dynamic_agents,
+)
 from flow_engine.workflows.sequence import (
     _resolve_refs,
     agent_activity,
@@ -174,6 +194,33 @@ async def create_agent_activity(agent_name: str, blueprint: Dict[str, Any]) -> s
     return agent_name
 
 
+@activity.defn
+async def generate_agent_spec_activity(
+    agent_name: str,
+    task_context: str,
+    node_params: Dict[str, Any],
+    prior_context_keys: List[str],
+) -> Dict[str, Any]:
+    """
+    Generate an AgentSpec for human review.
+    Runs as an activity so LLM calls happen outside the workflow sandbox.
+    """
+    from flow_engine.graph.autonomy import make_agent_spec
+    # Reconstruct a minimal prior_context from keys (values are not serialised here)
+    prior_context = {k: "<upstream_output>" for k in prior_context_keys}
+    return make_agent_spec(agent_name, task_context, node_params, prior_context)
+
+
+@activity.defn
+async def deregister_agents_activity(agent_names: List[str]) -> Dict[str, bool]:
+    """
+    Deregister dynamically created agents after workflow completion.
+    Runs as an activity so registry mutation is outside the sandbox.
+    """
+    from flow_engine.graph.autonomy import cleanup_dynamic_agents
+    return cleanup_dynamic_agents(agent_names)
+
+
 # ─── Graph Workflow ────────────────────────────────────────────────────────────
 
 @workflow.defn
@@ -205,6 +252,15 @@ class GraphWorkflow:
         self._dynamic_edges: List[Dict[str, Any]] = []  # reroute additions
         self._fan_out_specs: List[Dict[str, Any]] = []  # fan_out groups
         self._prune_requests: List[str] = []             # prune_branch targets
+        # ── Human approval state ──────────────────────────────────────────
+        self._pending_approvals: List[Dict[str, Any]] = []   # specs awaiting human
+        self._approved_agents: Dict[str, Dict[str, Any]] = {}  # name → approved spec
+        self._rejected_agents: Dict[str, str] = {}            # name → rejection reason
+        self._awaiting_approval: bool = False                  # paused for approval
+        # ── Dynamic agent lifecycle ───────────────────────────────────────
+        self._dynamic_agents: List[str] = []            # created this run → cleaned up
+        # ── Epistemic state ───────────────────────────────────────────────
+        self._epistemic_report: Dict[str, Any] = {}     # last full report
         # ── Shared mutable graph state (updated from run()) ───────────────
         self._raw_edges: List[Dict[str, Any]] = []
         # ── Live metrics (exposed via query handlers) ─────────────────────
@@ -299,6 +355,58 @@ class GraphWorkflow:
         self._prune_requests.append(node_id)
         logger.info("GraphWorkflow: prune_branch '%s' received", node_id)
 
+    # ── Human approval signals ─────────────────────────────────────────────────
+
+    @workflow.signal
+    def approve_agent(self, spec_json: str) -> None:
+        """
+        Human approves a pending dynamic agent spec.
+        Workflow unpauses and creates the agent before executing the node.
+
+        spec_json: the full AgentSpec JSON (copy from get_pending_approvals output).
+        """
+        try:
+            spec = json.loads(spec_json)
+            agent_name = spec.get("agent_name", "")
+            if not agent_name:
+                logger.error("approve_agent: spec missing 'agent_name'")
+                return
+            self._approved_agents[agent_name] = spec
+            # Remove from pending
+            self._pending_approvals = [
+                p for p in self._pending_approvals
+                if p.get("agent_name") != agent_name
+            ]
+            self._awaiting_approval = bool(self._pending_approvals)
+            logger.info("GraphWorkflow: agent '%s' approved by human", agent_name)
+        except json.JSONDecodeError as exc:
+            logger.error("approve_agent: invalid JSON: %s", exc)
+
+    @workflow.signal
+    def reject_agent(self, rejection_json: str) -> None:
+        """
+        Human rejects a pending dynamic agent spec.
+        The node will be skipped and added to dead_letters with the rejection reason.
+
+        rejection_json: {"agent_name": "...", "reason": "..."}
+        """
+        try:
+            data = json.loads(rejection_json)
+            agent_name = data.get("agent_name", "")
+            reason = data.get("reason", "rejected by human")
+            self._rejected_agents[agent_name] = reason
+            self._pending_approvals = [
+                p for p in self._pending_approvals
+                if p.get("agent_name") != agent_name
+            ]
+            self._awaiting_approval = bool(self._pending_approvals)
+            logger.warning(
+                "GraphWorkflow: agent '%s' rejected by human. Reason: %s",
+                agent_name, reason,
+            )
+        except json.JSONDecodeError as exc:
+            logger.error("reject_agent: invalid JSON: %s", exc)
+
     # ── Query handlers (live introspection without touching Temporal history) ──
 
     @workflow.query
@@ -330,6 +438,33 @@ class GraphWorkflow:
     def get_pending_count(self) -> int:
         return self._pending_count
 
+    @workflow.query
+    def get_pending_approvals(self) -> List[Dict[str, Any]]:
+        """
+        Return all agent specs currently awaiting human approval.
+        Humans review these and respond with approve_agent or reject_agent signals.
+        """
+        return self._pending_approvals
+
+    @workflow.query
+    def get_epistemic_report(self) -> Dict[str, Any]:
+        """
+        Return the latest epistemic transparency report.
+        Shows per-node confidence, uncertainty sources, known unknowns,
+        propagated uncertainty, and overall trustworthiness assessment.
+        """
+        return self._epistemic_report
+
+    @workflow.query
+    def get_dynamic_agents(self) -> Dict[str, Any]:
+        """Return info on agents created dynamically during this run."""
+        return {
+            "created": self._dynamic_agents,
+            "pending_approval": [p["agent_name"] for p in self._pending_approvals],
+            "approved": list(self._approved_agents.keys()),
+            "rejected": self._rejected_agents,
+        }
+
     # ── Run ───────────────────────────────────────────────────────────────────
 
     @workflow.run
@@ -355,6 +490,7 @@ class GraphWorkflow:
             recovery_executions=int(cb_cfg.get("recovery_executions", 5)),
         )
         tel = GraphTelemetry(workflow_id)
+        epistemic = EpistemicStateTracker(workflow_id)
 
         nodes: Dict[str, Dict] = {n["id"]: n for n in raw_nodes}
 
@@ -387,25 +523,111 @@ class GraphWorkflow:
                 tool_results[t_name] = tool_out.get("result") or tool_out.get("error")
             return tool_results
 
-        async def _run_agent(node: Dict, enriched_params: Dict) -> Dict[str, Any]:
+        async def _ensure_agent(node: Dict, enriched_params: Dict) -> str:
             """
-            Resolve or create the agent for this node, then execute it.
-            If the node has a 'blueprint' key instead of 'agent', a dynamic
-            agent is created via activity first.
+            Guarantee the agent for this node is registered and ready.
+
+            Priority order:
+              1. Explicit blueprint field → create BlueprintAgent directly
+              2. Agent already in registry → use it
+              3. Pre-approved dynamic agent → create from approved spec
+              4. Unknown agent → generate spec, pause for human approval, then create
             """
             agent_name = node.get("agent") or node.get("id")
             blueprint = node.get("blueprint")
+            node_id = node["id"]
 
+            # Case 1: explicit blueprint node
             if blueprint and not node.get("agent"):
-                dyn_name = f"blueprint_{node['id']}"
+                dyn_name = f"blueprint_{node_id}"
                 await workflow.execute_activity(
                     create_agent_activity,
                     args=[dyn_name, blueprint],
-                    start_to_close_timeout=timedelta(seconds=10),
+                    start_to_close_timeout=timedelta(seconds=15),
                     retry_policy=RetryPolicy(maximum_attempts=2),
                 )
-                agent_name = dyn_name
+                if dyn_name not in self._dynamic_agents:
+                    self._dynamic_agents.append(dyn_name)
+                return dyn_name
 
+            # Case 2: already registered (most common path)
+            if is_agent_registered(agent_name):
+                return agent_name
+
+            # Case 3: previously approved — create it now
+            if agent_name in self._approved_agents:
+                spec = self._approved_agents[agent_name]
+                bp = spec_to_blueprint(spec)
+                await workflow.execute_activity(
+                    create_agent_activity,
+                    args=[agent_name, bp],
+                    start_to_close_timeout=timedelta(seconds=15),
+                    retry_policy=RetryPolicy(maximum_attempts=2),
+                )
+                if agent_name not in self._dynamic_agents:
+                    self._dynamic_agents.append(agent_name)
+                logger.info("Dynamic agent '%s' created from approved spec", agent_name)
+                return agent_name
+
+            # Case 4: unknown agent → generate spec, pause, await human
+            task_context = node.get("task_description") or (
+                f"Process node '{node_id}' in a multi-agent workflow. "
+                f"Available context keys: {list(context.keys())}"
+            )
+            spec = await workflow.execute_activity(
+                generate_agent_spec_activity,
+                args=[
+                    agent_name,
+                    task_context,
+                    node.get("params") or {},
+                    list(context.keys()),
+                ],
+                start_to_close_timeout=timedelta(seconds=60),
+                retry_policy=RetryPolicy(maximum_attempts=2),
+            )
+
+            # Add to pending approvals and pause
+            spec["status"] = "pending_approval"
+            self._pending_approvals.append(spec)
+            self._awaiting_approval = True
+
+            logger.info(
+                "GraphWorkflow: unknown agent '%s' — spec generated, awaiting human approval",
+                agent_name,
+            )
+
+            # Wait until human approves or rejects this specific agent
+            await workflow.wait_condition(
+                lambda: agent_name in self._approved_agents
+                        or agent_name in self._rejected_agents
+            )
+
+            if agent_name in self._rejected_agents:
+                raise RuntimeError(
+                    f"Agent '{agent_name}' rejected by human: "
+                    f"{self._rejected_agents[agent_name]}"
+                )
+
+            # Human approved → create the agent
+            approved_spec = self._approved_agents[agent_name]
+            bp = spec_to_blueprint(approved_spec)
+            await workflow.execute_activity(
+                create_agent_activity,
+                args=[agent_name, bp],
+                start_to_close_timeout=timedelta(seconds=15),
+                retry_policy=RetryPolicy(maximum_attempts=2),
+            )
+            if agent_name not in self._dynamic_agents:
+                self._dynamic_agents.append(agent_name)
+            logger.info("Dynamic agent '%s' created after human approval", agent_name)
+            return agent_name
+
+        async def _run_agent(node: Dict, enriched_params: Dict) -> Dict[str, Any]:
+            """
+            Ensure the agent exists (creating it dynamically if needed),
+            then execute it as a Temporal activity.
+            """
+            agent_name = await _ensure_agent(node, enriched_params)
             retry_count = node.get("retry", 3)
             timeout_sec = node.get("timeout", 30)
             return await workflow.execute_activity(
@@ -430,26 +652,45 @@ class GraphWorkflow:
             iteration = execution_count.get(node_id, 0)
             cb_state = "open" if node_id in cb._breakers and not cb.can_execute(node_id, self._nodes_executed) else "closed"
 
-            t0 = time.monotonic()
+            t0 = workflow.now()
             with tel.node_span(node_id, agent_name, iteration, cb_state):
                 try:
                     tool_results = await _run_tools(node)
-                    base_params = node.get("params") or payload
+                    # Merge payload as base so node params override but payload
+                    # values (e.g. raw_data) are always available to every agent.
+                    base_params = {**payload, **(node.get("params") or {})}
                     enriched = {**base_params, "_tools": tool_results}
                     enriched = _resolve_refs(enriched, context)
 
                     agent_result = await _run_agent(node, enriched)
-                    duration = time.monotonic() - t0
+                    duration = (workflow.now() - t0).total_seconds()
 
                     output = agent_result.get("output", {})
                     confidence = extract_confidence(output)
-                    tel.annotate_span("graph.confidence", confidence)
-                    tel.record_node_complete(node_id, duration, confidence, "success")
+
+                    # Record epistemic state for this node
+                    upstream_ids = [
+                        e["source"] for e in _all_edges()
+                        if e.get("target") == node_id
+                    ]
+                    ep = epistemic.record_node(node_id, agent_name, output, upstream_ids)
+                    # Update report cache (queried by humans)
+                    self._epistemic_report = epistemic.get_transparency_report()
+
+                    tel.annotate_span("graph.confidence", ep["confidence"])
+                    tel.annotate_span("graph.epistemic_debt", len(ep.get("known_unknowns", [])))
+                    tel.record_node_complete(node_id, duration, ep["confidence"], "success")
                     cb.record_success(node_id)
-                    return {**agent_result, "node_id": node_id, "iteration": iteration + 1, "confidence": confidence}
+                    return {
+                        **agent_result,
+                        "node_id": node_id,
+                        "iteration": iteration + 1,
+                        "confidence": ep["confidence"],
+                        "epistemic": ep,
+                    }
 
                 except Exception as exc:
-                    duration = time.monotonic() - t0
+                    duration = (workflow.now() - t0).total_seconds()
                     cb.record_failure(node_id, self._nodes_executed)
                     tel.record_error(node_id)
                     tel.record_node_complete(node_id, duration, 0.0, "error")
@@ -503,13 +744,16 @@ class GraphWorkflow:
                 context[group_id] = best.get("output", {})
                 results.extend(r for r in fan_results if "error" not in r)
 
-                # Persist consensus output
-                await workflow.execute_activity(
-                    persist_node_state_activity,
-                    args=[workflow_id, group_id, context[group_id]],
-                    start_to_close_timeout=timedelta(seconds=10),
-                    retry_policy=RetryPolicy(maximum_attempts=2),
-                )
+                # Persist consensus output (non-fatal — MongoDB is read model only)
+                try:
+                    await workflow.execute_activity(
+                        persist_node_state_activity,
+                        args=[workflow_id, group_id, context[group_id]],
+                        start_to_close_timeout=timedelta(seconds=30),
+                        retry_policy=RetryPolicy(maximum_attempts=2),
+                    )
+                except Exception as _persist_exc:
+                    logger.warning("persist fan-out state failed (non-fatal): %s", _persist_exc)
 
             # 5. Absorb injected nodes → append to pending
             while self._injected:
@@ -588,13 +832,16 @@ class GraphWorkflow:
             context[node_id] = output
             results.append(result)
 
-            # 11. Persist to MongoDB (non-fatal)
-            await workflow.execute_activity(
-                persist_node_state_activity,
-                args=[workflow_id, node_id, output],
-                start_to_close_timeout=timedelta(seconds=10),
-                retry_policy=RetryPolicy(maximum_attempts=2),
-            )
+            # 11. Persist to MongoDB (non-fatal — Temporal history is authoritative)
+            try:
+                await workflow.execute_activity(
+                    persist_node_state_activity,
+                    args=[workflow_id, node_id, output],
+                    start_to_close_timeout=timedelta(seconds=30),
+                    retry_policy=RetryPolicy(maximum_attempts=2),
+                )
+            except Exception as _persist_exc:
+                logger.warning("persist node state failed (non-fatal): %s", _persist_exc)
 
             # 12. Reflection — auto-inject critic if confidence too low
             reflection_threshold = float(node.get("reflection_threshold", 0.0))
@@ -625,13 +872,35 @@ class GraphWorkflow:
                     if target not in self._skip_nodes:
                         pending.append(target)
 
+        # ── Cleanup dynamic agents (deregister from live registry) ───────────
+        if self._dynamic_agents:
+            try:
+                await workflow.execute_activity(
+                    deregister_agents_activity,
+                    args=[self._dynamic_agents],
+                    start_to_close_timeout=timedelta(seconds=15),
+                    retry_policy=RetryPolicy(maximum_attempts=2),
+                )
+                logger.info(
+                    "Deregistered %d dynamic agents: %s",
+                    len(self._dynamic_agents), self._dynamic_agents,
+                )
+            except Exception as exc:
+                logger.warning("Dynamic agent cleanup failed (non-fatal): %s", exc)
+
+        # ── Final epistemic report ─────────────────────────────────────────
+        final_epistemic = epistemic.get_transparency_report()
+        self._epistemic_report = final_epistemic
+
         return {
-            "nodes_executed": self._nodes_executed,
-            "context": context,
-            "results": results,
-            "skipped_cycles": skipped_cycles,
-            "dead_letters": self._dead_letters,
-            "reflections": self._reflections_triggered,
-            "fan_outs": self._fan_outs_executed,
-            "circuit_breaker_trips": self._cb_trips,
+            "nodes_executed":       self._nodes_executed,
+            "context":              context,
+            "results":              results,
+            "skipped_cycles":       skipped_cycles,
+            "dead_letters":         self._dead_letters,
+            "reflections":          self._reflections_triggered,
+            "fan_outs":             self._fan_outs_executed,
+            "circuit_breaker_trips":self._cb_trips,
+            "dynamic_agents":       self._dynamic_agents,
+            "epistemic_report":     final_epistemic,
         }

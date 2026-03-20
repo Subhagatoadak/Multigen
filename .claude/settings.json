@@ -11,10 +11,21 @@
       "Bash(for d:*)",
       "Bash(do mkdir:*)",
       "Bash(touch /Users/subhagatoadak/Documents/github/Multigen/$d/__init__.py)",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(pip show:*)",
+      "Bash(docker info:*)",
+      "Bash(/opt/anaconda3/bin/pip install:*)",
+      "Bash(/opt/anaconda3/bin/pip show:*)",
+      "Bash(/opt/anaconda3/bin/pip index:*)",
+      "Bash(/opt/anaconda3/bin/pip check:*)",
+      "Bash(/opt/anaconda3/bin/python -c \"import mcp; import fastapi; import starlette; print\\(''mcp:'', mcp.__version__\\); print\\(''fastapi:'', fastapi.__version__\\); print\\(''starlette:'', starlette.__version__\\)\")",
+      "Bash(/opt/anaconda3/bin/python -c \"import mcp; import fastapi; import starlette; print\\(''fastapi:'', fastapi.__version__\\); print\\(''starlette:'', starlette.__version__\\); print\\(''mcp: ok''\\)\")",
+      "Bash(/opt/anaconda3/bin/python -c \":*)",
+      "Bash(head -10 grep -n \"^TOOL\\\\|^RESOURCE\\\\|^PROMPT\" /Users/subhagatoadak/Documents/github/Multigen/mcp_server/resources.py /Users/subhagatoadak/Documents/github/Multigen/mcp_server/prompts.py)"
     ],
     "additionalDirectories": [
-      "/Users/subhagatoadak/Documents/github/Multigen/Agent-Components/.git"
+      "/Users/subhagatoadak/Documents/github/Multigen/Agent-Components/.git",
+      "/Users/subhagatoadak/Library/Application Support/Claude"
     ]
   }
 }

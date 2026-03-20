@@ -32,7 +32,14 @@ Signal hooks built into this example:
 """
 from __future__ import annotations
 
-from sdk.multigen.dsl import GraphBuilder
+import os
+import sys
+
+_repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+if _repo_root not in sys.path:
+    sys.path.insert(0, _repo_root)
+
+from multigen.dsl import GraphBuilder
 
 
 def build_ma_graph(
@@ -61,26 +68,27 @@ def build_ma_graph(
             .done()
 
         # ── Phase 2: Expert Analysis (parallel via explicit parallel edges) ─
+        # Timeout=120s per node: GPT-4o calls can take 20-40s; allows 2 retries
         .node("financial")
             .agent("FinancialAnalystAgent")
             .params(company_name=company_name)
             .reflect(threshold=0.80, max_rounds=2, critic="CritiqueAgent")
             .fallback("FallbackComplianceAgent")
-            .timeout(90)
+            .timeout(120)
             .done()
 
         .node("legal")
             .agent("LegalDueDiligenceAgent")
             .params(company_name=company_name)
             .reflect(threshold=0.75, max_rounds=2, critic="CritiqueAgent")
-            .timeout(90)
+            .timeout(120)
             .done()
 
         .node("technical")
             .agent("TechnicalDueDiligenceAgent")
             .params(company_name=company_name)
             .reflect(threshold=0.75, max_rounds=1, critic="CritiqueAgent")
-            .timeout(90)
+            .timeout(120)
             .done()
 
         .node("market_primary")
@@ -90,7 +98,7 @@ def build_ma_graph(
                 analysis_variant="base_case",
             )
             .reflect(threshold=0.78, max_rounds=2, critic="CritiqueAgent")
-            .timeout(90)
+            .timeout(120)
             .done()
 
         .node("culture")
@@ -100,7 +108,7 @@ def build_ma_graph(
                 acquirer_name=acquirer_name,
             )
             .reflect(threshold=0.72, max_rounds=1, critic="CritiqueAgent")
-            .timeout(60)
+            .timeout(120)
             .done()
 
         # ── Phase 3: Risk Synthesis ─────────────────────────────────────────
@@ -108,7 +116,7 @@ def build_ma_graph(
             .agent("RiskSynthesizerAgent")
             .params(company_name=company_name)
             .reflect(threshold=0.82, max_rounds=3, critic="CritiqueAgent")
-            .timeout(120)
+            .timeout(150)
             .done()
 
         # ── Phase 4: Valuation ──────────────────────────────────────────────
@@ -116,7 +124,7 @@ def build_ma_graph(
             .agent("ValuationAgent")
             .params(company_name=company_name)
             .reflect(threshold=0.85, max_rounds=2, critic="CritiqueAgent")
-            .timeout(120)
+            .timeout(150)
             .done()
 
         # ── Phase 5: Compliance ─────────────────────────────────────────────
@@ -127,7 +135,7 @@ def build_ma_graph(
                 acquirer_name=acquirer_name,
             )
             .fallback("FallbackComplianceAgent")
-            .timeout(60)
+            .timeout(120)
             .done()
 
         # ── Phase 6: Executive Summary ──────────────────────────────────────
@@ -138,7 +146,7 @@ def build_ma_graph(
                 acquirer_name=acquirer_name,
             )
             .reflect(threshold=0.88, max_rounds=1, critic="CritiqueAgent")
-            .timeout(120)
+            .timeout(150)
             .done()
 
         # ── Edges ───────────────────────────────────────────────────────────

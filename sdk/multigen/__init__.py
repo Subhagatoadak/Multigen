@@ -19,6 +19,7 @@ Exceptions:
 """
 from .client import MultigenClient
 from .sync_client import SyncMultigenClient
+from .dsl import WorkflowBuilder, GraphBuilder
 from .models import (
     RunResponse,
     WorkflowState,
@@ -50,6 +51,9 @@ __all__ = [
     # Clients
     "MultigenClient",
     "SyncMultigenClient",
+    # DSL builders
+    "WorkflowBuilder",
+    "GraphBuilder",
     # Models
     "RunResponse",
     "WorkflowState",

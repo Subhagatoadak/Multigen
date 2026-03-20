@@ -1,441 +1,618 @@
 # Multigen
 
-**Autonomous, self-expanding multi-agent orchestration framework.**
-
-Multigen lets you compose AI agents into workflows using a declarative DSL — with built-in support for parallel execution, conditional branching, dynamic step generation, durable execution via Temporal, and a reinforcement-learning feedback loop that continuously optimises orchestration policy.
+**Enterprise-grade autonomous multi-agent orchestration framework with durable execution, epistemic transparency, and human-in-the-loop governance.**
 
 [![CI](https://github.com/Subhagatoadak/Multigen/actions/workflows/ci.yml/badge.svg)](https://github.com/Subhagatoadak/Multigen/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue)](https://www.python.org)
 [![License](https://img.shields.io/badge/license-Apache%202.0-green)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.1.0--dev-orange)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.2.0--dev-orange)](CHANGELOG.md)
+[![Temporal](https://img.shields.io/badge/temporal-1.11-blueviolet)](https://temporal.io)
+[![OpenTelemetry](https://img.shields.io/badge/otel-enabled-brightgreen)](https://opentelemetry.io)
+
+---
+
+## What is Multigen?
+
+Multigen is a production-ready orchestration framework for building complex AI agent pipelines. It goes far beyond simple agent chaining — it provides **durable execution**, **real-time runtime control**, **epistemic transparency**, and **autonomous self-expansion** with human governance.
+
+Built on top of [Temporal.io](https://temporal.io) for workflow durability, Apache Kafka for distributed messaging, and MongoDB for state persistence, Multigen is designed to run in enterprise environments where reliability, auditability, and human oversight are non-negotiable.
 
 ---
 
 ## Why Multigen?
 
-| Feature | LangGraph | CrewAI | AutoGen | **Multigen** |
-| --------- | ----------- | ------ | ------- | ------------ |
-| Declarative DSL | ✗ | ✗ | ✗ | ✅ |
-| Durable execution (Temporal) | ✗ | ✗ | ✗ | ✅ |
-| Parallel + conditional steps | Partial | ✗ | ✗ | ✅ |
-| Dynamic agent generation | ✗ | ✗ | ✗ | ✅ *(roadmap)* |
-| RL policy optimisation | ✗ | ✗ | ✗ | ✅ *(roadmap)* |
-| Self-registering agents | ✗ | ✗ | ✗ | ✅ |
-| OpenTelemetry tracing | ✗ | ✗ | ✗ | ✅ |
+| Capability | LangGraph | CrewAI | AutoGen | LlamaIndex Workflows | **Multigen** |
+|---|---|---|---|---|---|
+| Declarative workflow DSL | Partial | ✗ | ✗ | ✗ | ✅ |
+| Durable execution (crash recovery) | ✗ | ✗ | ✗ | ✗ | ✅ Temporal |
+| Real-time runtime control signals | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Dynamic agent creation + approval | ✗ | ✗ | Partial | ✗ | ✅ |
+| Epistemic transparency per node | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Circuit breakers per node | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Reflection / self-critique loops | Partial | ✗ | Partial | ✗ | ✅ |
+| Fan-out consensus reasoning | ✗ | ✗ | Partial | ✗ | ✅ |
+| Human-in-the-loop approval gates | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Kafka-based distributed messaging | ✗ | ✗ | ✗ | ✗ | ✅ |
+| OpenTelemetry + Prometheus | ✗ | ✗ | ✗ | ✗ | ✅ |
+| MCP server (Claude/Cursor/Windsurf) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Self-registering agent decorator | ✗ | ✗ | ✗ | ✗ | ✅ |
+
+---
+
+## Core Pillars
+
+### 1. Durable Execution
+Every workflow step is persisted in Temporal's event history. If the worker crashes mid-execution, the workflow resumes exactly where it left off — no lost work, no double execution, no manual recovery.
+
+### 2. Real-Time Runtime Control
+Running workflows can be interrupted, redirected, and extended without restarting:
+- **Interrupt / Resume** — pause at any node boundary
+- **Inject Node** — append a new agent node to a running workflow
+- **Jump To** — reprioritise any node to the front of the execution queue
+- **Skip Node** — silently drop a node from the pipeline
+- **Reroute** — add a new edge between nodes at runtime
+- **Prune Branch** — cancel a node and all its downstream descendants
+- **Fan-Out** — spawn N parallel nodes and merge via consensus
+
+### 3. Dynamic Agent Self-Healing
+When a workflow encounters an agent that doesn't exist yet, it doesn't crash. Instead:
+1. An LLM generates a detailed `AgentSpec` describing what the agent should do
+2. The workflow **pauses** and presents the spec for human review
+3. The human approves, edits, or rejects it
+4. On approval, a `BlueprintAgent` is created and registered live
+5. Execution resumes; the agent is deregistered when the workflow ends
+
+### 4. Epistemic Transparency
+Every node output carries a structured `epistemic` envelope:
+```json
+{
+  "confidence": 0.82,
+  "reasoning": "Analysis based on 3-year revenue history",
+  "uncertainty_sources": ["no audited financials", "stale comparables"],
+  "assumptions": ["8% revenue growth based on sector median"],
+  "known_limitations": ["cannot assess off-balance-sheet liabilities"],
+  "known_unknowns": ["regulatory filing status unknown"],
+  "evidence_quality": "medium",
+  "data_completeness": 0.72,
+  "propagated_uncertainty": 0.15,
+  "flags": ["needs_human_review"]
+}
+```
+Uncertainty **propagates through the graph** — if upstream nodes have low confidence, downstream nodes inherit that uncertainty. The full transparency report is queryable at any time.
+
+### 5. Reasoning Quality Mechanisms
+- **Reflection loops** — automatically inject a critic agent when confidence falls below threshold
+- **Fan-out consensus** — run N competing agents in parallel, select best via `highest_confidence`, `aggregate`, `majority_vote`, or `first_success`
+- **Circuit breakers** — per-node failure tracking with automatic fallback routing and dead-letter capture
+
+---
+
+## Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│          Client Layer (SDK / REST / MCP / CLI)                      │
+└──────────────────────────────┬──────────────────────────────────────┘
+                               │
+┌──────────────────────────────▼──────────────────────────────────────┐
+│                    Orchestrator  :8000 (FastAPI)                    │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────────┐  │
+│  │  DSL Parser  │  │  LLM text→   │  │  Graph Signal Controller │  │
+│  │  Validator   │  │  DSL Service │  │  (REST endpoints)        │  │
+│  └──────────────┘  └──────────────┘  └──────────────────────────┘  │
+└──────┬─────────────────────────────────────────┬────────────────────┘
+       │ validate                                 │ Temporal client
+       ▼                                          ▼
+┌─────────────┐                    ┌─────────────────────────────────┐
+│ Capability  │                    │         Temporal Server         │
+│ Service     │                    │    ComplexSequenceWorkflow       │
+│ :8001       │                    │    GraphWorkflow                │
+│ (MongoDB)   │                    │      • BFS execution            │
+└─────────────┘                    │      • Signal handlers          │
+                                   │      • Query handlers           │
+       ┌────────────────────────── │      • Epistemic tracking       │
+       │ Kafka                     └────────────┬────────────────────┘
+       ▼                                        │ activities
+┌─────────────┐                    ┌────────────▼────────────────────┐
+│  Apache     │                    │       Temporal Worker           │
+│  Kafka      ├───────────────────►│  • agent_activity               │
+│  flow-      │                    │  • tool_activity                │
+│  requests   │                    │  • create_agent_activity        │
+└─────────────┘                    │  • generate_agent_spec_activity │
+                                   │  • deregister_agents_activity   │
+                                   │  • persist_node_state_activity  │
+                                   └────────────┬────────────────────┘
+                                                │
+                                   ┌────────────▼────────────────────┐
+                                   │         Agent Registry          │
+                                   │  EchoAgent, LangChainAgent,     │
+                                   │  LlamaIndexAgent, SpawnerAgent, │
+                                   │  ScreeningAgents, PatternAgents │
+                                   │  + Dynamic BlueprintAgents      │
+                                   └─────────────────────────────────┘
+```
 
 ---
 
 ## Quickstart
 
-**Requirements:** Docker, Docker Compose, Python 3.11+
+**Requirements:** Docker, Docker Compose, Python 3.11+, OpenAI API key
 
 ```bash
 git clone https://github.com/Subhagatoadak/Multigen.git
 cd Multigen
+git submodule update --init --recursive   # pulls Agent-Components
 
-# Copy and fill in your environment variables
+# Set environment variables
 cp .env.example .env
-# Required: set OPENAI_API_KEY in .env (only needed for text-to-DSL feature)
+# Edit .env: set OPENAI_API_KEY, and optionally MULTIGEN_BASE_URL
 
-# Start all services
+# Start full stack (Temporal, Kafka, MongoDB, Orchestrator, Capability Service)
 docker-compose up -d --build
 
-# Wait ~60s for Temporal to initialise, then check health
+# Wait ~60s for Temporal to initialise
 curl http://localhost:8000/health   # {"status":"ok"}
-curl http://localhost:8001/health   # {"status":"ok"}
 ```
 
-**Register an agent and run your first workflow:**
-
-```bash
-# 1. Register EchoAgent with the capability directory
-curl -X POST http://localhost:8001/capabilities \
-  -H "Content-Type: application/json" \
-  -d '{"name":"EchoAgent","version":"1.0.0","description":"Echoes input","metadata":{}}'
-
-# 2. Submit a workflow
-curl -X POST http://localhost:8000/workflows/run \
-  -H "Content-Type: application/json" \
-  -d '{
-    "dsl": {
-      "steps": [
-        {"name":"step1","agent":"EchoAgent","params":{"msg":"hello multigen"}}
-      ]
-    }
-  }'
-# → {"instance_id": "..."}
-
-# 3. Watch it execute in the Temporal UI
-open http://localhost:8080
-```
-
----
-
-## Services
-
-| Service | URL | Description |
-| --------- | ----- | ------------- |
-| Orchestrator | `http://localhost:8000` | FastAPI — submit workflows, register agents |
-| Capability Service | `http://localhost:8001` | Agent capability directory (MongoDB-backed) |
-| Temporal UI | `http://localhost:8080` | Workflow execution dashboard |
-| Temporal gRPC | `localhost:7233` | Workflow engine |
-| Kafka | `localhost:9092` | Message bus |
-| MongoDB | `localhost:27017` | Capability + feedback store |
-
----
-
-## Architecture
-
-```text
-┌─────────────────────────────────────────────────────────────┐
-│  Client (curl / SDK / CLI)                                   │
-└─────────────────────┬───────────────────────────────────────┘
-                      │ POST /workflows/run
-┌─────────────────────▼───────────────────────────────────────┐
-│  Orchestrator  :8000  (FastAPI)                              │
-│  • DSL Parser  • LLM text→DSL  • Capability Validator        │
-│  • OTel Tracer                                               │
-└──────┬──────────────────────────────────┬───────────────────┘
-       │ validate                          │ publish
-       ▼                                   ▼
-┌─────────────────┐              ┌─────────────────────────────┐
-│ Capability Svc  │              │  Kafka: flow-requests        │
-│ :8001 (MongoDB) │              └──────────────┬──────────────┘
-└─────────────────┘                             │ consume
-                                   ┌────────────▼────────────┐
-                                   │  Flow Worker             │
-                                   │  (Kafka Consumer)        │
-                                   └────────────┬────────────┘
-                                                │ start_workflow
-                                   ┌────────────▼────────────┐
-                                   │  Temporal               │
-                                   │  ComplexSequenceWorkflow │
-                                   │  • sequential            │
-                                   │  • parallel              │
-                                   │  • conditional (AST eval)│
-                                   │  • dynamic subtrees      │
-                                   └────────────┬────────────┘
-                                                │ agent_activity
-                                   ┌────────────▼────────────┐
-                                   │  Temporal Worker         │
-                                   │  • EchoAgent             │
-                                   │  • LangChainAgent        │
-                                   │  • LlamaIndexAgent       │
-                                   │  • SpawnerAgent          │
-                                   │  • Custom agents         │
-                                   └─────────────────────────┘
-```
-
-See [`docs/architecture.html`](docs/architecture.html) for the full interactive architecture diagram (open in browser).
-
----
-
-## DSL Reference
-
-Workflows are defined as a JSON/YAML `steps` array. Four step types are supported:
-
-### Sequential
-
-```json
-{
-  "name": "summarise",
-  "agent": "LangChainAgent",
-  "params": {"text": "..."}
-}
-```
-
-### Parallel
-
-```json
-{
-  "name": "evaluate",
-  "parallel": [
-    {"name": "skill_check",   "agent": "SkillMatcherAgent",   "params": {}},
-    {"name": "culture_check", "agent": "CultureFitAgent",     "params": {}}
-  ]
-}
-```
-
-### Conditional
-
-Conditions are evaluated against accumulated step outputs using a safe AST evaluator — no `eval()`.
-
-```json
-{
-  "name": "route",
-  "conditional": [
-    {
-      "condition": "score >= 70",
-      "then": {"name": "interview", "agent": "InterviewSchedulerAgent", "params": {}}
-    }
-  ],
-  "else": {"name": "reject", "agent": "RejectionAgent", "params": {}}
-}
-```
-
-**Supported condition syntax:** `==`, `!=`, `<`, `<=`, `>`, `>=`, `and`, `or`, `not`, subscript access (`result["key"]`), attribute access.
-
-### Dynamic Subtree
-
-Runs a spawner agent whose output is a list of steps, then executes those steps.
-
-```json
-{
-  "name":  "expand",
-  "agent": "SpawnerAgent",
-  "params": {"count": 3, "agent": "EchoAgent"},
-  "dynamic_subtree": {}
-}
-```
-
----
-
-## Building an Agent
-
-1. **Implement** — subclass `BaseAgent`:
+### Run your first graph workflow (Python SDK)
 
 ```python
-# agents/my_agent/my_agent.py
+from multigen import SyncMultigenClient, GraphBuilder
+
+client = SyncMultigenClient("http://localhost:8000")
+
+graph = (
+    GraphBuilder()
+    .node("research").agent("EchoAgent").params(task="research NovaSemi Technologies").timeout(30).done()
+    .node("analysis").agent("EchoAgent").params(task="analyse findings").timeout(30).done()
+    .edge("research", "analysis")
+    .entry("research")
+    .build()
+)
+
+resp = client.run_graph(graph_def=graph, payload={"company": "NovaSemi"})
+print(f"Workflow: {resp.instance_id}")
+
+# Poll state
+state = client.get_state(resp.instance_id)
+for node in state.nodes:
+    print(f"  {node.node_id}: {node.output}")
+```
+
+### Run the M&A Due Diligence example
+
+```bash
+# Set your OpenAI key
+export OPENAI_API_KEY=sk-...
+export MULTIGEN_BASE_URL=http://localhost:8009   # if running orchestrator locally
+
+# Start services (see DEV.md for local setup without Docker)
+python -m workers.temporal_worker &        # Terminal 1
+uvicorn orchestrator.main:app --port 8009  # Terminal 2
+
+# Run the example
+python examples/ma_due_diligence/run.py
+```
+
+### Open the Jupyter notebooks
+
+```bash
+pip install jupyter
+jupyter notebook notebooks/
+```
+
+Start with `01_quickstart.ipynb` and progress through to `10_autonomy_transparency.ipynb`.
+
+---
+
+## Graph Workflow DSL
+
+### Building a graph programmatically
+
+```python
+from multigen import GraphBuilder
+
+graph = (
+    GraphBuilder()
+    # Simple agent node
+    .node("ingest")
+        .agent("DataIngestionAgent")
+        .params(source="s3://bucket/data.csv")
+        .timeout(60)
+        .done()
+
+    # Node with reflection (auto-critique if confidence < threshold)
+    .node("analyse")
+        .agent("AnalysisAgent")
+        .reflect(threshold=0.80, max_rounds=2, critic="CritiqueAgent")
+        .timeout(90)
+        .done()
+
+    # Fallback routing if circuit breaker trips
+    .node("report")
+        .agent("ReportAgent")
+        .fallback("FallbackReportAgent")
+        .timeout(60)
+        .done()
+
+    .edge("ingest", "analyse")
+    .edge("analyse", "report")
+    .entry("ingest")
+    .max_cycles(5)
+    .circuit_breaker(trip_threshold=3, recovery_executions=5)
+    .build()
+)
+```
+
+### Raw graph definition (dict)
+
+```python
+graph_def = {
+    "nodes": [
+        {
+            "id": "think",
+            "agent": "PlannerAgent",
+            "params": {"objective": "draft a quarterly strategy"},
+            "timeout": 60,
+            "retry": 3,
+            "reflection_threshold": 0.75,
+            "max_reflections": 2,
+            "critic_agent": "CritiqueAgent",
+            "fallback_agent": "FallbackPlannerAgent"
+        },
+        {
+            "id": "write",
+            "blueprint": {
+                "system_prompt": "You are a professional business writer...",
+                "instruction": "Draft a 500-word executive summary"
+            }
+        }
+    ],
+    "edges": [
+        {"source": "think", "target": "write"},
+        {"source": "write", "target": "review", "condition": "confidence < 0.8"}
+    ],
+    "entry": "think",
+    "max_cycles": 10,
+    "circuit_breaker": {"trip_threshold": 3, "recovery_executions": 5}
+}
+```
+
+---
+
+## Sequence Workflow DSL
+
+```python
+dsl = {
+    "steps": [
+        # Sequential step
+        {"name": "parse", "agent": "ParserAgent", "params": {"doc": "..."}},
+
+        # Parallel step
+        {
+            "name": "dual_review",
+            "parallel": [
+                {"name": "legal", "agent": "LegalReviewAgent"},
+                {"name": "technical", "agent": "TechReviewAgent"}
+            ]
+        },
+
+        # Conditional branch
+        {
+            "name": "escalate",
+            "condition": "steps.dual_review.legal.output.risk > 0.7",
+            "if_true": {"name": "escalate", "agent": "EscalationAgent"},
+            "if_false": {"name": "approve",  "agent": "ApprovalAgent"}
+        },
+
+        # Dynamic subtree (spawner generates steps at runtime)
+        {
+            "name": "custom_pipeline",
+            "dynamic_subtree": {"spawner": "PipelineSpawnerAgent", "params": {}}
+        }
+    ]
+}
+```
+
+---
+
+## Runtime Control Signals
+
+```python
+client = SyncMultigenClient("http://localhost:8000")
+wf_id = "wf-abc123"
+
+# Pause at the next node boundary
+client.interrupt(wf_id)
+
+# Inject a new node into the running workflow
+from multigen.models import InjectNodeRequest
+client.inject_node(wf_id, InjectNodeRequest(
+    id="security_check",
+    agent="SecurityAuditAgent",
+    params={"scope": "full"},
+    edges_to=["synthesis"]
+))
+
+# Prioritise a node
+client.jump_to(wf_id, "risk_assessment")
+
+# Add a conditional edge at runtime
+client.reroute(wf_id, source="analysis", target="escalation", condition="confidence < 0.6")
+
+# Run parallel hypotheses, pick best
+from multigen.models import FanOutRequest, FanOutNodeDef
+client.fan_out(wf_id, FanOutRequest(
+    group_id="multi_view",
+    consensus="highest_confidence",
+    nodes=[
+        FanOutNodeDef(id="optimist", agent="BullCaseAgent"),
+        FanOutNodeDef(id="pessimist", agent="BearCaseAgent"),
+        FanOutNodeDef(id="neutral",   agent="BaselineAgent"),
+    ]
+))
+
+# Resume after human review
+client.resume(wf_id)
+```
+
+---
+
+## Human Approval Gate
+
+```python
+# Poll for pending approvals
+approvals = client.get_pending_approvals(wf_id)
+
+if approvals:
+    spec = approvals[0]
+    print(f"Agent requested: {spec['agent_name']}")
+    print(f"Capability: {spec['capability_description']}")
+    print(f"Known limitations: {spec['known_limitations']}")
+
+    # Optionally edit the spec
+    spec["system_prompt"] += "\n\nAdditional constraint: flag anything with >20% uncertainty."
+
+    # Approve — workflow resumes, agent is created and runs
+    client.approve_agent(wf_id, spec)
+
+    # Or reject — node is skipped, workflow continues
+    # client.reject_agent(wf_id, spec["agent_name"], reason="Use ValuationAgent instead")
+```
+
+---
+
+## Epistemic Transparency
+
+```python
+report = client.get_epistemic_report(wf_id)
+
+print(f"Average confidence:    {report['summary']['avg_confidence']:.1%}")
+print(f"Nodes flagged:         {report['summary']['nodes_flagged_for_human_review']}")
+print(f"Trustworthiness:       {report['overall_trustworthiness']}")
+print(f"Recommendation:        {report['recommendation']}")
+
+# Per-node breakdown
+for node_id, state in report["node_states"].items():
+    print(f"  {node_id}: confidence={state['confidence']:.1%}  "
+          f"propagated_uncertainty={state['propagated_uncertainty']:.1%}")
+```
+
+---
+
+## Writing an Agent
+
+```python
 from agents.base_agent import BaseAgent
 from orchestrator.services.agent_registry import register_agent
 
-@register_agent("MyAgent")
-class MyAgent(BaseAgent):
+@register_agent("FinancialAnalystAgent")
+class FinancialAnalystAgent(BaseAgent):
     async def run(self, params: dict) -> dict:
-        # your logic here
-        return {"result": params.get("input", "") + " processed"}
+        company = params.get("company", "Unknown")
+        # ... your analysis logic ...
+        return {
+            "output": {
+                "dcf_valuation": 1_200_000_000,
+                "recommendation": "BUY",
+                "confidence": 0.84,
+                "epistemic": {
+                    "confidence": 0.84,
+                    "reasoning": "3-year DCF with sector comps",
+                    "uncertainty_sources": ["no audited H2 data"],
+                    "assumptions": ["8% revenue growth"],
+                    "known_limitations": ["off-balance-sheet items excluded"],
+                    "known_unknowns": ["cap table concentration"],
+                    "evidence_quality": "medium",
+                    "data_completeness": 0.78,
+                    "flags": []
+                }
+            }
+        }
 ```
 
-1. **Import** in the Temporal worker so the decorator fires:
-
-```python
-# workers/temporal_worker.py
-import agents.my_agent.my_agent  # noqa: F401
-```
-
-1. **Register** with the capability directory:
-
-```bash
-curl -X POST http://localhost:8001/capabilities \
-  -H "Content-Type: application/json" \
-  -d '{"name":"MyAgent","version":"1.0.0","description":"...","metadata":{}}'
-```
-
-1. **Rebuild** the worker container:
-
-```bash
-docker-compose up -d --build temporal-worker
-```
-
-That's it — your agent is now available in any workflow DSL.
+The `@register_agent` decorator auto-registers the agent in the live registry. Import the module in `workers/temporal_worker.py` and the agent is immediately available to all workflows.
 
 ---
 
-## Example: Resume Screening Pipeline
+## Observability
 
-A complete end-to-end example that exercises all four step types.
+### OpenTelemetry
+Every node execution generates an OTel span with attributes:
+- `graph.node_id`, `graph.agent`, `graph.iteration`
+- `graph.circuit_state`, `graph.confidence`
+- `graph.epistemic_debt` (count of known unknowns)
+- `graph.duration_ms`
 
-**Pipeline:**
-
-```text
-Resume Input
-    │
-    ▼ sequential
-ResumeParserAgent          — normalise raw input
-    │
-    ▼ parallel (3 concurrent)
-SkillMatcherAgent          — score skill match vs. job requirements
-ExperienceEvaluatorAgent   — score seniority & years
-CultureFitAgent            — score values alignment
-    │
-    ▼ sequential
-ScoreAggregatorAgent       — weighted overall score (skill 50%, exp 30%, culture 20%)
-    │
-    ▼ conditional  (score >= 70 ?)
-InterviewSchedulerAgent    — book interview slot        ← YES
-RejectionAgent             — polite rejection           ← NO
-    │
-    ▼ sequential
-ReportCompilerAgent        — final screening report
+Configure your OTLP exporter endpoint in `.env`:
+```
+OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
 ```
 
-**Run it:**
+### Prometheus
+Counters exposed at `/metrics`:
+- `multigen_nodes_total` — total nodes executed
+- `multigen_errors_total` — node failures
+- `multigen_reflections_total` — reflection loops triggered
+- `multigen_circuit_open_total` — circuit breaker trips
 
-```bash
-# Register all 8 screening agents
-# Submit a strong candidate (score ~98 → interview)
-python examples/resume_screening.py --candidate strong
-
-# Submit a weak candidate (score ~10 → reject)
-python examples/resume_screening.py --candidate weak
-
-# Show the full DSL before submitting
-python examples/resume_screening.py --candidate borderline --show-dsl
-```
-
-**Expected outcomes:**
-
-| Profile | Skills | Experience | Culture | Overall | Decision |
-| --------- | -------- | ------------ | ------- | ------- | ---------- |
-| `strong` | 96 | 100 | 100 | **98** | ✅ Interview |
-| `borderline` | 73 | 100 | 67 | **79** | ✅ Interview |
-| `weak` | 0 | 33 | 0 | **10** | ❌ Reject |
-
-Watch execution live at `http://localhost:8080` (Temporal UI).
+### Temporal UI
+Access the workflow event history and execution timeline at `http://localhost:8080` (Temporal Web UI).
 
 ---
 
-## Running Tests
+## MCP Server (Claude Desktop / Cursor / Windsurf)
+
+Multigen ships with a Model Context Protocol server, letting you control workflows from any MCP-compatible AI assistant.
 
 ```bash
-pip install -r requirements.txt -r requirement_dev.txt
-pytest tests/ -v
+python -m mcp_server.server
 ```
+
+Add to `claude_desktop_config.json`:
+```json
+{
+  "mcpServers": {
+    "multigen": {
+      "command": "python",
+      "args": ["-m", "mcp_server.server"],
+      "cwd": "/path/to/Multigen"
+    }
+  }
+}
+```
+
+Available MCP tools: `start_workflow`, `run_graph`, `interrupt`, `resume`, `inject_node`, `jump_to`, `fan_out`, `get_state`, `get_epistemic_report`, `approve_agent`, `reject_agent`.
 
 ---
 
 ## Project Structure
 
-```text
+```
 Multigen/
-├── agents/
-│   ├── base_agent.py              # BaseAgent abstract class
-│   ├── echo_agent/                # Demo agent
-│   ├── langchain_agent/           # LangChain LCEL agent
-│   ├── llamaindex_agent/          # LlamaIndex retrieval agent
-│   ├── spawner_agent/             # Dynamic step generator
-│   └── screening_agents/          # Resume screening example agents
-├── orchestrator/
-│   ├── main.py                    # FastAPI app + OTel setup
-│   ├── controller/
-│   │   ├── workflow.py            # POST /workflows/run
-│   │   └── registration.py        # POST /capabilities
-│   ├── services/
-│   │   ├── config.py              # Environment config
-│   │   ├── agent_registry.py      # @register_agent decorator
-│   │   ├── dsl_parser.py          # DSL → Step objects
-│   │   ├── capability_directory.py
-│   │   ├── capability_directory_client.py
-│   │   ├── flow_messaging.py      # Kafka consumer worker
-│   │   └── llm_service.py         # text → DSL via OpenAI
-│   └── telemetry.py               # OpenTelemetry setup
-├── flow_engine/
-│   └── workflows/sequence.py      # ComplexSequenceWorkflow (Temporal)
-├── capability_service/
-│   └── main.py                    # Capability directory FastAPI app
-├── workers/
-│   └── temporal_worker.py         # Temporal worker process
-├── messaging/
-│   └── kafka_client.py            # Confluent Kafka wrapper
-├── examples/
-│   └── resume_screening.py        # End-to-end pipeline demo
-├── tests/                         # pytest test suite
-├── docs/
-│   ├── architecture.html          # Interactive architecture diagram
-│   ├── architecture.md            # Mermaid diagrams
-│   └── ...
-├── docker-compose.yml
-├── Dockerfile.orchestrator
-├── Dockerfile.capability
-├── requirements.txt
-└── .env.example
+├── agents/                      # Agent implementations
+│   ├── base_agent.py            # BaseAgent abstract class
+│   ├── echo_agent/              # Demo EchoAgent
+│   ├── langchain_agent/         # LangChain LCEL integration
+│   ├── llamaindex_agent/        # LlamaIndex RAG integration
+│   ├── spawner_agent/           # Dynamic subtree spawner
+│   ├── screening_agents/        # Resume screening pipeline
+│   └── pattern_agents/          # Ministry of Experts, Swarm, Debate
+├── orchestrator/                # FastAPI orchestration server
+│   ├── controller/              # REST endpoints
+│   └── services/                # DSL parser, registry, LLM, Kafka, MongoDB
+├── flow_engine/                 # Temporal workflow execution
+│   ├── workflows/sequence.py    # ComplexSequenceWorkflow
+│   └── graph/                   # GraphWorkflow + all sub-systems
+│       ├── engine.py            # Main workflow, signals, queries, activities
+│       ├── autonomy.py          # Dynamic agent lifecycle
+│       ├── epistemic.py         # Epistemic transparency engine
+│       ├── reasoning.py         # Reflection, fan-out consensus
+│       ├── circuit_breaker.py   # Per-node circuit breaker
+│       ├── agent_factory.py     # BlueprintAgent factory
+│       └── telemetry.py         # OTel spans + Prometheus counters
+├── workers/temporal_worker.py   # Temporal worker entrypoint
+├── messaging/kafka_client.py    # Kafka producer/consumer
+├── capability_service/          # Agent capability directory microservice
+├── mcp_server/                  # MCP server for AI assistants
+├── sdk/multigen/                # Python client SDK
+│   ├── client.py                # Async HTTP client
+│   ├── sync_client.py           # Sync wrapper (Jupyter-safe)
+│   ├── dsl.py                   # GraphBuilder, WorkflowBuilder
+│   └── models.py                # Pydantic request/response models
+├── examples/                    # End-to-end examples
+│   ├── resume_screening.py      # Resume screening pipeline
+│   └── ma_due_diligence/        # M&A due diligence graph workflow
+├── notebooks/                   # Jupyter notebooks (10 feature demos)
+├── tests/                       # pytest test suite
+├── docs/                        # Architecture diagrams, whitepapers
+├── Agent-Components/            # agentic_codex submodule (tools, patterns)
+└── docker-compose.yml           # Full local stack
 ```
 
 ---
 
-## Configuration
-
-Copy `.env.example` to `.env` and set the values:
+## Environment Variables
 
 | Variable | Default | Description |
-| ---------- | --------- | ------------- |
-| `OPENAI_API_KEY` | — | Required for text-to-DSL preprocessing |
-| `LLM_MODEL` | `gpt-4o` | OpenAI model to use |
-| `KAFKA_BROKER_URL` | `localhost:9092` | Kafka broker |
-| `TEMPORAL_SERVER_URL` | `localhost:7233` | Temporal gRPC address |
-| `MONGODB_URI` | `mongodb://localhost:27017` | MongoDB connection |
-| `CAPABILITY_SERVICE_URL` | `http://localhost:8000` | Capability service base URL |
-| `OTEL_EXPORTER_OTLP_ENDPOINT` | — | OTLP collector (Jaeger/Grafana). Console if unset |
-| `OTEL_SERVICE_NAME` | `multigen-orchestrator` | Service name in traces |
-| `LLAMAINDEX_DOCS_PATH` | `./data/docs` | Document directory for LlamaIndexAgent |
+|---|---|---|
+| `OPENAI_API_KEY` | — | Required for LLM-powered features (text→DSL, dynamic agent spec generation) |
+| `TEMPORAL_SERVER_URL` | `localhost:7233` | Temporal gRPC endpoint |
+| `TEMPORAL_TASK_QUEUE` | `multigen-queue` | Temporal task queue name |
+| `KAFKA_BOOTSTRAP_SERVERS` | `localhost:9092` | Kafka broker addresses |
+| `MONGODB_URI` | `mongodb://localhost:27017` | MongoDB connection string |
+| `MULTIGEN_BASE_URL` | `http://localhost:8000` | Orchestrator base URL (used by SDK) |
+| `LLM_MODEL` | `gpt-4o` | OpenAI model for agent spec generation |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://localhost:4317` | OTLP exporter for traces/metrics |
 
 ---
 
-## Roadmap
+## Development Setup
 
-### v0.1 — Foundation ✅
+```bash
+# Create virtual environment
+python -m venv .venv && source .venv/bin/activate
 
-- [x] FastAPI orchestrator with DSL parsing
-- [x] Sequential, parallel, conditional, dynamic step execution
-- [x] Temporal workflow engine integration
-- [x] Kafka message bus (request / response / DLQ)
-- [x] MongoDB capability directory
-- [x] `@register_agent` decorator system
-- [x] OpenTelemetry tracing
-- [x] Prometheus metrics
-- [x] Docker Compose local dev stack
-- [x] GitHub Actions CI
+# Install all dependencies
+pip install -r requirements.txt
+pip install -e ./Agent-Components   # local agentic_codex
+pip install -e ./sdk                # local multigen SDK
 
-### v0.2 — Developer Experience
+# Run tests
+pytest tests/ -v
 
-- [ ] Python SDK (`pip install multigen-sdk`)
-- [ ] CLI (`multigen run workflow.yaml`)
-- [ ] Output variable interpolation between steps (`{{steps.step1.output.key}}`)
-- [ ] Per-step timeout configuration
-- [ ] Agent input/output schema validation
+# Run linter
+ruff check . && ruff format --check .
 
-### v0.3 — Enterprise
+# Start local services (without Docker)
+# Terminal 1: Temporal (requires temporal CLI)
+temporal server start-dev
 
-- [ ] JWT authentication on orchestrator
-- [ ] OPA (Open Policy Agent) guardrails
-- [ ] Human-in-the-loop approval engine (Temporal signals)
-- [ ] Error handler with escalation policies
-- [ ] Helm chart for Kubernetes deployment
-- [ ] Multi-tenancy (namespaced capability directories)
+# Terminal 2: MongoDB
+mongod --dbpath ./data/db
 
-### v0.4 — Intelligence
+# Terminal 3: Orchestrator
+uvicorn orchestrator.main:app --host 0.0.0.0 --port 8000 --reload
 
-- [ ] Feedback collector (structured outcome events per workflow)
-- [ ] RL policy learner (PPO — optimise agent routing + retry policy)
-- [ ] AgentFactory (LLM-driven agent code generation + SAST + CI deploy)
-- [ ] Drift monitor + prompt optimiser
+# Terminal 4: Temporal Worker
+python -m workers.temporal_worker
+```
+
+See [docs/DEV.md](docs/DEV.md) for detailed development guide.
 
 ---
 
-## Contributing
+## Notebooks
 
-1. Fork the repo and create a branch: `git checkout -b feature/my-agent`
-2. Build a new agent (see [Building an Agent](#building-an-agent) above)
-3. Add tests in `tests/`
-4. Open a PR — CI runs automatically
-
-See `CONTRIBUTING.md` for full guidelines.
-
----
-
-## Tech Stack
-
-| Layer | Technology |
-| ------- | ----------- |
-| API | FastAPI 0.115, Pydantic v2, Uvicorn |
-| Workflow engine | Temporal.io 1.11 |
-| Message bus | Apache Kafka (confluent-kafka 2.10) |
-| Persistence | MongoDB (Motor async driver) |
-| LLM / AI | OpenAI 1.76, LangChain, LlamaIndex |
-| Observability | OpenTelemetry, Prometheus |
-| Infrastructure | Docker Compose, Kubernetes / Helm *(roadmap)* |
-| CI | GitHub Actions, ruff |
+| Notebook | What you'll learn |
+|---|---|
+| [01_quickstart](notebooks/01_quickstart.ipynb) | Connect to Multigen, run your first workflow |
+| [02_graph_workflow](notebooks/02_graph_workflow.ipynb) | Build directed graph workflows with nodes, edges, conditions |
+| [03_signals_control](notebooks/03_signals_control.ipynb) | Interrupt, inject, jump, skip, reroute at runtime |
+| [04_circuit_breakers](notebooks/04_circuit_breakers.ipynb) | Fault tolerance: circuit breakers, fallback routing, dead letters |
+| [05_reflection_loops](notebooks/05_reflection_loops.ipynb) | Self-improvement: auto-critique when confidence is low |
+| [06_fan_out_consensus](notebooks/06_fan_out_consensus.ipynb) | Parallel hypotheses: run N agents, pick best via consensus |
+| [07_dynamic_agents](notebooks/07_dynamic_agents.ipynb) | Create agents at runtime from LLM-generated blueprints |
+| [08_observability](notebooks/08_observability.ipynb) | OTel tracing, Prometheus metrics, Temporal UI |
+| [09_mmm_autopilot](notebooks/09_mmm_autopilot.ipynb) | Full autopilot: hierarchical MMM with synthetic data |
+| [10_autonomy_transparency](notebooks/10_autonomy_transparency.ipynb) | Dynamic agents + human approval + epistemic transparency report |
 
 ---
 
-## References
+## License
 
-1. IBM Research, "Autonomic Computing," 2003
-2. Microsoft Research, "AutoGen: A Framework for Agentic AI," 2024
-3. Kreps et al., "Kafka: a Distributed Messaging System for Log Processing," 2011
-4. Schulman et al., "Proximal Policy Optimization Algorithms," 2017
-5. [Temporal.io Documentation](https://docs.temporal.io)
+Apache License 2.0 — see [LICENSE](LICENSE).
 
 ---
 
-Version: 0.1.0-dev · Apache 2.0 License
+## Citation
+
+```bibtex
+@software{multigen2026,
+  title   = {Multigen: Enterprise Multi-Agent Orchestration Framework},
+  author  = {Adak, Subhagato},
+  year    = {2026},
+  url     = {https://github.com/Subhagatoadak/Multigen},
+  license = {Apache-2.0}
+}
+```

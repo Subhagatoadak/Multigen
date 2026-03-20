@@ -45,8 +45,8 @@ _root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__
 if _root not in sys.path:
     sys.path.insert(0, _root)
 
-from sdk.multigen.client import MultigenClient
-from sdk.multigen.models import FanOutNodeDef, FanOutRequest, InjectNodeRequest
+from multigen.client import MultigenClient
+from multigen.models import FanOutNodeDef, FanOutRequest, InjectNodeRequest
 from examples.ma_due_diligence.workflow import build_ma_graph, build_payload
 
 # ── Configuration ──────────────────────────────────────────────────────────────
@@ -118,8 +118,7 @@ async def run_demo(client: MultigenClient) -> None:
         },
     )
 
-    dsl = {"steps": [{"name": "due_diligence", "graph": graph_def}]}
-    resp = await client.run_workflow(dsl=dsl, payload=payload)
+    resp = await client.run_graph(graph_def=graph_def, payload=payload)
     wf_id = resp.instance_id
 
     _print_result("Workflow launched", {"instance_id": wf_id, "status": "running"})
@@ -134,7 +133,7 @@ async def run_demo(client: MultigenClient) -> None:
         "key_products, data_quality_issues, confidence ~0.85"
     )
 
-    ingest_output = await _wait_for_node(client, wf_id, "ingest", timeout=90)
+    ingest_output = await _wait_for_node(client, wf_id, "ingest", timeout=150)
     _print_result("ingest output", ingest_output)
 
     # ── Step 3: Parallel expert analysis begins ───────────────────────────────
@@ -154,7 +153,8 @@ async def run_demo(client: MultigenClient) -> None:
     expert_results: Dict[str, Any] = {}
 
     # Poll all in parallel
-    tasks = [_wait_for_node(client, wf_id, n, timeout=180) for n in expert_nodes]
+    # 5 agents run sequentially in the BFS queue; allow 120s per agent × 5 = 600s
+    tasks = [_wait_for_node(client, wf_id, n, timeout=700) for n in expert_nodes]
     results = await asyncio.gather(*tasks, return_exceptions=True)
 
     for node, result in zip(expert_nodes, results):
@@ -202,7 +202,7 @@ async def run_demo(client: MultigenClient) -> None:
         "conditions_to_proceed, confidence ~0.84"
     )
 
-    risk_output = await _wait_for_node(client, wf_id, "risk_synthesis", timeout=180)
+    risk_output = await _wait_for_node(client, wf_id, "risk_synthesis", timeout=300)
     _print_result("risk_synthesis output", risk_output)
 
     # ── Step 6: INTERRUPT for human review ───────────────────────────────────
@@ -274,7 +274,7 @@ async def run_demo(client: MultigenClient) -> None:
         "Cycle guard limits to max_cycles=6 to prevent infinite loops."
     )
 
-    valuation_output = await _wait_for_node(client, wf_id, "valuation", timeout=300)
+    valuation_output = await _wait_for_node(client, wf_id, "valuation", timeout=400)
     _print_result("valuation output", valuation_output)
 
     # ── Step 10: Compliance check ─────────────────────────────────────────────
@@ -286,7 +286,7 @@ async def run_demo(client: MultigenClient) -> None:
         "Fallback returns conservative estimates (18 months, high risk) to unblock pipeline."
     )
 
-    compliance_output = await _wait_for_node(client, wf_id, "compliance", timeout=180)
+    compliance_output = await _wait_for_node(client, wf_id, "compliance", timeout=300)
     _print_result("compliance output", compliance_output)
 
     # Show circuit breaker status
@@ -304,7 +304,7 @@ async def run_demo(client: MultigenClient) -> None:
         "top_3_value_creation_levers, top_3_deal_risks, conditions_for_proceeding, next_steps."
     )
 
-    summary_output = await _wait_for_node(client, wf_id, "exec_summary", timeout=300)
+    summary_output = await _wait_for_node(client, wf_id, "exec_summary", timeout=400)
     _print_result("EXECUTIVE SUMMARY", summary_output)
 
     # ── Step 12: Final state from MongoDB ─────────────────────────────────────
