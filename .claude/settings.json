@@ -1,7 +1,20 @@
 {
   "permissions": {
     "allow": [
-      "Bash(open /Users/subhagatoadak/Documents/github/Multigen/docs/architecture.html)"
+      "Bash(open /Users/subhagatoadak/Documents/github/Multigen/docs/architecture.html)",
+      "Read(//Users/subhagatoadak/Documents/github/**)",
+      "Read(//Users/subhagatoadak/**)",
+      "Bash(pip install:*)",
+      "Bash(python -c \":*)",
+      "Bash(grep -r \"NotImplementedError\\\\|pass$\\\\|TODO\\\\|FIXME\" /Users/subhagatoadak/Documents/github/Multigen --include=\"*.py\")",
+      "Bash(python3 -c \"import sys; sys.path.insert\\(0, ''/Users/subhagatoadak/Documents/github/Multigen''\\); import py_compile; import os; errors = [];:*)",
+      "Bash(for d:*)",
+      "Bash(do mkdir:*)",
+      "Bash(touch /Users/subhagatoadak/Documents/github/Multigen/$d/__init__.py)",
+      "Bash(done)"
+    ],
+    "additionalDirectories": [
+      "/Users/subhagatoadak/Documents/github/Multigen/Agent-Components/.git"
     ]
   }
 }

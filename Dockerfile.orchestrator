@@ -12,6 +12,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+# Install the bundled cognitive layer (agentic_codex) from Agent-Components/
+RUN pip install --no-cache-dir -e ./Agent-Components
+
 EXPOSE 8000
 
 CMD ["uvicorn", "orchestrator.main:app", "--host", "0.0.0.0", "--port", "8000"]

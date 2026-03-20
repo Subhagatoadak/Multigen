@@ -5,6 +5,7 @@ and error resilience.
 """
 import ast
 import operator
+import re
 from datetime import timedelta
 from typing import Any, Dict, List, Optional
 import asyncio
@@ -18,6 +19,37 @@ import orchestrator.services.config as config
 from orchestrator.services.agent_registry import get_agent
 
 _tracer = trace.get_tracer(__name__)
+
+# ─── Output reference resolver ─────────────────────────────────────────────────
+
+_REF_RE = re.compile(r"\{\{steps\.([^.}\s]+)\.output\.([^}\s]+)\}\}")
+
+
+def _resolve_refs(value: Any, context: Dict[str, Any]) -> Any:
+    """
+    Recursively replace ``{{steps.<step>.output.<key.path>}}`` placeholders
+    with the actual value from the accumulated step-output context.
+
+    Supports nested key paths: ``{{steps.parse.output.profile.skills}}``.
+    If the reference cannot be resolved the placeholder is left intact.
+    """
+    if isinstance(value, str):
+        def _sub(match: re.Match) -> str:
+            step_name = match.group(1)
+            key_path = match.group(2).split(".")
+            obj: Any = context.get(step_name, {})
+            for key in key_path:
+                if isinstance(obj, dict):
+                    obj = obj.get(key)
+                else:
+                    return match.group(0)  # unresolvable — leave as-is
+            return str(obj) if obj is not None else match.group(0)
+        return _REF_RE.sub(_sub, value)
+    if isinstance(value, dict):
+        return {k: _resolve_refs(v, context) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_resolve_refs(item, context) for item in value]
+    return value
 
 
 if not hasattr(workflow, "WorkflowError"):
@@ -72,17 +104,24 @@ def _eval_node(node: ast.AST, ctx: Dict[str, Any]) -> Any:
     raise ValueError(f"Unsupported expression node: {type(node).__name__}")
 
 
+_condition_logger = logging.getLogger(__name__)
+
+
 def evaluate_condition(condition: str, context: Dict[str, Any]) -> bool:
     """
     Safely evaluate a condition string against a context dict of prior step outputs.
     Only comparisons, boolean ops, attribute/subscript access, and constants are allowed.
-    Returns False on any parse or evaluation error.
+    Returns False on any parse or evaluation error (logged at DEBUG level).
     """
     try:
         tree = ast.parse(condition, mode='eval')
         result = _eval_node(tree.body, context)
         return bool(result)
-    except Exception:
+    except SyntaxError as exc:
+        _condition_logger.debug("Condition syntax error %r: %s", condition, exc)
+        return False
+    except Exception as exc:
+        _condition_logger.debug("Condition evaluation failed %r: %s", condition, exc)
         return False
 
 
@@ -131,7 +170,8 @@ class ComplexSequenceWorkflow:
 
         async def _execute(step: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             agent_name = step.get("agent") or step.get("name")
-            params = step.get("params") or payload
+            raw_params = step.get("params") or payload
+            params = _resolve_refs(raw_params, context)
             retry_count = step.get("retry", 3)
             policy = RetryPolicy(
                 initial_interval=timedelta(seconds=1),
@@ -188,6 +228,27 @@ class ComplexSequenceWorkflow:
                         context[step_name] = res.get("output", {})
                         results.append(res)
 
+            elif step_type == "loop":
+                loop_cfg = step.get("loop", {})
+                until_cond = loop_cfg.get("until", "")
+                max_iter = int(loop_cfg.get("max_iterations", 10))
+                loop_steps = loop_cfg.get("steps", [])
+
+                for _iteration in range(max_iter):
+                    for sub in loop_steps:
+                        res = await _execute(sub)
+                        if res is None:
+                            continue
+                        if "error" in res:
+                            errors.append(f"{res.get('agent')}: {res['error']}")
+                        else:
+                            context[sub.get("name", "")] = res.get("output", {})
+                            results.append(res)
+
+                    # Check exit condition after each full iteration
+                    if until_cond and evaluate_condition(until_cond, context):
+                        break
+
             elif step_type == "dynamic":
                 # Step 1: run the spawner agent to get sub-steps
                 spawner_res = await _execute(step)
@@ -211,6 +272,28 @@ class ComplexSequenceWorkflow:
                             results.append(res)
                 elif spawner_res:
                     errors.append(f"{spawner_res.get('agent')}: {spawner_res['error']}")
+
+            elif step_type == "graph":
+                # Delegate to GraphWorkflow as a child workflow.
+                # The child gets its own Temporal execution history and can be
+                # independently interrupted, resumed, and queried.
+                from flow_engine.graph.engine import GraphWorkflow
+
+                graph_def = step.get("graph", {})
+                child_id = f"{workflow.info().workflow_id}_{step_name}"
+
+                graph_result = await workflow.execute_child_workflow(
+                    GraphWorkflow.run,
+                    args=[graph_def, payload],
+                    id=child_id,
+                    task_queue=config.TEMPORAL_TASK_QUEUE,
+                )
+                context[step_name] = graph_result.get("context", {})
+                results.append({
+                    "agent": "graph",
+                    "node_id": step_name,
+                    "output": graph_result,
+                })
 
             else:
                 # Default: sequential

@@ -36,6 +36,16 @@ MONGODB_URI = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
 CAPABILITY_DB_NAME = os.getenv("CAPABILITY_DB_NAME", "multigen")
 CAPABILITY_COLLECTION_NAME = os.getenv("CAPABILITY_COLLECTION_NAME", "capabilities")
 
-# Capability Directory HTTP API
-CAPABILITY_SERVICE_URL = os.getenv("CAPABILITY_SERVICE_URL", "http://localhost:8000")
+# Capability Directory HTTP API (runs on port 8001, distinct from orchestrator on 8000)
+CAPABILITY_SERVICE_URL = os.getenv("CAPABILITY_SERVICE_URL", "http://localhost:8001")
+
+# Kafka consumer group
+KAFKA_CONSUMER_GROUP = os.getenv("KAFKA_CONSUMER_GROUP", "multigen-flow")
+
+# Graph engine defaults
+GRAPH_MAX_CYCLES = int(os.getenv("GRAPH_MAX_CYCLES", "20"))
+GRAPH_CB_TRIP_THRESHOLD = int(os.getenv("GRAPH_CB_TRIP_THRESHOLD", "3"))
+GRAPH_CB_RECOVERY_EXECUTIONS = int(os.getenv("GRAPH_CB_RECOVERY_EXECUTIONS", "5"))
+GRAPH_STATE_DB_NAME = os.getenv("GRAPH_STATE_DB_NAME", "multigen")
+GRAPH_STATE_COLLECTION = os.getenv("GRAPH_STATE_COLLECTION", "graph_state")
 

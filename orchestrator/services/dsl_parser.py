@@ -62,13 +62,17 @@ class Step:
         parallel: Sub-steps to execute in parallel.
         conditional: Conditional branches off this step.
         dynamic_subtree: Definition for spawning a dynamic subtree.
+        loop: Loop configuration for cyclic execution.
     """
     name: str
     agent: Optional[str] = None
+    agent_version: Optional[str] = None
     params: Dict[str, Any] = field(default_factory=dict)
     parallel: List['Step'] = field(default_factory=list)
     conditional: List[ConditionalBranch] = field(default_factory=list)
     dynamic_subtree: Optional[Dict[str, Any]] = None
+    loop: Optional[Dict[str, Any]] = None
+    graph: Optional[Dict[str, Any]] = None
 
     def __repr__(self) -> str:
         return f"Step(name={self.name!r}, agent={self.agent!r})"
@@ -143,6 +147,8 @@ def parse_step(node: Dict[str, Any]) -> Step:
     step.parallel = _parse_parallel_steps(node, name)
     step.conditional = _parse_conditional_branches(node, name)
     step.dynamic_subtree = _parse_dynamic_subtree(node, name)
+    step.loop = _parse_loop(node, name)
+    step.graph = _parse_graph(node, name)
 
     _validate_step_has_action(step, node)
     _warn_unknown_keys(node, name)
@@ -160,6 +166,12 @@ def _parse_agent_and_params(node: Dict[str, Any], step: Step) -> None:
         if not isinstance(agent, str):
             raise DSLParseError("'agent' must be a string", node=node, step_name=step.name)
         step.agent = agent
+
+    agent_version = node.get('agent_version')
+    if agent_version is not None:
+        if not isinstance(agent_version, str):
+            raise DSLParseError("'agent_version' must be a string", node=node, step_name=step.name)
+        step.agent_version = agent_version
 
     params = node.get('params', {})
     if not isinstance(params, dict):
@@ -243,6 +255,68 @@ def _parse_conditional_branches(node: Dict[str, Any], step_name: str) -> List[Co
     return branches
 
 
+def _parse_graph(node: Dict[str, Any], step_name: str) -> Optional[Dict[str, Any]]:
+    """
+    Parse a graph step definition.
+
+    Expected shape:
+        graph:
+          entry: "node_id"
+          max_cycles: 5
+          nodes:
+            - {id, agent, params, tools, retry, timeout}
+          edges:
+            - {source, target, condition}
+    """
+    graph = node.get("graph")
+    if graph is None:
+        return None
+    if not isinstance(graph, dict):
+        raise DSLParseError("'graph' must be a dictionary", node=node, step_name=step_name)
+    if "entry" not in graph:
+        raise DSLParseError("'graph' must have an 'entry' node id", node=node, step_name=step_name)
+    if not isinstance(graph.get("nodes"), list) or not graph["nodes"]:
+        raise DSLParseError("'graph.nodes' must be a non-empty list", node=node, step_name=step_name)
+    return graph
+
+
+def _parse_loop(node: Dict[str, Any], step_name: str) -> Optional[Dict[str, Any]]:
+    """
+    Parse a loop step definition.
+
+    Expected shape:
+        loop:
+          until: "quality_score >= 0.9"   # condition checked after each iteration
+          max_iterations: 5               # hard cap (default 10)
+          steps: [...]                    # sub-steps to execute each iteration
+    """
+    loop = node.get('loop')
+    if loop is None:
+        return None
+    if not isinstance(loop, dict):
+        raise DSLParseError("'loop' must be a dictionary", node=node, step_name=step_name)
+
+    loop_steps = loop.get('steps')
+    if not isinstance(loop_steps, list) or not loop_steps:
+        raise DSLParseError(
+            "'loop.steps' must be a non-empty list of step definitions",
+            node=node,
+            step_name=step_name,
+        )
+
+    for idx, sub in enumerate(loop_steps):
+        try:
+            parse_step(sub)
+        except DSLParseError as exc:
+            raise DSLParseError(
+                f"Error in loop sub-step at index {idx}: {exc}",
+                node=sub,
+                step_name=step_name,
+            ) from exc
+
+    return loop
+
+
 def _parse_dynamic_subtree(node: Dict[str, Any], step_name: str) -> Optional[Dict[str, Any]]:
     """
     Parse a dynamic subtree definition.
@@ -292,11 +366,11 @@ def _normalize_branch_node(
 
 def _validate_step_has_action(step: Step, node: Dict[str, Any]) -> None:
     """
-    Ensure the step has at least one action: agent, parallel, conditional, or dynamic_subtree.
+    Ensure the step has at least one action: agent, parallel, conditional, dynamic_subtree, or loop.
     """
-    if not (step.agent or step.parallel or step.conditional or step.dynamic_subtree):
+    if not (step.agent or step.parallel or step.conditional or step.dynamic_subtree or step.loop or step.graph):
         raise DSLParseError(
-            "Step must define at least one of: 'agent', 'parallel', 'conditional', or 'dynamic_subtree'",
+            "Step must define at least one of: 'agent', 'parallel', 'conditional', 'dynamic_subtree', or 'loop'",
             node=node,
             step_name=step.name,
         )
@@ -306,7 +380,7 @@ def _warn_unknown_keys(node: Dict[str, Any], step_name: str) -> None:
     """
     Log a warning if there are unrecognized keys in the step definition.
     """
-    known = {'name', 'agent', 'params', 'parallel', 'conditional', 'else', 'dynamic_subtree'}
+    known = {'name', 'agent', 'agent_version', 'params', 'parallel', 'conditional', 'else', 'dynamic_subtree', 'loop', 'graph'}
     extra = [k for k in node.keys() if k not in known]
     if extra:
         literal = '{' + ', '.join(f"'{k}'" for k in extra) + '}'

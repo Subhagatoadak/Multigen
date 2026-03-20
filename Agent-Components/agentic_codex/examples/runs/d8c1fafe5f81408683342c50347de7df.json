@@ -1,0 +1,335 @@
+{
+  "run_id": "d8c1fafe5f81408683342c50347de7df",
+  "messages": [
+    [
+      [
+        "role",
+        "planner"
+      ],
+      [
+        "content",
+        "planner:planner:Ship prod feature:"
+      ],
+      [
+        "meta",
+        {}
+      ],
+      [
+        "tool_calls",
+        null
+      ]
+    ],
+    [
+      [
+        "role",
+        "builder"
+      ],
+      [
+        "content",
+        "builder:executor:Ship prod feature:"
+      ],
+      [
+        "meta",
+        {}
+      ],
+      [
+        "tool_calls",
+        null
+      ]
+    ],
+    [
+      [
+        "role",
+        "builder"
+      ],
+      [
+        "content",
+        "builder:executor:Ship prod feature:design"
+      ],
+      [
+        "meta",
+        {}
+      ],
+      [
+        "tool_calls",
+        null
+      ]
+    ],
+    [
+      [
+        "role",
+        "builder"
+      ],
+      [
+        "content",
+        "builder:executor:Ship prod feature:impl"
+      ],
+      [
+        "meta",
+        {}
+      ],
+      [
+        "tool_calls",
+        null
+      ]
+    ],
+    [
+      [
+        "role",
+        "builder"
+      ],
+      [
+        "content",
+        "builder:executor:Ship prod feature:test"
+      ],
+      [
+        "meta",
+        {}
+      ],
+      [
+        "tool_calls",
+        null
+      ]
+    ],
+    [
+      [
+        "role",
+        "qa"
+      ],
+      [
+        "content",
+        "qa:quality:Ship prod feature:"
+      ],
+      [
+        "meta",
+        {}
+      ],
+      [
+        "tool_calls",
+        null
+      ]
+    ]
+  ],
+  "events": [
+    [
+      [
+        "ts",
+        "2025-11-22 08:38:54.683635"
+      ],
+      [
+        "kind",
+        "run.started"
+      ],
+      [
+        "payload",
+        {
+          "run_id": "d8c1fafe5f81408683342c50347de7df",
+          "goal": "Ship prod feature"
+        }
+      ]
+    ],
+    [
+      [
+        "ts",
+        "2025-11-22 08:38:54.683671+00:00"
+      ],
+      [
+        "kind",
+        "metric"
+      ],
+      [
+        "payload",
+        {
+          "name": "graph.ready",
+          "value": 1.0,
+          "run_id": "d8c1fafe5f81408683342c50347de7df"
+        }
+      ]
+    ],
+    [
+      [
+        "ts",
+        "2025-11-22 08:38:54.683783+00:00"
+      ],
+      [
+        "kind",
+        "metric"
+      ],
+      [
+        "payload",
+        {
+          "name": "graph.node.latency",
+          "value": 0.0,
+          "node": "plan",
+          "run_id": "d8c1fafe5f81408683342c50347de7df"
+        }
+      ]
+    ],
+    [
+      [
+        "ts",
+        "2025-11-22 08:38:54.683790+00:00"
+      ],
+      [
+        "kind",
+        "span"
+      ],
+      [
+        "payload",
+        {
+          "name": "planner",
+          "status": "ok",
+          "role": "graph_node",
+          "node": "plan",
+          "batch_index": null,
+          "duration": 9.9e-05,
+          "run_id": "d8c1fafe5f81408683342c50347de7df"
+        }
+      ]
+    ],
+    [
+      [
+        "ts",
+        "2025-11-22 08:38:54.683812+00:00"
+      ],
+      [
+        "kind",
+        "metric"
+      ],
+      [
+        "payload",
+        {
+          "name": "graph.ready",
+          "value": 1.0,
+          "run_id": "d8c1fafe5f81408683342c50347de7df"
+        }
+      ]
+    ],
+    [
+      [
+        "ts",
+        "2025-11-22 08:38:54.684479+00:00"
+      ],
+      [
+        "kind",
+        "metric"
+      ],
+      [
+        "payload",
+        {
+          "name": "graph.node.latency",
+          "value": 0.0,
+          "node": "build",
+          "run_id": "d8c1fafe5f81408683342c50347de7df"
+        }
+      ]
+    ],
+    [
+      [
+        "ts",
+        "2025-11-22 08:38:54.684486+00:00"
+      ],
+      [
+        "kind",
+        "span"
+      ],
+      [
+        "payload",
+        {
+          "name": "builder_with_steps",
+          "status": "ok",
+          "role": "graph_node",
+          "node": "build",
+          "batch_index": null,
+          "duration": 0.000649,
+          "run_id": "d8c1fafe5f81408683342c50347de7df"
+        }
+      ]
+    ],
+    [
+      [
+        "ts",
+        "2025-11-22 08:38:54.684501+00:00"
+      ],
+      [
+        "kind",
+        "metric"
+      ],
+      [
+        "payload",
+        {
+          "name": "graph.ready",
+          "value": 1.0,
+          "run_id": "d8c1fafe5f81408683342c50347de7df"
+        }
+      ]
+    ],
+    [
+      [
+        "ts",
+        "2025-11-22 08:38:54.684569+00:00"
+      ],
+      [
+        "kind",
+        "metric"
+      ],
+      [
+        "payload",
+        {
+          "name": "graph.node.latency",
+          "value": 0.0,
+          "node": "qa",
+          "run_id": "d8c1fafe5f81408683342c50347de7df"
+        }
+      ]
+    ],
+    [
+      [
+        "ts",
+        "2025-11-22 08:38:54.684573+00:00"
+      ],
+      [
+        "kind",
+        "span"
+      ],
+      [
+        "payload",
+        {
+          "name": "qa",
+          "status": "ok",
+          "role": "graph_node",
+          "node": "qa",
+          "batch_index": null,
+          "duration": 5.9e-05,
+          "run_id": "d8c1fafe5f81408683342c50347de7df"
+        }
+      ]
+    ],
+    [
+      [
+        "ts",
+        "2025-11-22 08:38:54.684585"
+      ],
+      [
+        "kind",
+        "run.finished"
+      ],
+      [
+        "payload",
+        {
+          "run_id": "d8c1fafe5f81408683342c50347de7df",
+          "goal": "Ship prod feature"
+        }
+      ]
+    ]
+  ],
+  "artifacts": [],
+  "meta": {
+    "tasks": [
+      "design",
+      "impl",
+      "test"
+    ],
+    "run_id": "d8c1fafe5f81408683342c50347de7df"
+  }
+}

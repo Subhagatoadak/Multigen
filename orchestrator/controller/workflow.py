@@ -72,6 +72,18 @@ def _serialize_steps(steps):
                 "params": step.params,
                 "subtree_config": step.dynamic_subtree,
             })
+        elif step.loop:
+            serialized.append({
+                "type": "loop",
+                "name": step.name,
+                "loop": step.loop,
+            })
+        elif step.graph:
+            serialized.append({
+                "type": "graph",
+                "name": step.name,
+                "graph": step.graph,
+            })
         else:
             serialized.append({
                 "type": "sequential",

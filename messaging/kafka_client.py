@@ -21,7 +21,7 @@ class KafkaClient:
 
         consumer_conf: Dict[str, Any] = {
             **common_conf,
-            'group.id': 'multigen-flow',
+            'group.id': config.KAFKA_CONSUMER_GROUP,
             'auto.offset.reset': 'earliest',
             'enable.auto.commit': False,
         }
@@ -48,15 +48,15 @@ class KafkaClient:
             return None
         try:
             return json.loads(msg.value().decode('utf-8'))
-        except Exception:
-            logger.exception("Failed to decode Kafka message")
+        except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+            logger.error("Failed to decode Kafka message: %s", exc)
             return None
 
     def commit(self) -> None:
         try:
             self.consumer.commit()
-        except Exception:
-            logger.exception("Failed to commit Kafka offset")
+        except KafkaError as exc:
+            logger.error("Kafka commit failed (retryable=%s): %s", exc.args[0].retriable() if exc.args else False, exc)
 
     def close(self) -> None:
         self.consumer.close()

@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agentic-codex"
+version = "0.1.0"
+description = "Composable agent orchestration primitives"
+authors = [{name = "Agent Components"}]
+license = {text = "MIT"}
+requires-python = ">=3.10"
+dependencies = [
+    "PyYAML>=6.0",
+    "pydantic>=1.10",
+    "faiss-cpu; platform_machine != \"arm64\"",
+    "faiss-cpu; platform_machine == \"arm64\" and sys_platform != \"darwin\"",
+    "openai",
+ 
+]
+
+[project.optional-dependencies]
+embeddings = ["spacy>=3.0"]
+otel = [
+    "opentelemetry-sdk>=1.24",
+    "opentelemetry-exporter-otlp>=1.24",
+]
+service = [
+    "fastapi>=0.110",
+    "uvicorn>=0.23",
+]
+
+
+[project.scripts]
+codex-run = "agentic_codex.cli:main"  # legacy alias
+agentic = "agentic_codex.cli:agentic_cli"
+
+[tool.setuptools.packages.find]
+include = ["agentic_codex*"]
