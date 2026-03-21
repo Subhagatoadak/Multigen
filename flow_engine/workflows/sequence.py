@@ -135,10 +135,27 @@ async def agent_activity(
 ) -> Dict[str, Any]:
     """
     Activity that locates and executes the named agent with given parameters.
+
+    Lazy hydration: if the agent is not in the local registry (e.g. it was
+    created as a dynamic agent on a different worker replica), this activity
+    fetches the blueprint spec from the distributed agent store (MongoDB) and
+    reconstructs the agent locally before executing.
+
     May raise on failure; Temporal retry_policy applies automatically.
     """
     with _tracer.start_as_current_span(f"agent.{agent_name}") as span:
         span.set_attribute("agent.name", agent_name)
+        # Try local registry first (fast path — almost all agents)
+        from orchestrator.services.agent_registry import _registry
+        if agent_name not in _registry:
+            # Lazy hydration: reconstruct dynamic agent from distributed store
+            from flow_engine.graph.agent_store import hydrate_agent_if_missing
+            hydrated = await hydrate_agent_if_missing(agent_name)
+            if not hydrated:
+                raise RuntimeError(
+                    f"Agent '{agent_name}' not found in local registry or distributed "
+                    f"agent store. Available locally: {sorted(_registry.keys())}"
+                )
         agent = get_agent(agent_name)
         result = await agent.run(params)
         return {"agent": agent_name, "output": result}

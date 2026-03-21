@@ -19,6 +19,14 @@ KAFKA_BROKER_URL = os.getenv("KAFKA_BROKER_URL", "localhost:9092")
 # Temporal configuration
 TEMPORAL_SERVER_URL = os.getenv("TEMPORAL_SERVER_URL", "localhost:7233")
 TEMPORAL_TASK_QUEUE = os.getenv("TEMPORAL_TASK_QUEUE", "flow-task-queue")
+# Comma-separated pool of task queues for partition-aware fan-out.
+# Each queue should have at least one worker process listening on it.
+# Example: "flow-task-queue,flow-task-queue-b,flow-task-queue-c"
+TEMPORAL_TASK_QUEUES: list = [
+    q.strip()
+    for q in os.getenv("TEMPORAL_TASK_QUEUES", TEMPORAL_TASK_QUEUE).split(",")
+    if q.strip()
+]
 
 # Metrics HTTP server port
 METRICS_PORT = int(os.getenv("METRICS_PORT", "8000"))

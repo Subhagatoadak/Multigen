@@ -5,7 +5,7 @@
 [![CI](https://github.com/Subhagatoadak/Multigen/actions/workflows/ci.yml/badge.svg)](https://github.com/Subhagatoadak/Multigen/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue)](https://www.python.org)
 [![License](https://img.shields.io/badge/license-Apache%202.0-green)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.2.0--dev-orange)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.3.0--dev-orange)](CHANGELOG.md)
 [![Temporal](https://img.shields.io/badge/temporal-1.11-blueviolet)](https://temporal.io)
 [![OpenTelemetry](https://img.shields.io/badge/otel-enabled-brightgreen)](https://opentelemetry.io)
 
@@ -36,6 +36,12 @@ Built on top of [Temporal.io](https://temporal.io) for workflow durability, Apac
 | OpenTelemetry + Prometheus | ✗ | ✗ | ✗ | ✗ | ✅ |
 | MCP server (Claude/Cursor/Windsurf) | ✗ | ✗ | ✗ | ✗ | ✅ |
 | Self-registering agent decorator | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Parallel BFS execution (dependency-aware) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Explicit `depends_on` node dependencies | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Partition-aware fan-out (multi-queue) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Real-time SSE streaming (node completion) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Agent2Agent (A2A) protocol support | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Cross-worker agent hydration (MongoDB) | ✗ | ✗ | ✗ | ✗ | ✅ |
 
 ---
 
@@ -90,46 +96,58 @@ Uncertainty **propagates through the graph** — if upstream nodes have low conf
 ## Architecture Overview
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│          Client Layer (SDK / REST / MCP / CLI)                      │
-└──────────────────────────────┬──────────────────────────────────────┘
-                               │
-┌──────────────────────────────▼──────────────────────────────────────┐
-│                    Orchestrator  :8000 (FastAPI)                    │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────────┐  │
-│  │  DSL Parser  │  │  LLM text→   │  │  Graph Signal Controller │  │
-│  │  Validator   │  │  DSL Service │  │  (REST endpoints)        │  │
-│  └──────────────┘  └──────────────┘  └──────────────────────────┘  │
-└──────┬─────────────────────────────────────────┬────────────────────┘
-       │ validate                                 │ Temporal client
-       ▼                                          ▼
-┌─────────────┐                    ┌─────────────────────────────────┐
-│ Capability  │                    │         Temporal Server         │
-│ Service     │                    │    ComplexSequenceWorkflow       │
-│ :8001       │                    │    GraphWorkflow                │
-│ (MongoDB)   │                    │      • BFS execution            │
-└─────────────┘                    │      • Signal handlers          │
-                                   │      • Query handlers           │
-       ┌────────────────────────── │      • Epistemic tracking       │
-       │ Kafka                     └────────────┬────────────────────┘
-       ▼                                        │ activities
-┌─────────────┐                    ┌────────────▼────────────────────┐
-│  Apache     │                    │       Temporal Worker           │
-│  Kafka      ├───────────────────►│  • agent_activity               │
-│  flow-      │                    │  • tool_activity                │
-│  requests   │                    │  • create_agent_activity        │
-└─────────────┘                    │  • generate_agent_spec_activity │
-                                   │  • deregister_agents_activity   │
-                                   │  • persist_node_state_activity  │
-                                   └────────────┬────────────────────┘
-                                                │
-                                   ┌────────────▼────────────────────┐
-                                   │         Agent Registry          │
-                                   │  EchoAgent, LangChainAgent,     │
-                                   │  LlamaIndexAgent, SpawnerAgent, │
-                                   │  ScreeningAgents, PatternAgents │
-                                   │  + Dynamic BlueprintAgents      │
-                                   └─────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────┐
+│              Client Layer (SDK / REST / MCP / CLI / EventSource)             │
+└─────────────────────────────────┬────────────────────────────────────────────┘
+                                  │
+┌─────────────────────────────────▼────────────────────────────────────────────┐
+│                        Orchestrator  :8000 (FastAPI)                         │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐ │
+│  │  DSL Parser  │  │  LLM text→   │  │  Graph Signal│  │  A2A Server      │ │
+│  │  Validator   │  │  DSL Service │  │  Controller  │  │  /.well-known/   │ │
+│  └──────────────┘  └──────────────┘  └──────────────┘  │  /a2a endpoints  │ │
+│                                                          └──────────────────┘ │
+│  ┌──────────────────────────────────────────────────────────────────────────┐ │
+│  │  SSE Streaming  GET /workflows/{id}/stream   (text/event-stream)         │ │
+│  │  Polling        GET /workflows/{id}/events?since=N                       │ │
+│  └──────────────────────────────────────────────────────────────────────────┘ │
+└──────┬──────────────────────────────────────────────┬─────────────────────────┘
+       │ validate                                      │ Temporal client
+       ▼                                               ▼
+┌─────────────────┐                 ┌──────────────────────────────────────────┐
+│ Capability      │                 │              Temporal Server             │
+│ Service  :8001  │                 │   ComplexSequenceWorkflow                │
+│ (MongoDB        │                 │   GraphWorkflow                          │
+│  agent_specs)   │                 │     • Parallel BFS (pending_set)         │
+│                 │                 │     • depends_on resolution              │
+│ A2A Client ─────┼──────────────── │     • Signal handlers                   │
+│ (remote agents) │                 │     • Query handlers                     │
+└─────────────────┘                 │     • Epistemic tracking                 │
+                                    └───────────────────┬──────────────────────┘
+       ┌───────────────────────────────────────────     │ activities
+       │ Kafka                                           ▼
+       ▼                                ┌───────────────────────────────────────┐
+┌─────────────┐    partition-aware      │   Worker Pool A   (queue-a)           │
+│  Apache     │    fan-out              │   Worker Pool B   (queue-b)           │
+│  Kafka      ├───────────────────────► │   Worker Pool C   (queue-c)           │
+│  flow-      │                         │                                       │
+│  requests   │                         │  Each pool runs:                      │
+└─────────────┘                         │  • agent_activity                     │
+                                        │  • tool_activity                      │
+                                        │  • create_agent_activity              │
+                                        │  • generate_agent_spec_activity       │
+                                        │  • deregister_agents_activity         │
+                                        │  • persist_node_state_activity        │
+                                        │  • sse_publish_activity               │
+                                        └───────────────────┬───────────────────┘
+                                                            │
+                       ┌────────────────────────────────────▼──────────────────┐
+                       │                   Agent Registry                      │
+                       │  EchoAgent, LangChainAgent, LlamaIndexAgent,          │
+                       │  SpawnerAgent, ScreeningAgents, PatternAgents         │
+                       │  + Dynamic BlueprintAgents                            │
+                       │  + Hydrated agents from MongoDB (agent_specs)         │
+                       └───────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -276,6 +294,123 @@ graph_def = {
     "max_cycles": 10,
     "circuit_breaker": {"trip_threshold": 3, "recovery_executions": 5}
 }
+```
+
+---
+
+## New Features (v0.3.0)
+
+### depends_on: Explicit Node Dependencies
+
+`depends_on` declares logical dependencies that don't carry data. A node only executes when ALL listed nodes are present in the result context — regardless of whether there is a direct data edge between them. This is useful when a node needs a resource or side-effect to be ready before it can proceed.
+
+```python
+graph_def = {
+    "nodes": [
+        {"id": "fetch_data", "agent": "DataAgent"},
+        {"id": "load_model", "agent": "ModelAgent"},
+        {
+            "id": "run_inference",
+            "agent": "InferenceAgent",
+            "depends_on": ["fetch_data", "load_model"],  # waits for BOTH
+        }
+    ],
+    "edges": [
+        {"source": "fetch_data", "target": "run_inference"},
+        # model loading is a resource dep, not a data dep — use depends_on
+    ],
+    "entry": "fetch_data"
+}
+```
+
+### Partition-Aware Fan-Out
+
+Nodes dispatched via fan-out can be distributed across named task queues, each backed by dedicated worker pods. This enables true multi-worker parallelism rather than concurrency within a single worker.
+
+```python
+# Signal a fan-out across 3 worker pools
+client.fan_out(workflow_id, {
+    "group_id": "expert_panel",
+    "task_queues": ["queue-a", "queue-b", "queue-c"],  # round-robin
+    "consensus": "highest_confidence",
+    "nodes": [
+        {"id": "financial_expert", "agent": "FinancialAgent"},
+        {"id": "legal_expert", "agent": "LegalAgent"},
+        {"id": "market_expert", "agent": "MarketAgent"},
+    ]
+})
+# Nodes are distributed: financial→queue-a, legal→queue-b, market→queue-c
+# Each queue has dedicated worker pods → true multi-worker parallelism
+```
+
+Configure available queues via environment variable:
+
+```bash
+TEMPORAL_TASK_QUEUES=queue-a,queue-b,queue-c
+```
+
+### SSE Streaming: Real-Time Node Completion
+
+Subscribe to a live event stream that delivers a structured event for each node as it completes. No polling required.
+
+```python
+import requests, json
+
+# Open SSE stream — events arrive as each node completes
+with requests.get(
+    f"http://localhost:8000/workflows/{workflow_id}/stream",
+    stream=True,
+    headers={"Accept": "text/event-stream"},
+) as resp:
+    for line in resp.iter_lines():
+        if line.startswith(b"data:"):
+            event = json.loads(line[5:])
+            print(f"[{event['node_id']}] confidence={event['confidence']:.2f}")
+            if event.get("done"):
+                break
+
+# Polling fallback (for clients that can't use SSE)
+events = requests.get(
+    f"http://localhost:8000/workflows/{workflow_id}/events?since=3"
+).json()
+```
+
+Event format: `{index, node_id, agent, confidence, timestamp, output, done}`
+
+Reconnect: `Last-Event-ID` header is automatically used by browser `EventSource` to resume from the last received event.
+
+### Agent2Agent (A2A) Protocol
+
+Multigen supports the Agent2Agent (A2A) protocol for both calling remote A2A-compatible agents from a graph node and exposing Multigen agents to external systems.
+
+**a) Calling a remote A2A agent from a graph node:**
+
+```python
+{
+    "id": "external_analyst",
+    "a2a_endpoint": "https://partner-ai.example.com",
+    "a2a_skill": "financial_analysis",
+    "timeout": 60,
+    "retry": 3,
+}
+```
+
+**b) Exposing Multigen agents to external systems:**
+
+```python
+# Discover all Multigen agents
+card = requests.get("http://localhost:8000/.well-known/agent.json").json()
+
+# Call an agent via A2A JSON-RPC
+result = requests.post("http://localhost:8000/a2a", json={
+    "jsonrpc": "2.0", "id": 1,
+    "method": "tasks/send",
+    "params": {
+        "id": "task-001",
+        "message": {"role": "user", "parts": [{"type": "text", "text": "Analyse NovaSemi"}]},
+        "metadata": {"skill_id": "EchoAgent"}
+    }
+}).json()
 ```
 
 ---

@@ -381,6 +381,55 @@ class MultigenClient:
         _raise_for(resp, "register_capability")
         return Capability.model_validate(resp.json())
 
+    # ── Agent2Agent (A2A) protocol ─────────────────────────────────────────────
+
+    async def get_agent_card(self) -> Dict[str, Any]:
+        """
+        Fetch this Multigen instance's A2A Agent Card.
+        Describes all registered agents as A2A skills for external discovery.
+        """
+        resp = await self._http.get("/.well-known/agent.json")
+        _raise_for(resp, "get_agent_card")
+        return resp.json()
+
+    async def a2a_send(
+        self,
+        skill_id: str,
+        text: Optional[str] = None,
+        data: Optional[Dict[str, Any]] = None,
+        task_id: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """
+        Submit an A2A task directly to this orchestrator's A2A endpoint.
+        Useful for testing A2A interoperability without the full workflow layer.
+        """
+        import uuid
+        tid = task_id or str(uuid.uuid4())
+        parts: List[Dict[str, Any]] = []
+        if text:
+            parts.append({"type": "text", "text": text})
+        if data:
+            parts.append({"type": "data", "data": data})
+        if not parts:
+            parts.append({"type": "text", "text": skill_id})
+
+        body = {
+            "jsonrpc": "2.0",
+            "id": tid,
+            "method": "tasks/send",
+            "params": {
+                "id": tid,
+                "message": {"role": "user", "parts": parts},
+                "metadata": {"skill_id": skill_id},
+            },
+        }
+        resp = await self._http.post("/a2a", json=body)
+        _raise_for(resp, "a2a_send")
+        result = resp.json()
+        if result.get("error"):
+            raise GraphSignalError(str(result["error"]))
+        return result.get("result", result)
+
     # ── Registered agents ──────────────────────────────────────────────────────
 
     async def list_agents(self) -> List[Dict[str, str]]:

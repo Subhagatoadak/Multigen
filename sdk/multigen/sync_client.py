@@ -183,6 +183,20 @@ class SyncMultigenClient:
     def register_capability(self, capability: Capability) -> Capability:
         return self._run(self._async.register_capability(capability))
 
+    # ── Agent2Agent (A2A) protocol ─────────────────────────────────────────────
+
+    def get_agent_card(self) -> Dict[str, Any]:
+        return self._run(self._async.get_agent_card())
+
+    def a2a_send(
+        self,
+        skill_id: str,
+        text: Optional[str] = None,
+        data: Optional[Dict[str, Any]] = None,
+        task_id: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        return self._run(self._async.a2a_send(skill_id=skill_id, text=text, data=data, task_id=task_id))
+
     # ── Registered agents ──────────────────────────────────────────────────────
 
     def list_agents(self) -> List[Dict[str, str]]:

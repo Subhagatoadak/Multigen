@@ -317,3 +317,235 @@ graph TB
     class KAFKA2,MONGO2,TEMPORAL2,PINECONE infra
     class OTEL2,GRAFANA,JAEGER2,PROM2,SPLUNK obs
 ```
+
+---
+
+## 7. Parallel BFS Execution Model
+
+How the graph workflow executes dependency-aware waves of nodes in parallel using a BFS loop.
+
+```mermaid
+flowchart TD
+    START([Start BFS Loop]) --> COLLECT["_collect_ready_batch()\nDrain pending queue\nFor each candidate node:\ncheck _deps_satisfied()"]
+
+    COLLECT --> DEPS_CHECK{"_deps_satisfied(node)?"}
+
+    DEPS_CHECK --> DEPS_DETAIL["Union of:\n• edge-upstream nodes\n• explicit depends_on list\nAll must be in context"]
+
+    DEPS_DETAIL --> READY_CHECK{"Any nodes\nready?"}
+
+    READY_CHECK -->|"No — pending\nnot empty"| DEADLOCK["Deadlock / cycle\ndetected → break"]
+    READY_CHECK -->|"No — pending\nempty"| DONE([BFS Complete])
+    READY_CHECK -->|"Yes"| GATHER["asyncio.gather(\n  *[_execute_node_full(n)\n    for n in ready_batch]\n)"]
+
+    GATHER --> RESULTS["For each result:\n_process_node_result(node, result)"]
+
+    RESULTS --> UPDATE["• Write output to context\n• Persist to MongoDB\n• Enqueue successors\n  (deduped via pending_set)"]
+
+    UPDATE --> START
+```
+
+Dependency resolution detail — `depends_on` union with edge-derived deps:
+
+```mermaid
+flowchart LR
+    subgraph Node["Node: process_data"]
+        EDGE_DEPS["Edge-upstream deps\n(inferred from graph edges)"]
+        EXPLICIT["depends_on field\n(explicit extra deps)"]
+        UNION["Union of both sets"]
+    end
+
+    subgraph Context["Workflow Context"]
+        CTX["context dict\n{node_name: output}"]
+    end
+
+    EDGE_DEPS --> UNION
+    EXPLICIT --> UNION
+    UNION --> SATISFIED{"All dep keys\npresent in context?"}
+    CTX --> SATISFIED
+    SATISFIED -->|"Yes"| ENQUEUE["Add to ready_batch"]
+    SATISFIED -->|"No"| WAIT["Stay in pending queue\nretry next wave"]
+```
+
+---
+
+## 8. Partition-Aware Fan-Out
+
+How fan-out nodes are distributed across multiple Temporal task queues for parallel execution on separate worker pools.
+
+```mermaid
+flowchart TD
+    ENV["TEMPORAL_TASK_QUEUES env var\ne.g. 'queue-a,queue-b,queue-c'"] --> CONFIG["config.TEMPORAL_TASK_QUEUES\n['queue-a', 'queue-b', 'queue-c']"]
+
+    FAN_SIG["fan_out signal received\n{nodes: [n0, n1, n2, n3, n4],\n task_queues: [...] (optional)}"] --> ASSIGN
+
+    CONFIG --> ASSIGN["Assign task queues\nnode.task_queue =\ntask_queues[idx % len(task_queues)]"]
+
+    ASSIGN --> N0["n0 → queue-a"]
+    ASSIGN --> N1["n1 → queue-b"]
+    ASSIGN --> N2["n2 → queue-c"]
+    ASSIGN --> N3["n3 → queue-a"]
+    ASSIGN --> N4["n4 → queue-b"]
+
+    subgraph WorkerPools["Worker Pools (Temporal Workers)"]
+        WPA["Worker Pool A\nlistening: queue-a"]
+        WPB["Worker Pool B\nlistening: queue-b"]
+        WPC["Worker Pool C\nlistening: queue-c"]
+    end
+
+    N0 & N3 --> WPA
+    N1 & N4 --> WPB
+    N2 --> WPC
+
+    GATHER_FO["asyncio.gather(\n  *[dispatch_activity(n)\n    for n in fan_out_nodes]\n)"]
+
+    WPA & WPB & WPC --> GATHER_FO
+
+    GATHER_FO --> CONSENSUS["select_consensus(results)\nAggregate / vote on outputs"]
+    CONSENSUS --> CTX_UPDATE["Write consensus result\nto workflow context"]
+```
+
+---
+
+## 9. SSE Streaming Architecture
+
+How completed node events are streamed to clients in real time via Server-Sent Events, with polling fallback.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant C as Client
+    participant F as FastAPI Orchestrator
+    participant T as Temporal Workflow
+
+    Note over T: _completed_events list<br/>(append-only, indexed)
+
+    C->>F: GET /workflows/{id}/stream<br/>Last-Event-ID: 4 (optional)
+    F->>F: StreamingResponse(_event_generator())<br/>cursor = int(Last-Event-ID) if present else 0
+
+    loop Every 500 ms
+        F->>T: handle.query("get_completed_nodes")
+        T-->>F: {events: [...], done: bool}
+        loop For each event where index > cursor
+            F-->>C: data: {"node": "...", "output": {...}}\nid: {index}\n\n
+            F->>F: cursor = index
+        end
+        alt done == True
+            F-->>C: data: {"done": true}\n\n
+            F->>F: close generator
+        end
+    end
+
+    Note over C,F: Reconnect flow
+    C->>F: GET /workflows/{id}/stream<br/>Last-Event-ID: 4
+    F->>F: Resume from cursor = 4<br/>skip already-sent events
+```
+
+Polling fallback for clients that do not support SSE:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant C as Client
+    participant F as FastAPI Orchestrator
+    participant T as Temporal Workflow
+
+    C->>F: GET /workflows/{id}/events?since=4
+    F->>T: handle.query("get_completed_nodes")
+    T-->>F: {events: [...], done: bool}
+    F->>F: Filter events where index > 4
+    F-->>C: 200 OK\n[{index: 5, node: "...", output: {...}}, ...]
+
+    Note over C: Client increments since param<br/>and polls again after delay
+```
+
+---
+
+## 10. Updated Request Flow (Graph Workflow with All Features)
+
+End-to-end sequence covering parallel BFS execution, partition-aware fan-out, SSE streaming, A2A nodes, human approval gates, and dynamic agents.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant C as Client
+    participant SSE as SSE Connection<br/>(Client EventSource)
+    participant O as Orchestrator<br/>FastAPI :8000
+    participant T as Temporal<br/>GraphWorkflow
+    participant QA as Worker Pool A<br/>(queue-a)
+    participant QB as Worker Pool B<br/>(queue-b)
+    participant QC as Worker Pool C<br/>(queue-c)
+    participant RA as Remote Agent<br/>(A2A JSON-RPC)
+    participant H as Human Approver
+    participant M as MongoDB
+
+    C->>O: POST /workflows/graph/run\n{graph_dsl, payload}
+    O->>T: start_workflow(GraphWorkflow, graph_dsl)
+    O-->>C: {workflow_id: "uuid"}
+
+    C->>O: GET /workflows/uuid/stream
+    O-->>SSE: StreamingResponse (SSE open)
+
+    Note over T: BFS Wave 1 — entry nodes (no deps)
+    T->>QA: agent_activity(entry_node_1) via queue-a
+    T->>QB: agent_activity(entry_node_2) via queue-b
+    Note over T: asyncio.gather() — both in parallel
+    QA-->>T: result_1
+    QB-->>T: result_2
+    T->>T: context[entry_node_1] = result_1\ncontext[entry_node_2] = result_2
+    T->>M: persist(entry_node_1, entry_node_2 results)
+    T->>T: _completed_events.append(...)
+    T-->>SSE: query → {events: [node1, node2], done: false}
+    SSE-->>C: data: {"node": "entry_node_1", ...}\ndata: {"node": "entry_node_2", ...}
+
+    Note over T: BFS Wave 2 — fan-out node (deps satisfied)
+    T->>T: fan_out signal\n{nodes: [n0..n4], task_queues: [a,b,c]}
+    T->>QA: agent_activity(n0) queue-a
+    T->>QB: agent_activity(n1) queue-b
+    T->>QC: agent_activity(n2) queue-c
+    T->>QA: agent_activity(n3) queue-a
+    T->>QB: agent_activity(n4) queue-b
+    Note over T: asyncio.gather() across all pools
+    QA-->>T: n0, n3 results
+    QB-->>T: n1, n4 results
+    QC-->>T: n2 result
+    T->>T: select_consensus(fan_out_results)
+    T->>T: _completed_events.append(fan_out result)
+    SSE-->>C: data: {"node": "fan_out", "output": {...}}
+
+    Note over T: BFS Wave 3 — A2A node
+    T->>QA: a2a_activity(remote_agent_url, task)
+    QA->>RA: JSON-RPC tasks/send\n{task_id, message, params}
+    RA-->>QA: JSON-RPC response\n{result, artifacts}
+    QA-->>T: a2a result
+    T->>T: context[a2a_node] = result
+    T->>T: _completed_events.append(a2a result)
+    SSE-->>C: data: {"node": "a2a_node", "output": {...}}
+
+    Note over T: BFS Wave 4 — Human Approval Gate
+    T->>T: pause and wait for\napprove_signal / reject_signal
+    T->>M: persist(pending_approval state)
+    SSE-->>C: data: {"node": "approval_gate", "status": "pending"}
+    H->>O: POST /workflows/uuid/signal\n{signal: "approve", data: {...}}
+    O->>T: signal(approve_signal)
+    T->>T: resume BFS
+    T->>T: _completed_events.append(approval result)
+    SSE-->>C: data: {"node": "approval_gate", "status": "approved"}
+
+    Note over T: BFS Wave 5 — Dynamic Agent
+    T->>M: store dynamic agent spec\n{agent_spec, config}
+    T->>QB: dynamic_agent_activity(spec) via queue-b
+    Note over QB: Worker-2 hydrates agent\nfrom MongoDB spec at runtime
+    QB->>M: fetch agent_spec(id)
+    M-->>QB: agent spec
+    QB->>QB: instantiate dynamic agent
+    QB-->>T: dynamic agent result
+    T->>T: context[dynamic_node] = result
+    T->>T: _completed_events.append(dynamic result)
+    SSE-->>C: data: {"node": "dynamic_agent", "output": {...}}
+
+    Note over T: All nodes complete — done = true
+    T->>T: _completed_events done flag set
+    SSE-->>C: data: {"done": true}
+    Note over C,SSE: SSE connection closed
+```

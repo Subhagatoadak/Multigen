@@ -6,8 +6,10 @@ from fastapi.middleware.gzip import GZipMiddleware
 from orchestrator.controller.workflow import router as workflow_router
 from orchestrator.controller.registration import router as cap_router
 from orchestrator.controller.graph import router as graph_router
+from orchestrator.controller.streaming import router as streaming_router
 from orchestrator.services.agent_registry import list_agents
 from orchestrator.telemetry import setup_tracing
+from a2a.server import router as a2a_router, well_known_router
 
 # Initialise tracing before the app starts receiving requests
 setup_tracing()
@@ -44,7 +46,10 @@ if _OTEL_FASTAPI:
 
 app.include_router(workflow_router, prefix="/workflows", tags=["workflows"])
 app.include_router(graph_router, prefix="/workflows", tags=["graph"])
+app.include_router(streaming_router)    # SSE + polling at /workflows/{id}/stream|events
 app.include_router(cap_router)
+app.include_router(a2a_router)          # A2A task endpoint at /a2a
+app.include_router(well_known_router)   # Agent Card at /.well-known/agent.json
 
 
 # ── Built-in endpoints ────────────────────────────────────────────────────────

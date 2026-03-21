@@ -18,6 +18,7 @@ import orchestrator.services.config as config
 from flow_engine.workflows.sequence import ComplexSequenceWorkflow, agent_activity
 from flow_engine.graph.engine import (
     GraphWorkflow,
+    a2a_activity,
     create_agent_activity,
     deregister_agents_activity,
     generate_agent_spec_activity,
@@ -79,6 +80,7 @@ async def main() -> None:
             create_agent_activity,
             generate_agent_spec_activity,
             deregister_agents_activity,
+            a2a_activity,
         ],
         workflow_runner=sandbox,
     )
