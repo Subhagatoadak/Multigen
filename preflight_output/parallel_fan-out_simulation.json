@@ -1,0 +1,220 @@
+{
+  "nodes": [
+    {
+      "data": {
+        "id": "dispatcher",
+        "label": "dispatcher\n(DispatcherAgent)",
+        "agent": "DispatcherAgent",
+        "is_entry": true,
+        "has_reflection": false,
+        "has_fanout": false,
+        "messages_sent": 3,
+        "messages_received": 1,
+        "activity": 4,
+        "activity_pct": 67,
+        "status": "entry",
+        "node_type": "entry",
+        "simulated": true
+      }
+    },
+    {
+      "data": {
+        "id": "worker_a",
+        "label": "worker_a\n(WorkerAgent)",
+        "agent": "WorkerAgent",
+        "is_entry": false,
+        "has_reflection": false,
+        "has_fanout": false,
+        "messages_sent": 1,
+        "messages_received": 1,
+        "activity": 2,
+        "activity_pct": 33,
+        "status": "active",
+        "node_type": "active",
+        "simulated": true
+      }
+    },
+    {
+      "data": {
+        "id": "worker_b",
+        "label": "worker_b\n(WorkerAgent)",
+        "agent": "WorkerAgent",
+        "is_entry": false,
+        "has_reflection": false,
+        "has_fanout": false,
+        "messages_sent": 1,
+        "messages_received": 1,
+        "activity": 2,
+        "activity_pct": 33,
+        "status": "active",
+        "node_type": "active",
+        "simulated": true
+      }
+    },
+    {
+      "data": {
+        "id": "worker_c",
+        "label": "worker_c\n(WorkerAgent)",
+        "agent": "WorkerAgent",
+        "is_entry": false,
+        "has_reflection": false,
+        "has_fanout": false,
+        "messages_sent": 1,
+        "messages_received": 1,
+        "activity": 2,
+        "activity_pct": 33,
+        "status": "active",
+        "node_type": "active",
+        "simulated": true
+      }
+    },
+    {
+      "data": {
+        "id": "reducer",
+        "label": "reducer\n(ReducerAgent)",
+        "agent": "ReducerAgent",
+        "is_entry": false,
+        "has_reflection": false,
+        "has_fanout": false,
+        "messages_sent": 3,
+        "messages_received": 3,
+        "activity": 6,
+        "activity_pct": 100,
+        "status": "active",
+        "node_type": "active",
+        "simulated": true
+      }
+    },
+    {
+      "data": {
+        "id": "output",
+        "label": "output\n(OutputAgent)",
+        "agent": "OutputAgent",
+        "is_entry": false,
+        "has_reflection": false,
+        "has_fanout": false,
+        "messages_sent": 0,
+        "messages_received": 3,
+        "activity": 3,
+        "activity_pct": 50,
+        "status": "dead_end",
+        "node_type": "dead_end",
+        "simulated": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "data": {
+        "id": "dispatcher->worker_a",
+        "source": "dispatcher",
+        "target": "worker_a",
+        "condition": "",
+        "is_conditional": false,
+        "edge_type": "edge",
+        "weight": 1,
+        "message_count": 1,
+        "label": "1",
+        "active": true
+      }
+    },
+    {
+      "data": {
+        "id": "dispatcher->worker_b",
+        "source": "dispatcher",
+        "target": "worker_b",
+        "condition": "",
+        "is_conditional": false,
+        "edge_type": "edge",
+        "weight": 1,
+        "message_count": 1,
+        "label": "1",
+        "active": true
+      }
+    },
+    {
+      "data": {
+        "id": "dispatcher->worker_c",
+        "source": "dispatcher",
+        "target": "worker_c",
+        "condition": "",
+        "is_conditional": false,
+        "edge_type": "edge",
+        "weight": 1,
+        "message_count": 1,
+        "label": "1",
+        "active": true
+      }
+    },
+    {
+      "data": {
+        "id": "worker_a->reducer",
+        "source": "worker_a",
+        "target": "reducer",
+        "condition": "",
+        "is_conditional": false,
+        "edge_type": "edge",
+        "weight": 1,
+        "message_count": 1,
+        "label": "1",
+        "active": true
+      }
+    },
+    {
+      "data": {
+        "id": "worker_b->reducer",
+        "source": "worker_b",
+        "target": "reducer",
+        "condition": "",
+        "is_conditional": false,
+        "edge_type": "edge",
+        "weight": 1,
+        "message_count": 1,
+        "label": "1",
+        "active": true
+      }
+    },
+    {
+      "data": {
+        "id": "worker_c->reducer",
+        "source": "worker_c",
+        "target": "reducer",
+        "condition": "",
+        "is_conditional": false,
+        "edge_type": "edge",
+        "weight": 1,
+        "message_count": 1,
+        "label": "1",
+        "active": true
+      }
+    },
+    {
+      "data": {
+        "id": "reducer->output",
+        "source": "reducer",
+        "target": "output",
+        "condition": "",
+        "is_conditional": false,
+        "edge_type": "edge",
+        "weight": 3,
+        "message_count": 3,
+        "label": "3",
+        "active": true
+      }
+    }
+  ],
+  "metadata": {
+    "total_nodes": 6,
+    "total_edges": 7,
+    "entry": "dispatcher",
+    "total_messages": 9,
+    "active_nodes": 6,
+    "dead_ends": [
+      "output"
+    ],
+    "unreachable": [],
+    "overloaded": [],
+    "simulated": true,
+    "layout": "dagre"
+  }
+}

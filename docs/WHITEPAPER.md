@@ -1468,5 +1468,653 @@ Wire this into CI/CD to prevent accidental removal of still-needed code paths.
 
 ---
 
+## 16. Python SDK v0.3: Zero-Infrastructure Local Execution
+
+### 16.1 Design Philosophy
+
+Multigen v0.3 introduces a complete local execution layer — a pure-Python, zero-dependency runtime that runs the full agent programming model without Kafka, Temporal, or MongoDB. The SDK is structured in layers:
+
+```text
+┌─────────────────────────────────────────────────────────┐
+│                   Application Layer                      │
+│         (user workflows, LLM calls, tools)               │
+├─────────────────────────────────────────────────────────┤
+│                  Execution Patterns                      │
+│    Chain │ Parallel │ Graph │ StateMachine │ MapReduce   │
+├─────────────────────────────────────────────────────────┤
+│                   Agent Primitives                       │
+│  FunctionAgent │ LLMAgent │ RouterAgent │ MemoryAgent    │
+│  CircuitBreakerAgent │ RetryAgent │ AggregatorAgent      │
+├─────────────────────────────────────────────────────────┤
+│                 Communication Layer                      │
+│        InMemoryBus │ Message │ Pub/Sub │ Req/Reply       │
+├─────────────────────────────────────────────────────────┤
+│                  Runtime & Backends                      │
+│    LocalRunner │ Temporal (opt) │ Kafka (opt)            │
+│    Simulator event bridge (optional)                     │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 16.2 Agent Primitives
+
+Every agent extends `BaseAgent` and exposes a single `async run(ctx: dict) → dict` interface. The `__call__` wrapper records invocation latency, call count, and error count in `agent.stats`.
+
+| Agent Type | Description |
+| --- | --- |
+| `FunctionAgent` | Wraps any sync or async callable. Sync fns run in `asyncio.run_in_executor`. |
+| `LLMAgent` | Calls OpenAI, Gemini, Mistral, or Ollama. Supports `{key}` template prompts. |
+| `RouterAgent` | Applies a classifier function to ctx, routes to one of N registered sub-agents. |
+| `AggregatorAgent` | Runs N sub-agents in parallel, merges outputs via configurable `merge_fn`. |
+| `CircuitBreakerAgent` | 3-state FSM (CLOSED → OPEN → HALF_OPEN). Prevents cascade failure. |
+| `RetryAgent` | Exponential backoff retry wrapper (configurable max_attempts, base_delay). |
+| `MemoryAgent` | Maintains a windowed conversation history across multi-turn calls. |
+| `HumanInLoopAgent` | Pauses execution, calls a `review_fn`, optionally modifies output. |
+| `FilterAgent` | Passes ctx through only if a predicate returns True, else returns `{}`. |
+| `TransformAgent` | Applies a deterministic transform function to ctx before downstream execution. |
+
+### 16.3 Sequential Chains
+
+`Chain` composes agents left-to-right. Each agent receives the accumulated context from all prior steps:
+
+```python
+from multigen import Chain, FunctionAgent
+
+chain = (
+    Chain()
+    .step(FunctionAgent("fetch",   fn=lambda ctx: {"data": fetch_data(ctx["query"])}))
+    .step(FunctionAgent("parse",   fn=lambda ctx: {"parsed": parse(ctx["fetch"]["data"])}),
+          when=lambda ctx: ctx.get("fetch", {}).get("data"))   # conditional step
+    .step(FunctionAgent("enrich",  fn=lambda ctx: {"result": enrich(ctx["parsed"])}),
+          timeout=30.0)
+)
+
+result = await chain.run({"query": "AAPL earnings"})
+print(result.final_output)   # output of last step
+print(result["parse"])       # output of specific step
+```
+
+**Middleware stack**: `Chain.use(middleware_fn)` adds pre/post hooks around every step. Built-in middleware: `logging_middleware` (structured log per step), `tracing_middleware` (span_start/span_end events).
+
+**Operator syntax**: `chain_a | chain_b` concatenates chains; `chain + agent` appends a step.
+
+**Pipeline**: `Pipeline` is an alias for `Chain` with named steps and a callable interface — suitable for embedding in other frameworks.
+
+### 16.4 Parallel Execution
+
+```python
+from multigen import Parallel, FanOut, MapReduce, Race, Batch
+
+# Fan-out: same input to N agents concurrently
+result = await Parallel([agent_a, agent_b, agent_c],
+                         concurrency=5,     # asyncio.Semaphore
+                         fail_fast=False,   # collect all results even on partial failure
+                         timeout=60.0).run(ctx)
+
+# FanOut: distribute a list across one agent
+result = await FanOut(item_agent, input_key="items", concurrency=10).run({"items": [...]})
+
+# MapReduce: parallel map phase, sequential reduce phase
+result = await MapReduce(mapper=extract_agent, reducer=merge_agent,
+                          input_key="documents").run({"documents": docs})
+
+# Race: first result wins, others are cancelled
+result = await Race([fast_agent, accurate_agent], timeout=10.0).run(ctx)
+
+# Batch: process list in chunks of N
+result = await Batch(agent, batch_size=20).run({"items": large_list})
+```
+
+`Parallel.all_succeeded`, `Parallel.outputs`, and `Parallel.errors` give fine-grained result inspection.
+
+### 16.5 Graph DAG Execution (Local)
+
+The local `Graph` mirrors the Temporal `GraphWorkflow` BFS engine but runs in-process:
+
+```python
+from multigen import Graph
+
+g = Graph(name="analysis_pipeline")
+g.node("fetch",    fetch_agent)
+g.node("parse",    parse_agent)
+g.node("enrich_a", enrich_a_agent, max_retries=2)
+g.node("enrich_b", enrich_b_agent, timeout=15.0)
+g.node("merge",    merge_agent)
+
+g.edge("fetch",    "parse")
+g.edge("parse",    "enrich_a")
+g.edge("parse",    "enrich_b")
+g.edge("enrich_a", "merge")
+g.edge("enrich_b", "merge")
+g.edge("parse",    "enrich_b", condition=lambda ctx: ctx["parse"]["count"] > 0)  # conditional
+
+result = await g.run()
+print(result.executed)       # ordered list of executed node IDs
+print(result.final_output)   # last node's output
+print(result["enrich_a"])    # access any node output
+```
+
+Topological sort uses **Kahn's algorithm**. Parallel waves are executed with `asyncio.gather()`. Dynamic routing is supported via `condition` lambdas on edges and `dynamic=True` edges that call an agent to produce the next node ID at runtime.
+
+### 16.6 MCMC Probabilistic State Machines
+
+The `StateMachine` class implements **Markov Chain Monte Carlo** sampling over state transition graphs. This enables stochastic agentic workflows that model iterative refinement, exploration/exploitation tradeoffs, and ensemble consensus.
+
+#### Transition Samplers
+
+| Sampler | Algorithm | Best for |
+| --- | --- | --- |
+| `weighted` | Softmax with temperature scaling | Default; smooth exploration |
+| `greedy` | argmax (temperature → 0) | Deterministic/exploitation |
+| `metropolis` | Metropolis-Hastings accept/reject | Principled exploration with detailed balance |
+| `gibbs` | Conditional sampling | Future: structured dependencies |
+
+#### Temperature Semantics
+
+- `temperature=0.0`: pure greedy — always takes highest-probability transition
+- `temperature=1.0`: exact probability distribution
+- `temperature>1.0`: more uniform — increases exploration
+
+#### Adaptive Transitions
+
+```python
+sm.adaptive_transition(
+    "review", "final",
+    score_fn=lambda ctx: ctx.get("review", {}).get("quality", 0),
+    threshold=0.8   # only allow if score_fn > threshold
+)
+```
+
+Adaptive transitions modify their probability at runtime based on the current context — enabling quality-gated workflows where the machine converges only when outputs are good enough.
+
+#### Ensemble Execution
+
+```python
+ensemble = await sm.run_ensemble(ctx, chains=10)
+print(ensemble.best_path)        # path from chain with best terminal output
+print(ensemble.agreement_score)  # fraction of chains that reached same terminal
+print(ensemble.consensus_output) # majority-vote output across chains
+```
+
+Ensemble execution parallelizes `chains` independent Markov chains using `asyncio.gather()`, then aggregates results. `agreement_score` measures confidence — a score of 1.0 means all chains reached the same terminal state.
+
+### 16.7 Communication Protocols (InMemoryBus)
+
+`InMemoryBus` implements five messaging patterns inspired by enterprise integration:
+
+| Pattern | Method | Use Case |
+| --- | --- | --- |
+| Pub/Sub | `publish(msg)` + `@bus.subscribe(topic)` | Event-driven pipelines, audit logs |
+| Request/Reply | `request(topic, content)` + `@bus.on_request(topic)` | Synchronous agent calls |
+| Broadcast | `broadcast(msg)` | System-wide notifications |
+| Push/Pull (work queue) | `add_worker(topic)` + `push(topic, content)` | Load-balanced task distribution |
+| Direct queue | `send(agent_id)` + `receive(agent_id)` | Agent-to-agent direct messaging |
+
+Additional features:
+- **Dead-letter queue**: failed messages routed to DLQ; inspectable via `dlq_snapshot()`, replayable via `dlq_flush()`
+- **TTL expiry**: `Message(ttl=30)` — messages auto-expire after N seconds
+- **Correlation IDs**: `request()` auto-generates UUIDs; `reply()` echoes correlation_id for routing
+- **Priority**: `Message(priority=10)` — higher priority processed first within a topic
+- **Headers**: arbitrary key-value metadata for downstream routing
+
+### 16.8 Runtime Integration
+
+`Runtime` is the unified entry-point that wires execution patterns, the event bus, optional backends, and the simulator bridge:
+
+```python
+from multigen import Runtime
+
+rt = Runtime(
+    simulator_url="http://localhost:8003",   # optional: push events to UI
+    max_concurrency=20,
+    trace=True,
+)
+
+result = await rt.run_chain([agent_a, agent_b], ctx={"query": "test"}, workflow_id="run-001")
+result = await rt.run_parallel([a, b, c], ctx={})
+result = await rt.run_graph(my_graph, ctx={})
+result = await rt.run_state_machine(sm, ctx={})
+
+# Optional backends
+rt.use_temporal(host="localhost:7233")
+rt.use_kafka(bootstrap_servers="kafka:9092")
+
+print(rt.stats())  # total runs, success rate, avg latency
+```
+
+When `simulator_url` is set, every workflow lifecycle event (start, step_complete, error, end) is POSTed to `POST /api/v1/events` and appears immediately in the Observability tab of the agentic-simulator UI.
+
+---
+
+## 17. Advanced Features from Frontier Research
+
+### 17.1 Reflexion: Verbal Self-Correction
+
+Inspired by the Reflexion paper (Shinn et al., 2023), Multigen supports agents that critique their own outputs and retry with stored verbal feedback:
+
+```python
+# Conceptual pattern (implement via Chain + MemoryAgent)
+critique = FunctionAgent("critique", fn=lambda ctx: {
+    "feedback": f"Output was {ctx['draft']['quality']:.2f}. Needs improvement in: {ctx['draft'].get('gaps', [])}"
+})
+revise = FunctionAgent("revise", fn=lambda ctx: {
+    "output": revise_with_feedback(ctx["draft"]["output"], ctx["critique"]["feedback"])
+})
+
+chain = Chain().step(draft_agent).step(critique).step(revise)
+memory_chain = MemoryAgent("reflexion_bot", chain, window=5)
+```
+
+The `MemoryAgent` stores the critique-revision history, enabling agents to learn from prior attempts within a session. This implements the episodic memory component of Reflexion.
+
+**Roadmap**: v0.5 will introduce `ReflexionAgent` — a first-class primitive that automatically critiques, stores feedback, and retries up to N times with decreasing temperature.
+
+### 17.2 MCTS / LATS Planning
+
+Language Agent Tree Search (LATS, Zhou et al., 2023) achieved SOTA on SWE-bench by combining Monte Carlo Tree Search with LLM as both rollout policy and value evaluator. Multigen's `StateMachine` + `run_ensemble` approximates this:
+
+```python
+# MCTS-inspired: multiple rollouts from branching points
+sm.enable_mcmc(temperature=0.8, sampler="metropolis")
+ensemble = await sm.run_ensemble(ctx, chains=20)
+
+# Use agreement_score as value estimate
+if ensemble.agreement_score > 0.7:
+    # High-confidence action
+    result = ensemble.consensus_output
+else:
+    # Low confidence: trigger human review
+    result = await human_review(ensemble)
+```
+
+**Roadmap**: v0.5 will add `MCTSPlanner` — an explicit tree expansion + backpropagation loop that uses an LLM as value function, enabling look-ahead planning before irreversible actions.
+
+### 17.3 Actor Model (AutoGen 0.4 Pattern)
+
+Multigen's `InMemoryBus` direct queues implement the actor model pattern from AutoGen 0.4:
+
+```python
+# Each agent gets a personal mailbox
+bus = InMemoryBus()
+
+async def agent_loop(agent_id: str, agent: BaseAgent):
+    while True:
+        msg = await bus.receive(agent_id)  # blocks on personal queue
+        result = await agent(msg.content)
+        if msg.reply_to:
+            await bus.send(msg.reply_to, result)
+
+# Spawn N actors
+for aid, ag in agents.items():
+    asyncio.create_task(agent_loop(aid, ag))
+
+# Type-safe message routing
+await bus.send("summarizer", {"text": "...", "reply_to": "reporter"})
+```
+
+Unlike AutoGen's full actor runtime, Multigen's implementation is lightweight — pure asyncio, no separate process per actor.
+
+### 17.4 Memory Taxonomy
+
+Modern agent memory systems are classified into four categories. Multigen supports all four:
+
+| Memory Type | Description | Multigen Implementation |
+| --- | --- | --- |
+| **Working** | Current turn context (in-flight) | `ctx` dict passed through execution |
+| **Episodic** | History of past interactions | `MemoryAgent(window=N)` — windowed history |
+| **Semantic** | Factual knowledge base | External RAG via `LLMAgent` tool calls |
+| **Procedural** | How to perform tasks | Agent code, DSL definitions, `@agent` decorators |
+
+**Collective memory** (shared across agent instances) is provided by the `InMemoryBus` and, in production, by MongoDB's CQRS read model.
+
+**Roadmap**: v0.5 will add `VectorMemoryAgent` — semantic search over past episodes using embedding similarity, enabling agents to retrieve relevant prior context rather than relying on recency alone.
+
+### 17.5 OTel GenAI Semantic Conventions
+
+OpenTelemetry formalized `gen_ai.*` semantic conventions in 2025. Multigen's observability layer emits compatible attributes:
+
+| OTel Attribute | Multigen Equivalent | Description |
+| --- | --- | --- |
+| `gen_ai.system` | `metadata.provider` | LLM provider (openai, gemini, mistral) |
+| `gen_ai.request.model` | `metadata.model` | Model name |
+| `gen_ai.request.temperature` | `metadata.temperature` | Sampling temperature |
+| `gen_ai.usage.prompt_tokens` | `metadata.prompt_tokens` | Input token count |
+| `gen_ai.usage.completion_tokens` | `metadata.completion_tokens` | Output token count |
+| `gen_ai.operation.name` | `event_type` | chat, completion, embedding |
+
+These attributes are stored in the `metadata` JSON column and exposed via Prometheus metrics, enabling dashboards that show per-model cost attribution, token throughput, and latency percentiles.
+
+**Roadmap**: v0.4 will add native OTel SDK export — workflows will emit proper OTLP spans to any Jaeger, Grafana Tempo, or Honeycomb backend.
+
+### 17.6 Prompt Injection Defense
+
+Prompt injection remains the #1 attack vector for agentic systems (OWASP Top 10 for LLM Applications, 2025). Multigen's security roadmap:
+
+| Layer | Current | v0.4 Roadmap |
+| --- | --- | --- |
+| Input sanitization | None | `PromptGuardAgent` wraps LLMAgent, scans for injection patterns |
+| Output validation | None | `OutputValidatorAgent` checks for instruction-following deviations |
+| Sandbox execution | None | E2B / Firecracker integration for code execution agents |
+| Identity | API keys | SPIFFE/SPIRE workload identity for inter-agent auth |
+| Policy | None | OPA policy engine for fine-grained capability access control |
+
+The EchoLeak vulnerability (CVE-2025-32711) demonstrated that cross-tenant context leakage through shared memory pools is a real risk. Multigen mitigates this by keeping all `ctx` dicts isolated per workflow run — no shared mutable state between concurrent workflows.
+
+---
+
+## 18. Agent2Agent (A2A) Protocol and Inter-Framework Interoperability
+
+### 18.1 A2A Protocol v0.3
+
+Google's Agent2Agent Protocol (A2A v0.3, Linux Foundation, 2025) defines a standard interface for agents across different frameworks to communicate. Multigen implements the A2A specification:
+
+**Agent Card**: Every Multigen agent exposes a metadata endpoint:
+
+```http
+GET /.well-known/agent.json
+```
+
+```json
+{
+  "name": "multigen-orchestrator",
+  "version": "0.3.0",
+  "description": "Multi-agent orchestration with MCMC state machines",
+  "capabilities": ["workflow.run", "workflow.signal", "agent.invoke"],
+  "endpoints": {
+    "run": "POST /api/v1/a2a/tasks",
+    "status": "GET /api/v1/a2a/tasks/{id}",
+    "cancel": "DELETE /api/v1/a2a/tasks/{id}"
+  },
+  "authentication": ["bearer", "api_key"],
+  "protocol_version": "a2a/0.3"
+}
+```
+
+**Task Lifecycle**: A2A defines four task states: `submitted → working → completed | failed`. Multigen maps these to its internal workflow states.
+
+**Interoperability**: This enables Multigen workflows to be orchestrated by or to orchestrate:
+- LangGraph agents
+- AutoGen agents
+- CrewAI crews
+- Any framework that implements A2A
+
+### 18.2 Model Context Protocol (MCP) Integration
+
+Anthropic's MCP v2025-11-25 enables Multigen to expose its capabilities as MCP tools consumable by Claude and other MCP-compatible assistants:
+
+```python
+# Multigen MCP server exposes:
+# - run_workflow(dsl: dict, payload: dict) → RunResponse
+# - signal_workflow(workflow_id: str, signal: str) → None
+# - get_workflow_state(workflow_id: str) → WorkflowState
+# - list_capabilities() → List[Capability]
+```
+
+The MCP server runs alongside the orchestrator and registers Multigen's capabilities as MCP tools, enabling AI assistants to directly invoke and manage Multigen workflows.
+
+---
+
+## 19. Framework Comparison Matrix
+
+### 19.1 Feature Comparison: Multigen vs. Leading Frameworks
+
+| Feature | Multigen | LangGraph | AutoGen 0.4 | CrewAI | smolagents | OpenAI SDK |
+| --- | --- | --- | --- | --- | --- | --- |
+| **Execution Model** | MCMC state machines + DAG | State graph (reducer) | Actor model | Role-based crew | Code-as-actions | Function calling |
+| **Durable Execution** | ✓ (Temporal) | Partial (SQLite checkpoints) | ✗ | ✗ | ✗ | ✗ |
+| **Crash Recovery** | ✓ (event-sourced) | Partial | ✗ | ✗ | ✗ | ✗ |
+| **Runtime Control** | ✓ (10 signals) | Partial (interrupt) | ✗ | ✗ | ✗ | ✗ |
+| **Human-in-the-Loop** | ✓ (first-class) | ✓ | Partial | ✓ | ✗ | ✗ |
+| **Zero-infra Local Mode** | ✓ (v0.3 SDK) | ✓ | ✓ | ✓ | ✓ | ✓ |
+| **Parallel Graph Execution** | ✓ (BFS waves) | Partial | ✓ | ✗ | ✗ | ✗ |
+| **Probabilistic State Machine** | ✓ (MCMC) | ✗ | ✗ | ✗ | ✗ | ✗ |
+| **Epistemic Transparency** | ✓ (confidence scores) | ✗ | ✗ | ✗ | ✗ | ✗ |
+| **Observability** | ✓ (OTel + Prometheus + SSE) | Partial (LangSmith) | Partial | ✗ | ✗ | Partial |
+| **Event Bus** | ✓ (5 patterns, Kafka opt.) | ✗ | ✓ | ✗ | ✗ | ✗ |
+| **A2A Protocol** | ✓ (roadmap v0.4) | ✗ | ✗ | ✗ | ✗ | ✗ |
+| **MCP Integration** | ✓ | Partial | ✗ | ✗ | ✗ | ✗ |
+| **Multi-LLM Provider** | ✓ (4 providers + local) | ✓ | ✓ | ✓ | ✓ | ✗ (OpenAI only) |
+| **Visual Simulator** | ✓ (real-time React UI) | Partial (LangGraph Studio) | ✗ | ✗ | ✗ | ✗ |
+| **Dynamic Agent Generation** | ✓ (BlueprintAgent) | ✗ | ✗ | ✗ | ✗ | ✗ |
+| **Self-Organizing** | ✓ (auto-capability routing) | ✗ | ✗ | ✗ | ✗ | ✗ |
+| **Time-Travel Debug** | Roadmap v0.5 | ✓ (LangSmith) | ✗ | ✗ | ✗ | ✗ |
+| **Production Deployment** | ✓ (Temporal + Kafka) | Limited | Limited | Limited | Limited | Limited |
+| **License** | Apache 2.0 | MIT | MIT | MIT | Apache 2.0 | MIT |
+
+### 19.2 When to Choose Multigen
+
+**Choose Multigen when:**
+- You need production-grade durability (workflows that survive restarts)
+- Human oversight of AI decisions is a regulatory or business requirement
+- Your workflow involves probabilistic/iterative reasoning (MCMC)
+- You need real-time observability and runtime steering
+- You are orchestrating across multiple teams or LLM providers
+- You need fine-grained epistemic transparency (confidence scores per node)
+
+**LangGraph may be sufficient when:**
+- You need simple linear or cyclic graph execution
+- LangSmith observability is acceptable
+- No durable execution requirement
+
+**AutoGen may be preferred when:**
+- Pure multi-agent conversation is the core use case
+- Actor model with typed messages is preferred
+
+---
+
+## 20. Use Cases and Market Positioning
+
+### 20.1 Financial Services
+
+#### Credit Risk Assessment
+
+```text
+ingest_application → [credit_bureau, income_verify, fraud_screen] (parallel)
+→ risk_score (aggregator) → condition(score > 0.7) → [escalate | approve | manual_review]
+→ audit_log → regulatory_report
+```
+
+Value: MCMC sampling for sensitivity analysis; epistemic confidence on every risk factor; full audit trail for model risk governance; human approval gate for edge cases.
+
+#### Equity Research (Multi-Manager)
+
+```text
+StateMachine: search → [fundamental_analysis, technical_analysis, sentiment] (parallel)
+→ synthesis → condition(confidence > 0.8) → [publish | revise]
+→ MCMC ensemble (5 chains) → consensus recommendation
+```
+
+Value: Ensemble voting prevents single-analyst bias; agreement_score indicates conviction; Temporal durability for multi-day research workflows.
+
+### 20.2 Marketing Mix Modeling (MMM)
+
+```text
+data_ingest → feature_engineering → [channel_model × N] (MapReduce)
+→ attribution_aggregator → budget_optimizer
+→ scenario_simulator (StateMachine, MCMC) → human_review → publish
+```
+
+Value: MCMC state machine for posterior sampling over budget allocations; parallel channel models; deterministic replay for regulatory review.
+
+### 20.3 Healthcare and Clinical Decision Support
+
+```text
+patient_intake → [lab_results, imaging, history] (parallel, circuit_breaker)
+→ differential_diagnosis → evidence_retrieval (RAG)
+→ risk_stratification (confidence_scored) → human_clinician_gate
+→ treatment_plan → audit_log
+```
+
+Value: Circuit breakers prevent cascade on missing data sources; epistemic confidence forces uncertainty surfacing; mandatory human gate before treatment recommendation; full Temporal audit trail for liability.
+
+### 20.4 DevOps and AIOps
+
+```text
+alert_ingestion → triage (RouterAgent) → [root_cause_analysis, blast_radius]
+→ remediation_planner (MCTS-inspired ensemble) → confidence_gate
+→ [auto_remediate (high confidence) | human_page (low confidence)]
+→ post_mortem_generator
+```
+
+Value: Race pattern for fast vs. accurate diagnosis; circuit breakers on external tool calls; confidence-gated automation vs. human escalation.
+
+### 20.5 Legal and Compliance
+
+```text
+document_ingest → clause_extractor (MapReduce) → risk_classifier
+→ [jurisdiction_check, precedent_search, compliance_check] (Parallel)
+→ synthesis (AggregatorAgent) → review_state_machine
+→ MCMC iteration until confidence > 0.85 → human_lawyer_gate → opinion_draft
+```
+
+Value: Iterative MCMC refinement until quality threshold; mandatory lawyer review gate; complete Temporal audit trail for privilege and liability.
+
+### 20.6 Research and Hypothesis Generation
+
+```text
+hypothesis_generator → experiment_designer → simulation_runner (Batch)
+→ result_analyzer → StateMachine(explore/exploit/report)
+→ ensemble(chains=20) → consensus_hypothesis → peer_review_gate
+```
+
+Value: Exploration/exploitation via MCMC temperature; ensemble consensus for reproducibility; durable execution for multi-hour simulations.
+
+---
+
+## 21. Deployment Guide
+
+### 21.1 Local Development (Zero Infrastructure)
+
+```bash
+pip install multigen-sdk
+```
+
+```python
+from multigen import Chain, FunctionAgent, Runtime
+
+rt = Runtime()
+result = await rt.run_chain([agent_a, agent_b], ctx={"input": "test"})
+```
+
+No configuration required. All execution is in-process.
+
+### 21.2 With Simulator UI
+
+```bash
+# Terminal 1: Start simulator backend
+cd agentic-simulator/backend && uvicorn main:app --reload --port 8003
+
+# Terminal 2: Start simulator frontend
+cd agentic-simulator/frontend && npm run dev
+
+# Terminal 3: Your application
+python your_workflow.py
+```
+
+```python
+from multigen import Runtime
+
+rt = Runtime(simulator_url="http://localhost:8003")
+# All workflow events appear in simulator Observability tab
+```
+
+### 21.3 Full Production Stack (Docker Compose)
+
+```yaml
+# docker-compose.yml (abridged)
+services:
+  orchestrator:
+    build: ./orchestrator
+    ports: ["8000:8000"]
+    environment:
+      TEMPORAL_HOST: temporal:7233
+      KAFKA_BROKERS: kafka:9092
+      MONGODB_URI: mongodb://mongo:27017
+
+  temporal:
+    image: temporalio/auto-setup:latest
+    ports: ["7233:7233"]
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    ports: ["9092:9092"]
+
+  mongo:
+    image: mongo:7
+    ports: ["27017:27017"]
+
+  simulator:
+    build: ./agentic-simulator
+    ports: ["8003:8003", "3000:3000"]
+
+  temporal_worker:
+    build: ./workers
+    command: python temporal_worker.py
+    depends_on: [temporal, kafka, mongo]
+```
+
+### 21.4 Event Ingestion from External Systems
+
+Any system can push events to the simulator:
+
+```python
+import httpx, time
+
+async def push_event(event: dict):
+    async with httpx.AsyncClient() as client:
+        await client.post("http://localhost:8003/api/v1/events", json={
+            "sender": "my_service",
+            "content": event,
+            "event_type": "agent_call",
+            "level": "INFO",
+            "trace_id": "trace-abc123",
+            "metadata": {"model": "gpt-4o", "latency_ms": 342}
+        })
+```
+
+Events appear immediately in LogConsole, Live Events tab, and are grouped by `trace_id` in the Traces tab.
+
+### 21.5 Kubernetes (Helm) — Roadmap v0.5
+
+A Helm chart is planned for v0.5 that will:
+
+- Deploy orchestrator, temporal workers, and simulator as a single chart
+- Auto-scale temporal workers based on Kafka consumer lag
+- Provide HPA (Horizontal Pod Autoscaler) for burst workloads
+- Include Prometheus ServiceMonitor for scraping metrics
+
+---
+
+## 22. Roadmap
+
+### v0.4 (Q2 2026) — Security and Protocols
+
+- **PromptGuardAgent**: injection detection via heuristic + LLM-as-judge
+- **A2A Protocol v0.3**: full task lifecycle, Agent Cards endpoint
+- **SPIFFE/SPIRE**: workload identity for inter-agent authentication
+- **OTel SDK export**: native OTLP spans to Jaeger/Grafana Tempo/Honeycomb
+- **Token cost attribution**: per-workflow token spend breakdown in Prometheus
+- **Output validation**: schema-based output guard for structured agent outputs
+
+### v0.5 (Q3 2026) — Planning and Memory
+
+- **MCTSPlanner**: tree expansion + LLM value function for look-ahead planning
+- **ReflexionAgent**: automatic critique-revise loop with episodic memory
+- **VectorMemoryAgent**: semantic retrieval over past workflow episodes
+- **Time-travel debugging**: replay any historical workflow state in simulator
+- **Cross-session checkpointing**: LangGraph-style state persistence across sessions
+- **Helm chart**: production Kubernetes deployment
+
+### v0.6 (Q4 2026) — Scale and Enterprise
+
+- **Distributed MCMC**: parallel chains across multiple workers (not just asyncio)
+- **Workflow versioning UI**: visual diff of DSL versions in simulator
+- **OPA integration**: Open Policy Agent for fine-grained capability authorization
+- **E2B sandbox**: secure code execution for code-generating agents
+- **Enterprise SSO**: SAML/OIDC for simulator authentication
+- **SLA monitoring**: automated alerts when workflow latency exceeds thresholds
+
+---
+
 *Multigen is open source under the Apache 2.0 license.*
 *Technical questions: open an issue at <https://github.com/Subhagatoadak/Multigen>*
+*SDK documentation: [https://github.com/Subhagatoadak/Multigen/wiki](https://github.com/Subhagatoadak/Multigen/wiki)*

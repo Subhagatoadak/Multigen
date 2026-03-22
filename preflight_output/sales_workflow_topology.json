@@ -1,0 +1,162 @@
+{
+  "nodes": [
+    {
+      "data": {
+        "id": "customer",
+        "label": "customer\n(CustomerAgent)",
+        "agent": "CustomerAgent",
+        "is_entry": true,
+        "has_reflection": false,
+        "has_fanout": false,
+        "timeout": 0,
+        "node_type": "entry",
+        "simulated": false
+      }
+    },
+    {
+      "data": {
+        "id": "sales_agent",
+        "label": "sales_agent\n(SalesAgent)",
+        "agent": "SalesAgent",
+        "is_entry": false,
+        "has_reflection": false,
+        "has_fanout": false,
+        "timeout": 0,
+        "node_type": "normal",
+        "simulated": false
+      }
+    },
+    {
+      "data": {
+        "id": "inventory",
+        "label": "inventory\n(InventoryAgent)",
+        "agent": "InventoryAgent",
+        "is_entry": false,
+        "has_reflection": false,
+        "has_fanout": false,
+        "timeout": 0,
+        "node_type": "normal",
+        "simulated": false
+      }
+    },
+    {
+      "data": {
+        "id": "payment",
+        "label": "payment\n(PaymentAgent)",
+        "agent": "PaymentAgent",
+        "is_entry": false,
+        "has_reflection": false,
+        "has_fanout": false,
+        "timeout": 0,
+        "node_type": "normal",
+        "simulated": false
+      }
+    },
+    {
+      "data": {
+        "id": "order_confirm",
+        "label": "order_confirm\n(OrderConfirmAgent)",
+        "agent": "OrderConfirmAgent",
+        "is_entry": false,
+        "has_reflection": false,
+        "has_fanout": false,
+        "timeout": 0,
+        "node_type": "normal",
+        "simulated": false
+      }
+    }
+  ],
+  "edges": [
+    {
+      "data": {
+        "id": "customer->sales_agent",
+        "source": "customer",
+        "target": "sales_agent",
+        "condition": "",
+        "is_conditional": false,
+        "edge_type": "edge",
+        "weight": 1,
+        "label": ""
+      }
+    },
+    {
+      "data": {
+        "id": "sales_agent->inventory",
+        "source": "sales_agent",
+        "target": "inventory",
+        "condition": "",
+        "is_conditional": false,
+        "edge_type": "edge",
+        "weight": 1,
+        "label": ""
+      }
+    },
+    {
+      "data": {
+        "id": "inventory->sales_agent",
+        "source": "inventory",
+        "target": "sales_agent",
+        "condition": "",
+        "is_conditional": false,
+        "edge_type": "edge",
+        "weight": 1,
+        "label": ""
+      }
+    },
+    {
+      "data": {
+        "id": "sales_agent->payment",
+        "source": "sales_agent",
+        "target": "payment",
+        "condition": "",
+        "is_conditional": false,
+        "edge_type": "edge",
+        "weight": 1,
+        "label": ""
+      }
+    },
+    {
+      "data": {
+        "id": "payment->sales_agent",
+        "source": "payment",
+        "target": "sales_agent",
+        "condition": "",
+        "is_conditional": false,
+        "edge_type": "edge",
+        "weight": 1,
+        "label": ""
+      }
+    },
+    {
+      "data": {
+        "id": "sales_agent->order_confirm",
+        "source": "sales_agent",
+        "target": "order_confirm",
+        "condition": "",
+        "is_conditional": false,
+        "edge_type": "edge",
+        "weight": 1,
+        "label": ""
+      }
+    },
+    {
+      "data": {
+        "id": "order_confirm->customer",
+        "source": "order_confirm",
+        "target": "customer",
+        "condition": "",
+        "is_conditional": false,
+        "edge_type": "edge",
+        "weight": 1,
+        "label": ""
+      }
+    }
+  ],
+  "metadata": {
+    "total_nodes": 5,
+    "total_edges": 7,
+    "entry": "customer",
+    "simulated": false,
+    "layout": "dagre"
+  }
+}

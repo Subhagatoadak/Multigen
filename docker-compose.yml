@@ -175,6 +175,35 @@ services:
         condition: service_started
     restart: unless-stopped
 
+  # ─── Agentic Simulator ─────────────────────────────────────────────────────
+
+  backend:
+    build:
+      context: ./agentic-simulator/backend
+      dockerfile: Dockerfile
+    container_name: agentic-backend
+    ports:
+      - "8003:8000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  simulator-frontend:
+    build:
+      context: ./agentic-simulator/frontend
+      dockerfile: Dockerfile
+    container_name: agentic-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
 volumes:
   mongodb_data:
   temporal_db_data:

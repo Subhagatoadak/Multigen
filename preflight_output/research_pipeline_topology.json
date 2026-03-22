@@ -1,0 +1,101 @@
+{
+  "nodes": [
+    {
+      "data": {
+        "id": "planner",
+        "label": "planner\n(PlannerAgent)",
+        "agent": "PlannerAgent",
+        "is_entry": true,
+        "has_reflection": false,
+        "has_fanout": false,
+        "timeout": 0,
+        "node_type": "entry",
+        "simulated": false
+      }
+    },
+    {
+      "data": {
+        "id": "researcher",
+        "label": "researcher\n(ResearchAgent)",
+        "agent": "ResearchAgent",
+        "is_entry": false,
+        "has_reflection": false,
+        "has_fanout": false,
+        "timeout": 60,
+        "node_type": "normal",
+        "simulated": false
+      }
+    },
+    {
+      "data": {
+        "id": "analyst",
+        "label": "analyst\n(AnalystAgent)",
+        "agent": "AnalystAgent",
+        "is_entry": false,
+        "has_reflection": true,
+        "has_fanout": false,
+        "timeout": 0,
+        "node_type": "normal",
+        "simulated": false
+      }
+    },
+    {
+      "data": {
+        "id": "reporter",
+        "label": "reporter\n(ReportAgent)",
+        "agent": "ReportAgent",
+        "is_entry": false,
+        "has_reflection": false,
+        "has_fanout": false,
+        "timeout": 0,
+        "node_type": "normal",
+        "simulated": false
+      }
+    }
+  ],
+  "edges": [
+    {
+      "data": {
+        "id": "planner->researcher",
+        "source": "planner",
+        "target": "researcher",
+        "condition": "",
+        "is_conditional": false,
+        "edge_type": "edge",
+        "weight": 1,
+        "label": ""
+      }
+    },
+    {
+      "data": {
+        "id": "researcher->analyst",
+        "source": "researcher",
+        "target": "analyst",
+        "condition": "",
+        "is_conditional": false,
+        "edge_type": "edge",
+        "weight": 1,
+        "label": ""
+      }
+    },
+    {
+      "data": {
+        "id": "analyst->reporter",
+        "source": "analyst",
+        "target": "reporter",
+        "condition": "",
+        "is_conditional": false,
+        "edge_type": "edge",
+        "weight": 1,
+        "label": ""
+      }
+    }
+  ],
+  "metadata": {
+    "total_nodes": 4,
+    "total_edges": 3,
+    "entry": "planner",
+    "simulated": false,
+    "layout": "dagre"
+  }
+}

@@ -1,0 +1,132 @@
+{
+  "nodes": [
+    {
+      "data": {
+        "id": "entry",
+        "label": "entry\n(EntryAgent)",
+        "agent": "EntryAgent",
+        "is_entry": true,
+        "has_reflection": false,
+        "has_fanout": false,
+        "messages_sent": 1,
+        "messages_received": 1,
+        "activity": 2,
+        "activity_pct": 100,
+        "status": "entry",
+        "node_type": "entry",
+        "simulated": true
+      }
+    },
+    {
+      "data": {
+        "id": "processor",
+        "label": "processor\n(ProcessorAgent)",
+        "agent": "ProcessorAgent",
+        "is_entry": false,
+        "has_reflection": false,
+        "has_fanout": false,
+        "messages_sent": 1,
+        "messages_received": 1,
+        "activity": 2,
+        "activity_pct": 100,
+        "status": "active",
+        "node_type": "active",
+        "simulated": true
+      }
+    },
+    {
+      "data": {
+        "id": "sink_node",
+        "label": "sink_node\n(SinkAgent)",
+        "agent": "SinkAgent",
+        "is_entry": false,
+        "has_reflection": false,
+        "has_fanout": false,
+        "messages_sent": 0,
+        "messages_received": 1,
+        "activity": 1,
+        "activity_pct": 50,
+        "status": "dead_end",
+        "node_type": "dead_end",
+        "simulated": true
+      }
+    },
+    {
+      "data": {
+        "id": "orphan_node",
+        "label": "orphan_node\n(OrphanAgent)",
+        "agent": "OrphanAgent",
+        "is_entry": false,
+        "has_reflection": false,
+        "has_fanout": false,
+        "messages_sent": 0,
+        "messages_received": 0,
+        "activity": 0,
+        "activity_pct": 0,
+        "status": "unreachable",
+        "node_type": "unreachable",
+        "simulated": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "data": {
+        "id": "entry->processor",
+        "source": "entry",
+        "target": "processor",
+        "condition": "",
+        "is_conditional": false,
+        "edge_type": "edge",
+        "weight": 1,
+        "message_count": 1,
+        "label": "1",
+        "active": true
+      }
+    },
+    {
+      "data": {
+        "id": "processor->sink_node",
+        "source": "processor",
+        "target": "sink_node",
+        "condition": "",
+        "is_conditional": false,
+        "edge_type": "edge",
+        "weight": 1,
+        "message_count": 1,
+        "label": "1",
+        "active": true
+      }
+    },
+    {
+      "data": {
+        "id": "orphan_node->processor",
+        "source": "orphan_node",
+        "target": "processor",
+        "condition": "",
+        "is_conditional": false,
+        "edge_type": "edge",
+        "weight": 1,
+        "message_count": 0,
+        "label": "",
+        "active": false
+      }
+    }
+  ],
+  "metadata": {
+    "total_nodes": 4,
+    "total_edges": 3,
+    "entry": "entry",
+    "total_messages": 2,
+    "active_nodes": 3,
+    "dead_ends": [
+      "sink_node"
+    ],
+    "unreachable": [
+      "orphan_node"
+    ],
+    "overloaded": [],
+    "simulated": true,
+    "layout": "dagre"
+  }
+}
