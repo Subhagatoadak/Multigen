@@ -1,0 +1,164 @@
+site_name: "Multigen — Advanced Agentic Framework"
+site_description: "Production-grade multi-agent orchestration: parallel execution, graph DAGs, MCMC state machines, and resilience patterns."
+site_author: "Multigen Contributors"
+site_url: "https://subhagatoadak.github.io/Multigen"
+repo_url: "https://github.com/Subhagatoadak/Multigen"
+repo_name: "Subhagatoadak/Multigen"
+edit_uri: "edit/main/docs/"
+
+copyright: "Copyright &copy; 2026 Multigen Contributors — MIT License"
+
+theme:
+  name: material
+  custom_dir: docs/overrides
+  logo: assets/logo.png
+  favicon: assets/favicon.png
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: pink
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: pink
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - content.tooltips
+    - toc.follow
+  icon:
+    repo: fontawesome/brands/github
+    admonition:
+      note: octicons/tag-16
+      abstract: octicons/checklist-16
+      info: octicons/info-16
+      tip: octicons/squirrel-16
+      success: octicons/check-16
+      question: octicons/question-16
+      warning: octicons/alert-16
+      failure: octicons/x-circle-16
+      danger: octicons/zap-16
+      bug: octicons/bug-16
+      example: octicons/beaker-16
+      quote: octicons/quote-16
+
+plugins:
+  - search:
+      separator: '[\s\-,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+      title: On this page
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink:
+      repo_url_shorthand: true
+      user: subhagatoadak
+      repo: Multigen
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+extra:
+  version:
+    provider: mike
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Subhagatoadak/Multigen
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/agentic-codex/
+  analytics:
+    provider: google
+    property: G-XXXXXXXXXX
+  announcement: "Multigen v0.1.0 — now with MCMC state machines and MapReduce coordinators!"
+
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - getting-started/installation.md
+    - getting-started/quickstart.md
+    - getting-started/concepts.md
+  - Tutorials:
+    - Agents: tutorials/agents.md
+    - Execution:
+      - Chains & Pipelines: tutorials/chains.md
+      - Parallel Execution: tutorials/parallel.md
+      - Graph (DAG): tutorials/graph.md
+    - State Machines: tutorials/state_machine.md
+    - Messaging: tutorials/event_bus.md
+    - Runtime:
+      - Runtime & Simulator: tutorials/runtime.md
+      - Resilience Patterns: tutorials/resilience.md
+  - Use Cases:
+    - use_cases/credit_risk.md
+    - use_cases/research.md
+    - use_cases/devops.md
+    - use_cases/healthcare.md
+    - use_cases/legal.md
+  - API Reference:
+    - Agents: api/agents.md
+    - Chain / Pipeline: api/chain.md
+    - Parallel & MapReduce: api/parallel.md
+    - Graph: api/graph.md
+    - State Machine: api/state_machine.md
+    - Message Bus: api/bus.md
+    - Runtime: api/runtime.md
+  - Deployment:
+    - Local Development: deployment/local.md
+    - Docker Compose: deployment/docker.md
+    - Observability: deployment/observability.md
+  - Framework Comparison: comparison.md
+  - Contributing: contributing.md

@@ -24,18 +24,25 @@ def patch_agent_registry(monkeypatch):
     # Patch get_agent to always return our DummyAgent
     monkeypatch.setattr(
         'flow_engine.workflows.sequence.get_agent',
-        lambda name: dummy
+        lambda name: dummy,
     )
+    # Also insert into _registry so the pre-check in agent_activity passes
+    # without attempting a MongoDB lookup.
+    import orchestrator.services.agent_registry as _reg_mod
+    monkeypatch.setitem(_reg_mod._registry, 'TestAgent', dummy)
     return dummy
 
 @pytest.fixture(autouse=True)
 def patch_execute_activity(monkeypatch):
-    # Replace workflow.execute_activity with a direct call to the activity function
-    async def fake_execute_activity(fn, name, params, **kwargs):
-        return await fn(name, params)
+    # workflow.execute_activity is called as:
+    #   workflow.execute_activity(fn, args=[name, params], **temporal_kwargs)
+    # Unwrap args= and call fn directly.
+    async def fake_execute_activity(fn, *pos, **kwargs):
+        actual_args = kwargs.pop('args', pos)
+        return await fn(*actual_args)
     monkeypatch.setattr(
         'flow_engine.workflows.sequence.workflow.execute_activity',
-        fake_execute_activity
+        fake_execute_activity,
     )
 
 @pytest.mark.asyncio
@@ -80,7 +87,10 @@ async def test_complex_sequence_parallel(patch_agent_registry):
 @pytest.mark.asyncio
 async def test_complex_sequence_error_aggregation(monkeypatch):
     # Make one activity raise to trigger error collection
-    async def fake_execute(fn, name, params, **kwargs):
+    async def fake_execute(fn, *pos, **kwargs):
+        actual_args = kwargs.pop('args', pos)
+        name = actual_args[0]
+        params = actual_args[1] if len(actual_args) > 1 else {}
         if name == "bad":
             raise RuntimeError("fail")
         return {"agent": name, "output": params}
@@ -110,7 +120,7 @@ async def test_run_complex_workflow_client(monkeypatch):
             return self._result
 
     class StubClient:
-        async def start_workflow(self, method, steps, payload, id, task_queue):
+        async def start_workflow(self, method, *args, **kwargs):
             return StubHandle([{"agent": "Z", "output": {}}])
 
     async def fake_connect(url):

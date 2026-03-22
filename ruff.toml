@@ -1,7 +1,21 @@
 [lint]
 select = ["E", "F", "W"]
-# E101 catches mixed indentation, W191 tabs — both prevent smart-quote-style issues
 ignore = []
+
+line-length = 120
+
+[lint.per-file-ignores]
+# Notebooks are linted cell-by-cell; cross-cell name resolution and long
+# display strings cause many false positives that are not worth fixing.
+"*.ipynb" = [
+    "E501",   # line too long – display strings and long URLs are intentional
+    "E401",   # multiple imports on one line – common in notebook setup cells
+    "E702",   # multiple statements on one line – notebook one-liners
+    "W291",   # trailing whitespace – editor artefacts in notebook JSON
+    "F401",   # imported but unused – cells import for side-effects / later cells
+    "F811",   # redefinition of unused name – notebooks re-define across cells
+    "F821",   # undefined name – cross-cell references not visible to ruff
+]
 
 [format]
 quote-style = "double"

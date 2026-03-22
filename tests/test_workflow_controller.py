@@ -8,10 +8,15 @@ from orchestrator.models.workflow import RunRequest, RunResponse
 from confluent_kafka import KafkaError
 
 class DummyStep:
-    def __init__(self, name, params=None, parallel=None):
+    def __init__(self, name, params=None, parallel=None, agent=None):
         self.name = name
         self.params = params or {}
         self.parallel = parallel or []
+        self.agent = agent
+        self.conditional = None
+        self.dynamic_subtree = None
+        self.loop = None
+        self.graph = None
 
 @pytest.fixture
 def app_and_client(monkeypatch):
@@ -36,8 +41,8 @@ def test_serialize_steps_sequential():
     steps = [DummyStep('s1', {'a': 1}), DummyStep('s2')]
     out = _serialize_steps(steps)
     assert out == [
-        {'name': 's1', 'params': {'a': 1}},
-        {'name': 's2', 'params': {}}
+        {'type': 'sequential', 'name': 's1', 'agent': None, 'params': {'a': 1}},
+        {'type': 'sequential', 'name': 's2', 'agent': None, 'params': {}},
     ]
 
 
@@ -47,10 +52,14 @@ def test_serialize_steps_parallel():
     parent = DummyStep('parent', parallel=[p1, p2])
     out = _serialize_steps([parent])
     assert out == [
-        {'parallel_with': [
-            {'name': 'p1', 'params': {'x': 1}},
-            {'name': 'p2', 'params': {}}
-        ]}
+        {
+            'type': 'parallel',
+            'name': 'parent',
+            'parallel_with': [
+                {'name': 'p1', 'agent': None, 'params': {'x': 1}},
+                {'name': 'p2', 'agent': None, 'params': {}},
+            ],
+        }
     ]
 
 
