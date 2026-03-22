@@ -1,0 +1,350 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+'-----------------------------------
+' External Interface
+'-----------------------------------
+class APIGateway {
+  - routes: Map<String,ServiceEndpoint>
+  + routeRequest(req: Request)
+  + enforceAuth(req: Request)
+}
+
+'-----------------------------------
+' Core Orchestration
+'-----------------------------------
+class Orchestrator {
+  - directory: CapabilityDirectory
+  - flowEngine: FlowEngine
+  - bus: MessageBus
+  - policy: RLPolicy
+  + handleRequest(req: Request)
+  + invokeTool(toolName: String, params: Map)
+}
+
+class CapabilityDirectory {
+  - entries: Map<String,CapabilityMetadata>
+  + register(meta: CapabilityMetadata)
+  + lookup(name: String): CapabilityMetadata
+  + rollback(version: String)
+}
+
+class FlowEngine {
+  - workflow: WorkflowDSL
+  + execute(workflowId: String, context: Context)
+  + pauseForApproval(stepId: String)
+  + resume(stepId: String, decision: Boolean)
+}
+
+class MessageBus {
+  - topics: List<String>
+  + publish(topic: String, msg: Message)
+  + subscribe(topic: String, handler: Function)
+}
+
+class RLPolicy {
+  - model: PolicyModel
+  + selectAction(state: State): Action
+  + update(rewardData: Reward)
+}
+
+'-----------------------------------
+' Factories & Registration
+'-----------------------------------
+class AgentFactory {
+  - templatesDir: String
+  + generateAgent(spec: JsonSchema)
+}
+
+class ToolFactory {
+  - adaptersDir: String
+  + generateToolAdapter(spec: JsonSchema)
+}
+
+class RegistrationService {
+  - serviceName: String
+  + onStartup(selfMeta: CapabilityMetadata)
+  + emitRegistration(meta: CapabilityMetadata)
+}
+
+'-----------------------------------
+' Agents & ToolAdapters
+'-----------------------------------
+class BaseAgent {
+  - name: String
+  - tools: List<String>
+  + onInvocation(inv: Invocation): Response
+  + register()
+}
+
+class ToolAdapter {
+  - name: String
+  - spec: OpenAPI
+  + call(params: Json): Json
+  + register()
+}
+
+'-----------------------------------
+' Governance & Guardrails
+'-----------------------------------
+class GuardrailsEngine {
+  - policies: PolicyStore
+  + checkPolicy(step: String, params: Map): PolicyResult
+  + validateResponse(step: String, payload: Json): Violation?
+}
+
+class ApprovalEngine {
+  - levels: Map<String,Role>
+  + requestApproval(step: String): ApprovalToken
+  + receiveResponse(token: ApprovalToken, decision: Boolean)
+}
+
+class EscalationManager {
+  - pending: Queue<ApprovalRequest>
+  + monitorPending()
+  + escalate(stepId: String)
+}
+
+class ErrorHandler {
+  - retryPolicies: Map<String,RetryPolicy>
+  + handleError(err: ErrorEvent)
+  + routeToOwner(ownerId: String)
+}
+
+'-----------------------------------
+' State, Memory & Privacy
+'-----------------------------------
+class ContextMemoryStore {
+  - vectorDB: DBConnection
+  + saveSnapshot(ctx: ConversationContext)
+  + queryContext(query: String): List<Embedding>
+}
+
+class ConsentManager {
+  - consentRecords: Map<String,Consent>
+  + enforceConsent(record: DataRecord)
+}
+
+class PIIDetector {
+  - patterns: List<Regex>
+  + detectAndMask(text: String): String
+}
+
+'-----------------------------------
+' Observability, Resilience & Scaling
+'-----------------------------------
+class PerformanceAnalyzer {
+  - metricsDB: DBConnection
+  + ingestMetrics(m: Metric)
+  + detectDrift(): Boolean
+}
+
+class PolicyLearner {
+  - policyModel: PolicyModel
+  + retrain(data: TrainingBatch)
+  + updatePolicy()
+}
+
+class CostMonitor {
+  - costData: DataSource
+  + trackCost(entry: CostRecord)
+  + enforceBudget(workflowId: String)
+}
+
+class SecurityScanner {
+  - scanners: List<ScannerTool>
+  + runSAST(repo: CodeRepo)
+  + runDAST(endpoint: String)
+}
+
+class ChaosController {
+  - scenarios: List<ChaosScenario>
+  + injectFault(target: String, type: FaultType)
+}
+
+class Autoscaler {
+  - hpaConfig: HPAConfig
+  + scale(component: String, metric: Metric)
+}
+
+'-----------------------------------
+' Feedback-Driven Modules
+'-----------------------------------
+class FeedbackCollector {
+  - channels: List<Channel>
+  + collect(feedback: FeedbackRecord)
+}
+
+class FeedbackStore {
+  - store: DBConnection
+  + storeFeedback(record: FeedbackRecord)
+  + queryFeedback(filter: Filter): List<FeedbackRecord>
+}
+
+class FeedbackRewarder {
+  - rewardCalc: RewardCalculator
+  + processRewards(records: List<FeedbackRecord>)
+}
+
+class RLHFTrainer {
+  - trainingData: Dataset
+  + prepareDataset(records: List<FeedbackRecord>)
+  + kickOffFineTune()
+}
+
+class ActiveLearner {
+  - selectionStrategy: Strategy
+  + selectExamples(store: FeedbackStore): List<FeedbackRecord>
+}
+
+class DriftMonitor {
+  - threshold: Float
+  + analyzeTrends(store: FeedbackStore)
+  + alertDrift()
+}
+
+class RuleMiner {
+  - ruleTemplates: List<Template>
+  + mineRules(store: FeedbackStore)
+  + proposePolicies()
+}
+
+class AgentPrioritizer {
+  - agentScores: Map<String,Float>
+  + rankAgents(store: FeedbackStore)
+  + biasRouting()
+}
+
+class TestCaseGenerator {
+  - testFramework: String
+  + generateTests(store: FeedbackStore)
+}
+
+class UserProfileManager {
+  - profiles: Map<String,Profile>
+  + buildProfiles(store: FeedbackStore)
+  + getPreferences(userId: String): Preferences
+}
+
+class ComplianceAuditor {
+  - auditLogs: DBConnection
+  + compileReport(store: FeedbackStore)
+}
+
+class FeedbackMarketplace {
+  - publishedPatterns: List<Pattern>
+  + publishPatterns(store: FeedbackStore)
+}
+
+class PromptOptimizer {
+  - promptLibrary: PromptStore
+  + optimizePrompts(feedbackBatch: List<FeedbackRecord>)
+}
+
+class FlowOptimizer {
+  - flowRegistry: WorkflowRegistry
+  + optimizeWorkflow(feedbackBatch: List<FeedbackRecord>)
+}
+
+'-----------------------------------
+' UI & Dev Tools
+'-----------------------------------
+class Dashboard {
+  - widgets: List<Widget>
+  + showTraces()
+  + showMetrics()
+  + showPendingApprovals()
+}
+
+class VisualWorkflowDesigner {
+  - components: List<UIComponent>
+  + designFlowDSL()
+  + exportDSL()
+}
+
+class SandboxSimulator {
+  - contexts: Map<String,SimulationContext>
+  + simulateFlow(workflowId: String)
+}
+
+'-----------------------------------
+' Relationships
+'-----------------------------------
+APIGateway --> Orchestrator
+
+Orchestrator --> CapabilityDirectory
+Orchestrator --> FlowEngine
+Orchestrator --> MessageBus
+Orchestrator --> RLPolicy
+
+AgentFactory --> RegistrationService
+ToolFactory --> RegistrationService
+RegistrationService --> CapabilityDirectory
+
+FlowEngine --> GuardrailsEngine
+FlowEngine --> ApprovalEngine
+FlowEngine --> EscalationManager
+FlowEngine --> ErrorHandler
+
+MessageBus --> BaseAgent
+MessageBus --> ToolAdapter
+BaseAgent --> MessageBus
+ToolAdapter --> MessageBus
+
+FlowEngine --> ContextMemoryStore
+BaseAgent --> ContextMemoryStore
+
+ContextMemoryStore --> PIIDetector
+ContextMemoryStore --> ConsentManager
+
+PerformanceAnalyzer --> PolicyLearner
+PolicyLearner --> Orchestrator
+
+PerformanceAnalyzer --> ChaosController
+ChaosController --> Orchestrator
+
+CostMonitor --> PolicyLearner
+SecurityScanner --> AgentFactory
+SecurityScanner --> ToolFactory
+
+Autoscaler --> MessageBus
+Autoscaler --> BaseAgent
+
+FlowEngine --> FeedbackCollector
+FeedbackCollector --> FeedbackStore
+
+FeedbackStore --> FeedbackRewarder
+FeedbackRewarder --> PolicyLearner
+
+FeedbackStore --> RLHFTrainer
+FeedbackStore --> TestCaseGenerator
+FeedbackStore --> ActiveLearner
+ActiveLearner --> FeedbackCollector
+
+FeedbackStore --> DriftMonitor
+DriftMonitor --> PromptOptimizer
+
+FeedbackStore --> RuleMiner
+RuleMiner --> GuardrailsEngine
+
+FeedbackStore --> AgentPrioritizer
+AgentPrioritizer --> RLPolicy
+
+FeedbackStore --> UserProfileManager
+UserProfileManager --> Orchestrator
+
+FeedbackStore --> ComplianceAuditor
+FeedbackStore --> FeedbackMarketplace
+
+FeedbackStore --> PromptOptimizer
+PromptOptimizer --> Orchestrator
+
+FeedbackStore --> FlowOptimizer
+FlowOptimizer --> FlowEngine
+
+FlowEngine --> SandboxSimulator
+VisualWorkflowDesigner --> FlowEngine
+Dashboard --> PerformanceAnalyzer
+Dashboard --> ComplianceAuditor
+
+@enduml

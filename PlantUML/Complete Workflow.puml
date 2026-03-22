@@ -1,0 +1,133 @@
+@startuml
+actor User
+participant APIGateway  as "API Gateway"
+participant Orchestrator
+participant RLPolicy      as "RL Policy"
+participant CapDir        as "Capability Directory"
+participant ToolFactory
+participant RegService    as "Registration Service"
+participant Guardrails    as "Guardrails Engine"
+participant FlowEngine    as "Flow Engine"
+participant Bus           as "Message Bus"
+participant BaseAgent
+participant FactExtractionAgent
+participant KnowledgeAgent as "Knowledge Retriever"
+participant WikiAdapter   as "Wiki API Adapter"
+participant SPARQLAdapter
+participant DBAdapter     as "DB Query Adapter"
+participant VerifierAgent as "Source Verifier"
+participant CheckerAgent  as "FactChecker"
+participant ScoreAgg      as "Score Aggregator"
+participant ApprovalEng   as "Approval Engine"
+participant EscalationMgr as "Escalation Manager"
+participant ReportGen     as "Report Generator"
+participant DataStore
+participant FeedbackColl  as "Feedback Collector"
+participant FeedbackStore as "Feedback Store"
+participant RuleMiner
+participant DriftMonitor
+participant PromptOpt     as "Prompt Optimizer"
+participant FlowOpt       as "Flow Optimizer"
+participant Rewarder      as "Feedback Rewarder"
+participant PolicyLearner
+participant Autoscaler
+participant Kubernetes
+
+== User request ==
+User -> APIGateway : submitRequest(payload)
+
+== Routing & Bootstrap ==
+APIGateway -> Orchestrator : routeRequest(payload)
+Orchestrator -> RLPolicy : selectAction(state)
+RLPolicy --> Orchestrator : action
+Orchestrator -> CapDir : lookup(\"fact_check_workflow\")
+CapDir --> Orchestrator : notFound
+Orchestrator -> ToolFactory : generateToolAdapter(\"SQLAdapter spec\")
+ToolFactory -> RegService : emitRegistration(SQLAdapter)
+RegService --> CapDir : register(SQLAdapter)
+
+== Guardrails check ==
+Orchestrator -> Guardrails : checkPolicy(step=\"start\", params)
+Guardrails --> Orchestrator : allowed
+
+== Flow execution ==
+Orchestrator -> FlowEngine : execute(\"fact_check_workflow\", payload)
+FlowEngine -> Bus : publish(invocation: collect_responses)
+Bus -> BaseAgent : deliver(collect_responses)
+BaseAgent -> Bus : publish(response: responses)
+
+FlowEngine -> Bus : publish(invocation: extract_facts)
+Bus -> FactExtractionAgent : deliver(extract_facts)
+FactExtractionAgent -> Bus : publish(response: facts)
+
+FlowEngine -> Bus : publish(invocation: retrieve_evidence)
+alt Wikipedia
+  Bus -> KnowledgeAgent : deliver(retrieve_evidence, source=wiki)
+  KnowledgeAgent -> WikiAdapter : call(query=facts)
+  WikiAdapter --> KnowledgeAgent : evidence
+  KnowledgeAgent -> Bus : publish(response: wikiEvidence)
+end
+alt Wikidata
+  Bus -> KnowledgeAgent : deliver(retrieve_evidence, source=wikidata)
+  KnowledgeAgent -> SPARQLAdapter : call(query=facts)
+  SPARQLAdapter --> KnowledgeAgent : evidence
+  KnowledgeAgent -> Bus : publish(response: sparqlEvidence)
+end
+alt Internal DB
+  Bus -> KnowledgeAgent : deliver(retrieve_evidence, source=internal_db)
+  KnowledgeAgent -> DBAdapter : call(query=facts)
+  DBAdapter --> KnowledgeAgent : evidence
+  KnowledgeAgent -> Bus : publish(response: dbEvidence)
+end
+
+FlowEngine -> Bus : publish(invocation: verify_sources)
+Bus -> VerifierAgent : deliver(verify_sources)
+VerifierAgent -> Bus : publish(response: verifiedEvidence)
+
+FlowEngine -> Bus : publish(invocation: judge_factuality)
+Bus -> CheckerAgent : deliver(judge_factuality)
+CheckerAgent -> LLM : verify(facts, verifiedEvidence)
+LLM --> CheckerAgent : judgments
+CheckerAgent -> Bus : publish(response: judgments)
+
+FlowEngine -> ScoreAgg : aggregate(judgments)
+ScoreAgg -> Bus : publish(response: factualScore)
+
+== Approval ==
+FlowEngine -> ApprovalEng : requestApproval(step=\"factualCheck\", score)
+ApprovalEng -> EscalationMgr : monitor(pending)
+EscalationMgr --> ApprovalEng : escalate(if timeout)
+ApprovalEng --> FlowEngine : approvalDecision
+
+== Reporting ==
+FlowEngine -> ReportGen : generateReport(results, factualScore)
+ReportGen -> DataStore : save(report)
+ReportGen -> Bus : publish(response: reportSaved)
+
+== Feedback & Learning ==
+FlowEngine -> FeedbackColl : collectFeedback(context, results)
+FeedbackColl -> FeedbackStore : storeFeedback(record)
+FeedbackStore -> RuleMiner : mineRules()
+RuleMiner -> Guardrails : proposePolicies(rules)
+Guardrails --> FlowEngine : updatePolicies
+
+FeedbackStore -> DriftMonitor : analyzeTrends()
+DriftMonitor -> PromptOpt : alertDrift(data)
+PromptOpt -> Orchestrator : updatePrompt(newPrompt)
+
+FeedbackStore -> FlowOpt : optimizeWorkflow(data)
+FlowOpt -> FlowEngine : updateWorkflow(newDSL)
+
+FeedbackStore -> Rewarder : processRewards(records)
+Rewarder -> PolicyLearner : feedRewards(data)
+PolicyLearner -> Orchestrator : updatePolicy(newPolicy)
+
+PolicyLearner -> Autoscaler : recommendScale(metrics)
+Autoscaler -> Kubernetes : scale(component, replicas)
+
+== Final Output ==
+FlowEngine --> Orchestrator : finalResult
+Orchestrator --> APIGateway : returnResponse(finalResult)
+APIGateway --> User : deliverResponse(finalResult)
+
+@enduml
