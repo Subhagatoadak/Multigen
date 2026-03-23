@@ -30,9 +30,9 @@ from typing import Any, Dict, List
 # Python 3.8+ ships TypedDict in typing; 3.11+ adds NotRequired.
 # We use typing_extensions for broad compatibility.
 try:
-    from typing import Literal, NotRequired, TypedDict
+    from typing import Literal, NotRequired, TypedDict  # noqa: F401
 except ImportError:  # pragma: no cover
-    from typing_extensions import Literal, NotRequired, TypedDict  # type: ignore[assignment]
+    from typing_extensions import Literal, NotRequired, TypedDict  # type: ignore[assignment]  # noqa: F401
 
 
 # ── Tool specs ────────────────────────────────────────────────────────────────

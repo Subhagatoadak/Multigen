@@ -1,4 +1,3 @@
-import json
 import logging
 import pytest
 from confluent_kafka import KafkaError

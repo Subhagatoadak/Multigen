@@ -205,7 +205,9 @@ class Runtime:
         if self.simulator_url:
             asyncio.create_task(self._push_to_simulator(event_type, workflow_id, trace_id, kind, metadata))
 
-    async def _push_to_simulator(self, event_type: str, workflow_id: str, trace_id: str, kind: str, metadata: Dict) -> None:
+    async def _push_to_simulator(
+        self, event_type: str, workflow_id: str, trace_id: str, kind: str, metadata: Dict
+    ) -> None:
         payload = {
             "source":     f"multigen.{self.backend}",
             "event_type": event_type,
