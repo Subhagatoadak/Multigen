@@ -36,8 +36,8 @@ from __future__ import annotations
 import asyncio
 import logging
 import time
-from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, Union
+from dataclasses import dataclass
+from typing import Any, Callable, Dict, List, Optional
 
 from .agent import BaseAgent, AgentOutput
 
@@ -236,7 +236,6 @@ class MapReduce:
 
     async def run(self, ctx: Optional[Context] = None) -> AgentOutput:
         context: Context = dict(ctx or {})
-        records = context.get(self._input_key, [])
         fan_out = FanOut(self._mapper, input_key=self._input_key, concurrency=self._concurrency)
         mapped = await fan_out.run(context)
         reduce_ctx = {**context, "records": mapped["results"], "map_results": mapped}

@@ -19,7 +19,7 @@ async def register_capability(cap: Capability) -> Capability:
 
     cap.created_at = datetime.utcnow()
     # Use model_dump() instead of deprecated dict()
-    await coll.insert_one(cap.model_dump())  
+    await coll.insert_one(cap.model_dump())
     return cap
 
 
@@ -37,7 +37,7 @@ async def get_capability(name: str, version: Optional[str] = None) -> Capability
         raise AgentRegistryError(f"Capability '{ident}' not found")
 
     # Use model_validate() instead of deprecated parse_obj()
-    return Capability.model_validate(doc)  
+    return Capability.model_validate(doc)
 
 
 async def list_capabilities() -> List[Capability]:

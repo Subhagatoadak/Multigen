@@ -1,7 +1,6 @@
 # tests/test_capability_directory.py
 import pytest
 from datetime import datetime, timedelta
-from typing import List, Optional
 
 import orchestrator.services.capability_directory as cd
 from orchestrator.models.capability import Capability
@@ -18,14 +17,15 @@ class FakeCollection:
             if all(doc.get(k) == v for k, v in query.items()):
                 return doc.copy()
         return None
-    
+
     async def insert_one(self, doc):
         # simulate setting _id
         new = doc.copy()
         self.docs.append(new)
-        class Res: pass
+        class Res:
+            pass
         return Res()
-    
+
     def find(self,filter=None):
         # return an async iterator over docs
         async def gen():

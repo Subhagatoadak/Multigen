@@ -4,7 +4,6 @@ from fastapi.testclient import TestClient
 
 from orchestrator.controller.workflow import router, _serialize_steps
 from orchestrator.services.dsl_parser import DSLParseError
-from orchestrator.models.workflow import RunRequest, RunResponse
 from confluent_kafka import KafkaError
 
 class DummyStep:

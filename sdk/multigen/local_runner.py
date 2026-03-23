@@ -29,7 +29,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from collections import deque
-from typing import Any, Deque, Dict, List, Optional, Set
+from typing import Any, Deque, Dict, List, Set
 
 logger = logging.getLogger(__name__)
 

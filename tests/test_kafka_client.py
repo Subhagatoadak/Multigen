@@ -1,12 +1,6 @@
 import json
 import logging
-import json
-import logging
 import pytest
-from confluent_kafka import KafkaError
-
-# Use built-in unittest.mock instead of unittest2
-from unittest.mock import MagicMock
 from confluent_kafka import KafkaError
 
 from messaging.kafka_client import KafkaClient

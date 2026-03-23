@@ -38,7 +38,7 @@ import asyncio
 import logging
 import time
 import uuid
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 from .agent import BaseAgent
 from .bus import InMemoryBus, Message, get_default_bus
@@ -176,13 +176,19 @@ class Runtime:
             try:
                 result = await run_fn(ctx_with_trace)
                 latency_ms = round((time.perf_counter() - start) * 1000, 2)
-                await self._emit_event("workflow_end", wid, tid, kind, {"latency_ms": latency_ms, "status": "completed"})
+                await self._emit_event(
+                    "workflow_end", wid, tid, kind,
+                    {"latency_ms": latency_ms, "status": "completed"},
+                )
                 record = {"workflow_id": wid, "kind": kind, "status": "completed", "latency_ms": latency_ms}
                 self._history.append(record)
                 return result
             except Exception as exc:
                 latency_ms = round((time.perf_counter() - start) * 1000, 2)
-                await self._emit_event("workflow_error", wid, tid, kind, {"error": str(exc), "latency_ms": latency_ms})
+                await self._emit_event(
+                    "workflow_error", wid, tid, kind,
+                    {"error": str(exc), "latency_ms": latency_ms},
+                )
                 raise
 
     async def _emit_event(self, event_type: str, workflow_id: str, trace_id: str, kind: str, metadata: Dict) -> None:
@@ -212,7 +218,8 @@ class Runtime:
             "metadata":   {"workflow_id": workflow_id, **metadata},
         }
         try:
-            import json, urllib.request
+            import json
+            import urllib.request
             data = json.dumps(payload).encode()
             req = urllib.request.Request(
                 f"{self.simulator_url}/api/v1/events",

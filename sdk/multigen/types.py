@@ -25,13 +25,12 @@ Usage
 """
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 # Python 3.8+ ships TypedDict in typing; 3.11+ adds NotRequired.
 # We use typing_extensions for broad compatibility.
 try:
-    from typing import Literal, TypedDict
-    from typing import NotRequired  # 3.11+
+    from typing import Literal, NotRequired, TypedDict
 except ImportError:  # pragma: no cover
     from typing_extensions import Literal, NotRequired, TypedDict  # type: ignore[assignment]
 

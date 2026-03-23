@@ -1,6 +1,4 @@
 import pytest
-import asyncio
-from datetime import timedelta
 import temporalio.workflow as workflow_module
 
 from flow_engine.workflows.sequence import (
@@ -26,10 +24,11 @@ def patch_agent_registry(monkeypatch):
         'flow_engine.workflows.sequence.get_agent',
         lambda name: dummy,
     )
-    # Also insert into _registry so the pre-check in agent_activity passes
-    # without attempting a MongoDB lookup.
+    # Insert all agent names used across tests so the pre-check in
+    # agent_activity passes without attempting a MongoDB lookup.
     import orchestrator.services.agent_registry as _reg_mod
-    monkeypatch.setitem(_reg_mod._registry, 'TestAgent', dummy)
+    for name in ('TestAgent', 'A', 'B', 'X', 'Y', 'good'):
+        monkeypatch.setitem(_reg_mod._registry, name, dummy)
     return dummy
 
 @pytest.fixture(autouse=True)
@@ -75,7 +74,7 @@ async def test_complex_sequence_parallel(patch_agent_registry):
         {"name": "X"},
         {"name": "Y", "params": {"y": 2}}
     ]
-    steps = [{"parallel_with": group}]
+    steps = [{"type": "parallel", "parallel_with": group}]
     wf = ComplexSequenceWorkflow()
     results = await wf.run(steps, {})
     # Order is maintained

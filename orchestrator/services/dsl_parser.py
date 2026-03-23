@@ -233,7 +233,8 @@ def _parse_conditional_branches(node: Dict[str, Any], step_name: str) -> List[Co
                 )
             if cond.lower() == 'else':
                 raise DSLParseError(
-                    "'condition: else' is not allowed within the 'conditional' list; use the top-level 'else' key instead.",
+                    "'condition: else' is not allowed within the 'conditional' list; "
+                    "use the top-level 'else' key instead.",
                     node=entry,
                     step_name=step_name,
                 )
@@ -380,7 +381,10 @@ def _warn_unknown_keys(node: Dict[str, Any], step_name: str) -> None:
     """
     Log a warning if there are unrecognized keys in the step definition.
     """
-    known = {'name', 'agent', 'agent_version', 'params', 'parallel', 'conditional', 'else', 'dynamic_subtree', 'loop', 'graph'}
+    known = {
+        'name', 'agent', 'agent_version', 'params', 'parallel',
+        'conditional', 'else', 'dynamic_subtree', 'loop', 'graph',
+    }
     extra = [k for k in node.keys() if k not in known]
     if extra:
         literal = '{' + ', '.join(f"'{k}'" for k in extra) + '}'
@@ -393,8 +397,6 @@ def _warn_unknown_keys(node: Dict[str, Any], step_name: str) -> None:
 
 if __name__ == "__main__":
     # Simple evaluator to confirm all expected functions are present
-    import inspect
-
     expected = [
         'parse_workflow',
         'parse_step',

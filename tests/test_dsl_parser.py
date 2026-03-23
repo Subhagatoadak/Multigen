@@ -1,9 +1,7 @@
 import pytest
-import warnings
 
 from orchestrator.services.dsl_parser import (
     parse_workflow,
-    parse_step,
     Step,
     ConditionalBranch,
     DSLParseError
@@ -211,8 +209,10 @@ def test_unknown_key_warning():
         "extra_field": "foo",
         "another_unknown": 123
     }]}
-    with pytest.warns(SyntaxWarning,
-                      match=r"Step 's1': Unknown keys \{'extra_field', 'another_unknown'\} found and will be ignored\."):
+    with pytest.warns(
+        SyntaxWarning,
+        match=r"Step 's1': Unknown keys \{'extra_field', 'another_unknown'\} found and will be ignored\.",
+    ):
         steps = parse_workflow(dsl)
 
     assert len(steps) == 1

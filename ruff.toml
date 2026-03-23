@@ -3,6 +3,8 @@ line-length = 120
 exclude = [
     "Agent-Components/agentic_codex/examples/agentic_feature_showcase.ipynb",
     "Agent-Components/agentic_codex/examples/model_lab_demo.ipynb",
+    "notebooks/09_mmm_autopilot.ipynb",
+    "notebooks/10_autonomy_transparency.ipynb",
 ]
 
 [lint]
@@ -25,6 +27,7 @@ ignore = []
     "F811",   # redefinition of unused name – notebooks re-define across cells
     "F821",   # undefined name – cross-cell references not visible to ruff
     "F841",   # local variable assigned but never used – exploratory notebook code
+    "E722",   # bare except – acceptable in exploratory notebook cells
 ]
 
 [format]

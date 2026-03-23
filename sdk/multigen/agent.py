@@ -39,8 +39,7 @@ import logging
 import time
 import uuid
 from abc import ABC, abstractmethod
-from functools import wraps
-from typing import Any, Callable, Coroutine, Dict, List, Optional, Union
+from typing import Any, Callable, Coroutine, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -208,7 +207,8 @@ class LLMAgent(BaseAgent):
             )
             return resp.choices[0].message.content
         except ImportError:
-            import json, urllib.request
+            import json
+            import urllib.request
             data = json.dumps({
                 "model": self.model or "gpt-4o-mini",
                 "messages": [{"role": "user", "content": prompt}],
@@ -224,7 +224,9 @@ class LLMAgent(BaseAgent):
                 return json.loads(r.read())["choices"][0]["message"]["content"]
 
     def _gemini(self, prompt: str) -> str:
-        import json, os, urllib.request
+        import json
+        import os
+        import urllib.request
         api_key = os.getenv("GEMINI_API_KEY", "")
         model = self.model or "gemini-1.5-flash"
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
@@ -234,7 +236,9 @@ class LLMAgent(BaseAgent):
             return json.loads(r.read())["candidates"][0]["content"]["parts"][0]["text"]
 
     def _mistral(self, prompt: str) -> str:
-        import json, os, urllib.request
+        import json
+        import os
+        import urllib.request
         api_key = os.getenv("MISTRAL_API_KEY", "")
         data = json.dumps({
             "model": self.model or "mistral-small-latest",
@@ -249,7 +253,9 @@ class LLMAgent(BaseAgent):
             return json.loads(r.read())["choices"][0]["message"]["content"]
 
     def _ollama(self, prompt: str) -> str:
-        import json, os, urllib.request
+        import json
+        import os
+        import urllib.request
         base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
         data = json.dumps({
             "model": self.model or "llama3",
@@ -366,7 +372,10 @@ class FilterAgent(BaseAgent):
 class TransformAgent(BaseAgent):
     """Apply a pure transformation to the context and pass to downstream."""
 
-    def __init__(self, name: str, transform: Callable[[Context], Context], downstream: Optional[BaseAgent] = None, **kwargs: Any) -> None:
+    def __init__(
+        self, name: str, transform: Callable[[Context], Context],
+        downstream: Optional[BaseAgent] = None, **kwargs: Any,
+    ) -> None:
         super().__init__(name, **kwargs)
         self._transform = transform
         self._downstream = downstream
@@ -402,7 +411,11 @@ class CircuitBreakerAgent(BaseAgent):
             if now - self._opened_at >= self._recovery_timeout:
                 self._state = "HALF_OPEN"
             else:
-                return {"circuit_open": True, "agent": self._agent.name, "retry_after": self._recovery_timeout - (now - self._opened_at)}
+                return {
+                    "circuit_open": True,
+                    "agent": self._agent.name,
+                    "retry_after": self._recovery_timeout - (now - self._opened_at),
+                }
 
         try:
             result = await self._agent(ctx)
@@ -440,7 +453,10 @@ class RetryAgent(BaseAgent):
                 last_exc = exc
                 if attempt < self._max_retries:
                     delay = self._base_delay * (2 ** attempt)
-                    logger.warning("RetryAgent %s attempt %d failed, retrying in %.1fs: %s", self.name, attempt + 1, delay, exc)
+                    logger.warning(
+                        "RetryAgent %s attempt %d failed, retrying in %.1fs: %s",
+                        self.name, attempt + 1, delay, exc,
+                    )
                     await asyncio.sleep(delay)
         raise RuntimeError(f"RetryAgent {self.name}: all {self._max_retries} retries exhausted") from last_exc
 

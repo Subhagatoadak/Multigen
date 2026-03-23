@@ -45,7 +45,6 @@ class TemporalBackend:
     ) -> Dict[str, Any]:
         """Submit DSL as a Temporal workflow and await result."""
         import uuid
-        from temporalio.client import Client  # type: ignore
 
         client = await self._ensure_client()
         wid = workflow_id or f"multigen-{uuid.uuid4().hex[:8]}"

@@ -10,13 +10,12 @@ Swap with LLMAgent("name", prompt="...", provider="openai") for real LLM calls.
 
 import asyncio
 from multigen import (
-    FunctionAgent, LLMAgent, RouterAgent, AggregatorAgent,
-    CircuitBreakerAgent, RetryAgent, MemoryAgent,
-    Chain, Parallel, FanOut, MapReduce, Race,
+    FunctionAgent, RouterAgent,
+    CircuitBreakerAgent, MemoryAgent,
+    Chain, Parallel, MapReduce,
     Graph, StateMachine,
     InMemoryBus, Message,
     Runtime,
-    agent,
 )
 
 
@@ -60,7 +59,9 @@ async def example_graph():
     g.node("parse",    FunctionAgent("parse",    fn=lambda ctx: {"parsed": len(ctx["fetch"]["data"])}))
     g.node("enrich_a", FunctionAgent("enrich_a", fn=lambda ctx: {"a_score": ctx["parse"]["parsed"] * 2}))
     g.node("enrich_b", FunctionAgent("enrich_b", fn=lambda ctx: {"b_score": ctx["parse"]["parsed"] * 3}))
-    g.node("merge",    FunctionAgent("merge",    fn=lambda ctx: {"total": ctx["enrich_a"]["a_score"] + ctx["enrich_b"]["b_score"]}))
+    g.node("merge",    FunctionAgent("merge",    fn=lambda ctx: {
+        "total": ctx["enrich_a"]["a_score"] + ctx["enrich_b"]["b_score"]
+    }))
 
     g.edge("fetch",    "parse")
     g.edge("parse",    "enrich_a")
@@ -78,11 +79,15 @@ async def example_graph():
 async def example_state_machine():
     print("\n=== 4. MCMC State Machine ===")
 
-    quality_scores = {"draft": 0.4, "review": 0.75, "final": 1.0}
-
-    draft  = FunctionAgent("draft",  fn=lambda ctx: {"text": f"Draft answer for: {ctx.get('query', '')}", "quality": 0.4})
-    review = FunctionAgent("review", fn=lambda ctx: {"text": ctx.get("draft", {}).get("text", "") + " [reviewed]", "quality": 0.75})
-    final  = FunctionAgent("final",  fn=lambda ctx: {"text": ctx.get("review", {}).get("text", "") + " [FINAL]", "quality": 1.0})
+    draft  = FunctionAgent("draft",  fn=lambda ctx: {
+        "text": f"Draft answer for: {ctx.get('query', '')}", "quality": 0.4
+    })
+    review = FunctionAgent("review", fn=lambda ctx: {
+        "text": ctx.get("draft", {}).get("text", "") + " [reviewed]", "quality": 0.75
+    })
+    final  = FunctionAgent("final",  fn=lambda ctx: {
+        "text": ctx.get("review", {}).get("text", "") + " [FINAL]", "quality": 1.0
+    })
 
     sm = StateMachine(name="writing_loop", start_state="draft", terminal_states={"final"}, max_steps=10)
     sm.state("draft",  draft)
@@ -117,9 +122,16 @@ async def example_router_circuit_breaker():
     neg_agent = FunctionAgent("negative_handler", fn=lambda ctx: {"action": "escalate", "reason": "negative sentiment"})
     neu_agent = FunctionAgent("neutral_handler",  fn=lambda ctx: {"action": "follow_up", "reason": "neutral"})
 
+    def _classify(ctx):
+        if ctx.get("score", 0) > 0.6:
+            return "positive"
+        if ctx.get("score", 0) < 0.3:
+            return "negative"
+        return "neutral"
+
     router = RouterAgent(
         "sentiment_router",
-        classifier=lambda ctx: "positive" if ctx.get("score", 0) > 0.6 else ("negative" if ctx.get("score", 0) < 0.3 else "neutral"),
+        classifier=_classify,
         routes={"positive": pos_agent, "negative": neg_agent, "neutral": neu_agent},
     )
 
@@ -169,8 +181,13 @@ async def example_map_reduce():
         "Oil prices fell 2% amid demand concerns from China",
     ]
 
-    mapper  = FunctionAgent("extract_keywords", fn=lambda ctx: {"keywords": ctx["item"].split()[:3], "doc": ctx["item"][:40]})
-    reducer = FunctionAgent("aggregate",        fn=lambda ctx: {"summary": f"Processed {len(ctx['records'])} documents", "all_keywords": [kw for r in ctx['records'] for kw in r.get('keywords', [])]})
+    mapper  = FunctionAgent("extract_keywords", fn=lambda ctx: {
+        "keywords": ctx["item"].split()[:3], "doc": ctx["item"][:40]
+    })
+    reducer = FunctionAgent("aggregate",        fn=lambda ctx: {
+        "summary": f"Processed {len(ctx['records'])} documents",
+        "all_keywords": [kw for r in ctx['records'] for kw in r.get('keywords', [])],
+    })
 
     result = await MapReduce(mapper=mapper, reducer=reducer, input_key="documents").run({"documents": documents})
     print("MapReduce result:", result.get("summary"))
