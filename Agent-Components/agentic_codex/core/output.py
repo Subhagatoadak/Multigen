@@ -5,7 +5,7 @@ import json
 import xml.etree.ElementTree as ET
 from typing import Any, Mapping, Type
 
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel
 
 
 def parse_llm_json(text: str, model: Type[BaseModel] | None = None) -> Any:

@@ -6,7 +6,10 @@ import sqlite3
 from dataclasses import dataclass, field
 import ast
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Mapping, Optional, Protocol
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Mapping, Optional, Protocol
+
+if TYPE_CHECKING:
+    from .safety.rate_limit import MultiLimiter
 
 
 class ToolAdapter(Protocol):
@@ -145,7 +148,6 @@ class SanitizedCodeExecutionToolAdapter:
 
     def _ensure_safe(self, code: str) -> None:
         tree = ast.parse(code, mode="exec")
-        forbidden = (ast.Import, ast.ImportFrom, ast.Call, ast.Attribute)
         for node in ast.walk(tree):
             if isinstance(node, (ast.Import, ast.ImportFrom)):
                 raise RuntimeError("Imports are not allowed in sanitized code execution.")

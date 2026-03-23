@@ -6,7 +6,10 @@ from typing import Any, Dict, List, Optional
 
 
 class Prompt:  # type: ignore
-        def __init__(self, name: str, template: str, version: Optional[str] = None, metadata: Optional[Dict[str, Any]] = None) -> None:
+        def __init__(
+            self, name: str, template: str,
+            version: Optional[str] = None, metadata: Optional[Dict[str, Any]] = None,
+        ) -> None:
             self.name = name
             self.template = template
             self.version = version or "default"
@@ -43,7 +46,10 @@ class PromptManager:
     def __post_init__(self) -> None:
         self.registry = PromptRegistry()
 
-    def add(self, name: str, template: str, *, version: Optional[str] = None, metadata: Optional[Dict[str, Any]] = None) -> None:
+    def add(
+        self, name: str, template: str, *,
+        version: Optional[str] = None, metadata: Optional[Dict[str, Any]] = None,
+    ) -> None:
         prompt = Prompt(name=name, template=template, version=version, metadata=metadata or {})
         self.registry.register(prompt)
 
@@ -58,7 +64,10 @@ class PromptManager:
 class Prompt_Framework:
     """Switchable prompt engineering frameworks with shared context/style."""
 
-    def __init__(self, context: str, output_type: str | None = None, style: str | None = None, role: str | None = None, *args, **kwargs) -> None:
+    def __init__(
+        self, context: str, output_type: str | None = None,
+        style: str | None = None, role: str | None = None, *args, **kwargs,
+    ) -> None:
         self.context = context
         self.output_type = output_type
         self.style = style
@@ -124,7 +133,9 @@ class Prompt_Framework:
         prompt += "Task: Generate a response based on the above information."
         return prompt
 
-    def create_framework(self, character: str, request: str, examples: str, adjustment: str, output_type: str, *args, **kwargs) -> str:
+    def create_framework(
+        self, character: str, request: str, examples: str, adjustment: str, output_type: str, *args, **kwargs,
+    ) -> str:
         prompt = (
             f"Character: {character}\n"
             f"Request: {request}\n"
@@ -155,7 +166,9 @@ class Prompt_Framework:
         prompt += "Task: Generate a response based on the above parameters."
         return prompt
 
-    def coast_framework(self, context: str, objective: str, actions: str, scenario: str, task: str, *args, **kwargs) -> str:
+    def coast_framework(
+        self, context: str, objective: str, actions: str, scenario: str, task: str, *args, **kwargs,
+    ) -> str:
         prompt = (
             f"Context: {context}\n"
             f"Objective: {objective}\n"
@@ -166,7 +179,9 @@ class Prompt_Framework:
         prompt += "Task: Generate a response based on the above parameters."
         return prompt
 
-    def roses_framework(self, role: str, objective: str, scenario: str, expected_solution: str, steps: str, *args, **kwargs) -> str:
+    def roses_framework(
+        self, role: str, objective: str, scenario: str, expected_solution: str, steps: str, *args, **kwargs,
+    ) -> str:
         prompt = (
             f"Role: {role}\n"
             f"Objective: {objective}\n"

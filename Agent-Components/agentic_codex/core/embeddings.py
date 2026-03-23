@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Callable, Iterable, List, Protocol, Sequence
+from typing import Any, Callable, List, Protocol, Sequence
 
 import math
 

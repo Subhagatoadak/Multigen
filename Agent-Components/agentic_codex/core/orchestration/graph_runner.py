@@ -7,7 +7,6 @@ from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence, Set
 
 from ..agent import Agent, Context
 from ..schemas import Message
-from ..cancel import CancelToken
 from .coordinator.base import CoordinatorBase
 
 
@@ -91,7 +90,8 @@ class GraphRunner(CoordinatorBase):
             if context.scratch.get("graph_stop"):
                 break
 
-            # Handle dynamic branching: nodes appended to context.scratch["_graph_additions"] as list of (id, GraphNodeSpec)
+            # Handle dynamic branching: nodes appended to context.scratch["_graph_additions"]
+            # as list of (id, GraphNodeSpec)
             additions = context.scratch.pop("_graph_additions", [])
             for node_id, spec in additions:
                 if self.branch_budget is not None and branch_additions >= self.branch_budget:
@@ -150,7 +150,11 @@ class GraphRunner(CoordinatorBase):
                 if result.out_messages:
                     context.push_message(result.out_messages[-1])
                 context.scratch.update(result.state_updates if target_context is context else target_context.scratch)
-                self.tracer.metric("graph.node.latency", self.tracer.events[-1].payload.get("duration", 0.0) if self.tracer.events else 0.0, node=node_id)
+                self.tracer.metric(
+                    "graph.node.latency",
+                    self.tracer.events[-1].payload.get("duration", 0.0) if self.tracer.events else 0.0,
+                    node=node_id,
+                )
                 # Dynamic graph mutations can be emitted via state_updates["_graph_additions"]
                 additions = result.state_updates.get("_graph_additions", [])
                 if additions:

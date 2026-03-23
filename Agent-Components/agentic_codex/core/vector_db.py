@@ -14,7 +14,10 @@ except ImportError:  # pragma: no cover - optional dependency
 class VectorDBAdapter(Protocol):
     """Protocol for vector database adapters."""
 
-    def add(self, ids: Sequence[str], vectors: Sequence[Sequence[float]], metadata: Sequence[Mapping[str, Any]] | None = None) -> None:
+    def add(
+        self, ids: Sequence[str], vectors: Sequence[Sequence[float]],
+        metadata: Sequence[Mapping[str, Any]] | None = None,
+    ) -> None:
         ...
 
     def search(self, query: Sequence[float], k: int = 5) -> List[Tuple[str, float, Mapping[str, Any]]]:
@@ -49,7 +52,10 @@ class FaissAdapter:
             if path.exists():
                 self._index = faiss.read_index(str(path))
 
-    def add(self, ids: Sequence[str], vectors: Sequence[Sequence[float]], metadata: Sequence[Mapping[str, Any]] | None = None) -> None:
+    def add(
+        self, ids: Sequence[str], vectors: Sequence[Sequence[float]],
+        metadata: Sequence[Mapping[str, Any]] | None = None,
+    ) -> None:
         import numpy as np
 
         meta_list = list(metadata or [{} for _ in ids])

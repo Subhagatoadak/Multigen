@@ -4,9 +4,9 @@ from __future__ import annotations
 import os
 import time
 from collections.abc import Callable, Iterable, Iterator, Sequence
-from typing import Any, Dict, Generator, Mapping, Optional
+from typing import Any, Dict, Mapping, Optional
 
-from .interfaces import LLMAdapter, SamplingParams
+from .interfaces import SamplingParams
 from .schemas import Message
 
 
@@ -34,7 +34,7 @@ class _BaseLLMAdapter:
                 if cost_callback is not None:
                     cost_callback({"model": self.model, "attempt": attempt + 1})
                 return result
-            except Exception as exc:  # pragma: no cover - defensive, tests use FunctionAdapter
+            except Exception:  # pragma: no cover - defensive, tests use FunctionAdapter
                 attempt += 1
                 if attempt >= self._max_retries:
                     raise
@@ -138,7 +138,10 @@ class EnvOpenAIAdapter(_BaseLLMAdapter):
             # If openai streaming is available, create yields chunks; otherwise return single-message iterable
             result = self._with_retry(call_stream, cost_callback=cost_callback)
             if isinstance(result, Iterable):
-                return (chunk if isinstance(chunk, Message) else Message(role="assistant", content=str(chunk)) for chunk in result)
+                return (
+                    chunk if isinstance(chunk, Message) else Message(role="assistant", content=str(chunk))
+                    for chunk in result
+                )
             return (Message(role="assistant", content=str(result)),)
 
         def call() -> str:
@@ -182,7 +185,10 @@ class FunctionAdapter(_BaseLLMAdapter):
         cost_callback: Optional[Callable[[Dict[str, Any]], None]] = None,
     ) -> Message | Iterable[Message]:
         prompt = "\n".join(f"{m.role}: {m.content}" for m in messages)
-        result = self.generate(prompt, sampling=sampling, stream=stream, response_format=response_format, cost_callback=cost_callback)
+        result = self.generate(
+            prompt, sampling=sampling, stream=stream,
+            response_format=response_format, cost_callback=cost_callback,
+        )
         if stream and isinstance(result, Iterable):
             return (Message(role="assistant", content=chunk) for chunk in result)  # type: ignore[misc]
         return Message(role="assistant", content=result if isinstance(result, str) else "".join(result))

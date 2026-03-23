@@ -9,7 +9,7 @@ This guide covers every supported way to run Multigen, from a five-minute local 
 1. [Prerequisites](#1-prerequisites)
 2. [Quick Start — Local Mode (no infrastructure)](#2-quick-start--local-mode-no-infrastructure)
 3. [Full Local Stack — Manual Setup](#3-full-local-stack--manual-setup)
-4. [Docker Compose — Recommended for Development](#4-docker-compose--recommended-for-development)
+4. [Docker Compose (Recommended for Development)](#4-docker-compose-recommended-for-development)
 5. [CLI Installation (`multigen` command)](#5-cli-installation-multigen-command)
 6. [SDK Installation (Python client)](#6-sdk-installation-python-client)
 7. [MCP Server Setup](#7-mcp-server-setup)
@@ -210,7 +210,7 @@ curl http://localhost:8000/health
 
 ---
 
-## 4. Docker Compose — Recommended for Development
+## 4. Docker Compose Recommended for Development
 
 The Compose file starts the complete stack (Zookeeper, Kafka, MongoDB, PostgreSQL, Temporal, Temporal UI, Capability Service, Orchestrator, Flow Worker, Temporal Worker) with a single command.
 

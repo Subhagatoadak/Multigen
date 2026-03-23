@@ -13,6 +13,7 @@ if TYPE_CHECKING:  # pragma: no cover - import-time typing helpers
     from .interfaces import LLMAdapter, Memory
     from .skills import SkillRegistry
     from .tools import ToolAdapter, ToolPermissions, BudgetGuard
+    from .safety.rate_limit import MultiLimiter
     from .message_bus import MessageBus
 
 

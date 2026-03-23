@@ -102,7 +102,9 @@ class Agent:
 
         kernel = self._ensure_kernel()
         logger: StructuredLogger = (
-            context.components.get("logger") if isinstance(context.components, Mapping) and "logger" in context.components else StructuredLogger(name="agentic")
+            context.components.get("logger")
+            if isinstance(context.components, Mapping) and "logger" in context.components
+            else StructuredLogger(name="agentic")
         )
         if isinstance(context.scratch, Mapping):
             run_id = context.scratch.get("run_id")

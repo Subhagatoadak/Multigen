@@ -5,13 +5,12 @@ import asyncio
 import inspect
 import time
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
-from dataclasses import dataclass, field
-from typing import Any, Callable, Iterable, List, Mapping, Optional, Sequence
+from dataclasses import dataclass
+from typing import Callable, List, Mapping, Optional, Sequence
 
 from ..agent import Context
 from ..schemas import AgentStep
 from ..observability.metrics import record_counter, record_latency
-from ..cancel import CancelToken
 
 
 StepFn = Callable[[Context], AgentStep]
@@ -104,7 +103,11 @@ def run_steps(
     """Execute a series of steps with optional batch/parallel/conditional controls."""
 
     token = context.components.get("cancel_token") if isinstance(context.components, Mapping) else None
-    logger = context.components.get("logger") if isinstance(context.components, Mapping) and "logger" in context.components else None
+    logger = (
+        context.components.get("logger")
+        if isinstance(context.components, Mapping) and "logger" in context.components
+        else None
+    )
     results: List[AgentStep] = []
     for spec in steps:
         if getattr(token, "cancelled", False):

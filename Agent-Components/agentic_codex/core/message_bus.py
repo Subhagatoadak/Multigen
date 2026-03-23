@@ -33,7 +33,10 @@ class MessageBus:
         channel: str = "default",
         meta: Mapping[str, Any] | None = None,
     ) -> MessageRecord:
-        record = MessageRecord(agent=agent, content=content, iteration=iteration, channel=channel, meta=dict(meta or {}))
+        record = MessageRecord(
+            agent=agent, content=content, iteration=iteration,
+            channel=channel, meta=dict(meta or {}),
+        )
         self._records.append(record)
         return record
 
@@ -101,7 +104,9 @@ class CommunicationHub:
     def set_group(self, name: str, members: Iterable[str]) -> None:
         self._groups[name] = set(members)
 
-    def set_namespace_acl(self, namespace: str, allow: Iterable[str] | None = None, deny: Iterable[str] | None = None) -> None:
+    def set_namespace_acl(
+        self, namespace: str, allow: Iterable[str] | None = None, deny: Iterable[str] | None = None
+    ) -> None:
         """Set allow/deny ACLs for namespace messaging."""
 
         self._namespace_acls[namespace] = {
@@ -129,18 +134,29 @@ class CommunicationHub:
         handler = self._handlers.get(envelope.mode, self._handlers["direct"])
         return tuple(handler(envelope))
 
-    def _emit(self, recipient: str, envelope: CommEnvelope, *, content: str | None = None, store: bool = True, meta_extra: Mapping[str, Any] | None = None) -> MessageRecord:
+    def _emit(
+        self, recipient: str, envelope: CommEnvelope, *,
+        content: str | None = None, store: bool = True, meta_extra: Mapping[str, Any] | None = None,
+    ) -> MessageRecord:
         meta = dict(envelope.meta)
         meta.update(meta_extra or {})
         meta.setdefault("sender", envelope.sender)
         builder = {
-            True: lambda: self.bus.publish(agent=recipient, content=content or envelope.content, iteration=envelope.iteration, channel=envelope.channel, meta=meta),
+            True: lambda: self.bus.publish(
+                agent=recipient, content=content or envelope.content,
+                iteration=envelope.iteration, channel=envelope.channel, meta=meta,
+            ),
             False: lambda: self._append_ephemeral(recipient, content or envelope.content, envelope, meta),
         }
         return builder[store]()
 
-    def _append_ephemeral(self, recipient: str, content: str, envelope: CommEnvelope, meta: Mapping[str, Any]) -> MessageRecord:
-        record = MessageRecord(agent=recipient, content=content, iteration=envelope.iteration, channel=envelope.channel, meta=meta)
+    def _append_ephemeral(
+        self, recipient: str, content: str, envelope: CommEnvelope, meta: Mapping[str, Any]
+    ) -> MessageRecord:
+        record = MessageRecord(
+            agent=recipient, content=content,
+            iteration=envelope.iteration, channel=envelope.channel, meta=meta,
+        )
         self._ephemeral.append(record)
         return record
 
@@ -183,7 +199,10 @@ class CommunicationHub:
 
     def _handle_encrypted(self, envelope: CommEnvelope) -> List[MessageRecord]:
         secure_content = self._cipher(envelope.content)
-        return [self._emit(target, envelope, content=secure_content, meta_extra={"encrypted": True}) for target in envelope.targets]
+        return [
+            self._emit(target, envelope, content=secure_content, meta_extra={"encrypted": True})
+            for target in envelope.targets
+        ]
 
     def _handle_ephemeral(self, envelope: CommEnvelope) -> List[MessageRecord]:
         targets = list(envelope.targets)
