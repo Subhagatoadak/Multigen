@@ -1,6 +1,7 @@
 # agents/echo_agent/register.py
 
-import os, asyncio
+import os
+import asyncio
 import httpx
 from orchestrator.models.capability import Capability
 

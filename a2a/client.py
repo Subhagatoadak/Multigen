@@ -30,7 +30,7 @@ from typing import Any, AsyncGenerator, Dict, Optional
 
 import httpx
 
-from .models import AgentCard, Task, TaskSendParams, TaskState, Message, TextPart, DataPart
+from .models import AgentCard, TaskState
 
 logger = logging.getLogger(__name__)
 

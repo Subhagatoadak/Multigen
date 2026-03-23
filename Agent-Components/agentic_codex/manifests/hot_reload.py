@@ -9,7 +9,13 @@ from typing import Callable
 from .loaders import build_from_manifest
 
 
-def watch_manifest(path: str | Path, on_change: Callable[[object], None], *, interval: float = 1.0, stop_event: threading.Event | None = None) -> threading.Thread:
+def watch_manifest(
+    path: str | Path,
+    on_change: Callable[[object], None],
+    *,
+    interval: float = 1.0,
+    stop_event: threading.Event | None = None,
+) -> threading.Thread:
     """Poll a manifest file for changes and invoke `on_change` with the parsed manifest."""
 
     manifest_path = Path(path)
@@ -35,7 +41,12 @@ def watch_manifest(path: str | Path, on_change: Callable[[object], None], *, int
     return thread
 
 
-def watch_graph(on_change: Callable[[dict], None], *, interval: float = 1.0, stop_event: threading.Event | None = None) -> threading.Thread:
+def watch_graph(
+    on_change: Callable[[dict], None],
+    *,
+    interval: float = 1.0,
+    stop_event: threading.Event | None = None,
+) -> threading.Thread:
     """Placeholder for dynamic graph updates; callers push changes into on_change."""
 
     def _loop() -> None:

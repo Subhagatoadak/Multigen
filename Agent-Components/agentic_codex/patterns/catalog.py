@@ -23,7 +23,10 @@ CATALOG: Dict[str, List[PatternDescriptor]] = {
     "hierarchical": [
         PatternDescriptor(
             name="Ministry of Experts",
-            idea="A lead planner decomposes the goal and allocates sub-problems to an expert council before a cabinet consolidates the result.",
+            idea=(
+                "A lead planner decomposes the goal and allocates sub-problems"
+                " to an expert council before a cabinet consolidates the result."
+            ),
             best_for="Complex, multi-disciplinary tasks where oversight and governance are crucial.",
             tradeoffs="High quality and accountability, but can bottleneck on the minister and cabinet review cycles.",
             personas=[
@@ -34,8 +37,14 @@ CATALOG: Dict[str, List[PatternDescriptor]] = {
         ),
         PatternDescriptor(
             name="Manager-Worker",
-            idea="A manager agent creates milestones and assigns them to worker agents that deliver concrete artifacts.",
-            best_for="Deliverables with verifiable outputs such as reports, code, or analyses with acceptance criteria.",
+            idea=(
+                "A manager agent creates milestones and assigns them to worker"
+                " agents that deliver concrete artifacts."
+            ),
+            best_for=(
+                "Deliverables with verifiable outputs such as reports, code,"
+                " or analyses with acceptance criteria."
+            ),
             tradeoffs="Clear accountability with milestone tracking, but requires good task decomposition.",
             personas=[
                 "Manager (supervisor)",
@@ -45,7 +54,10 @@ CATALOG: Dict[str, List[PatternDescriptor]] = {
         ),
         PatternDescriptor(
             name="Judge-Referee Gate",
-            idea="An independent judge validates outputs from other agents using rubrics, constraints, or schema checks.",
+            idea=(
+                "An independent judge validates outputs from other agents"
+                " using rubrics, constraints, or schema checks."
+            ),
             best_for="Safety-critical or regulated deliverables that must pass strict validation.",
             tradeoffs="Improves safety but adds extra latency and cost for each verification cycle.",
             personas=[
@@ -58,7 +70,10 @@ CATALOG: Dict[str, List[PatternDescriptor]] = {
     "collective_intelligence": [
         PatternDescriptor(
             name="Agent Swarm",
-            idea="Many lightweight agents explore the search space in parallel and converge via heuristics or quorum rules.",
+            idea=(
+                "Many lightweight agents explore the search space in parallel"
+                " and converge via heuristics or quorum rules."
+            ),
             best_for="Open-ended ideation, divergent research, and loosely structured problem solving.",
             tradeoffs="Broad coverage versus increased compute; requires deduplication and consensus heuristics.",
             personas=[
@@ -80,7 +95,10 @@ CATALOG: Dict[str, List[PatternDescriptor]] = {
         ),
         PatternDescriptor(
             name="Debate / Adversarial Pair",
-            idea="Opposing agents argue for and against a position while a judge selects or synthesizes the best argument.",
+            idea=(
+                "Opposing agents argue for and against a position while a judge"
+                " selects or synthesizes the best argument."
+            ),
             best_for="Reasoning, red-teaming, policy reviews, and safety evaluations.",
             tradeoffs="Produces higher rigor but doubles token usage and needs a strong judging rubric.",
             personas=[
@@ -166,7 +184,10 @@ CATALOG: Dict[str, List[PatternDescriptor]] = {
             name="Branching Flow",
             idea="A DAG coordinator executes conditional, parallel, and batched steps with traceability.",
             best_for="Complex workflows that need optional gates, parallel experiments, or multi-path fallbacks.",
-            tradeoffs="Flexible but requires explicit dependency graphs and attention to shared state in parallel paths.",
+            tradeoffs=(
+                "Flexible but requires explicit dependency graphs and attention"
+                " to shared state in parallel paths."
+            ),
             personas=[
                 "Graph Planner",
                 "Parallel Specialists",
@@ -188,7 +209,10 @@ CATALOG: Dict[str, List[PatternDescriptor]] = {
     "federation": [
         PatternDescriptor(
             name="Hub-and-Spoke",
-            idea="Tenant hubs own local policies and memories while a federation broker coordinates cross-hub collaboration.",
+            idea=(
+                "Tenant hubs own local policies and memories while a federation"
+                " broker coordinates cross-hub collaboration."
+            ),
             best_for="Enterprises spanning multiple business units or regions with local compliance needs.",
             tradeoffs="Balances autonomy with federation but requires metadata standardisation.",
             personas=[

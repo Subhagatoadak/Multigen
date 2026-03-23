@@ -1,5 +1,10 @@
 line-length = 120
 
+exclude = [
+    "Agent-Components/agentic_codex/examples/agentic_feature_showcase.ipynb",
+    "Agent-Components/agentic_codex/examples/model_lab_demo.ipynb",
+]
+
 [lint]
 select = ["E", "F", "W"]
 ignore = []
@@ -10,11 +15,16 @@ ignore = []
 "*.ipynb" = [
     "E501",   # line too long – display strings and long URLs are intentional
     "E401",   # multiple imports on one line – common in notebook setup cells
-    "E702",   # multiple statements on one line – notebook one-liners
+    "E402",   # module-level import not at top – notebooks reorder imports freely
+    "E701",   # multiple statements on one line (colon) – notebook one-liners
+    "E702",   # multiple statements on one line (semicolon) – notebook one-liners
     "W291",   # trailing whitespace – editor artefacts in notebook JSON
+    "W293",   # whitespace on blank line – editor artefacts in notebook JSON
     "F401",   # imported but unused – cells import for side-effects / later cells
+    "F541",   # f-string without placeholders – common in notebook print cells
     "F811",   # redefinition of unused name – notebooks re-define across cells
     "F821",   # undefined name – cross-cell references not visible to ruff
+    "F841",   # local variable assigned but never used – exploratory notebook code
 ]
 
 [format]

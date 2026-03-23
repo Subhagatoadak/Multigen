@@ -25,8 +25,7 @@ Usage inside engine.py:
 from __future__ import annotations
 
 import contextlib
-import time
-from typing import Any, Dict, Generator, Optional
+from typing import Any, Generator
 
 from opentelemetry import trace
 

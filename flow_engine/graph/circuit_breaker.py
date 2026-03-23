@@ -14,7 +14,7 @@ Recovery: after recovery_executions total graph iterations in OPEN → HALF_OPEN
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from typing import Dict
 

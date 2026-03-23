@@ -31,7 +31,7 @@ workflow code).
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, Optional, Type
+from typing import Any, Dict, Type
 
 from agents.base_agent import BaseAgent
 from orchestrator.services.agent_registry import _registry  # internal dict

@@ -1,1 +1,1 @@
-from .echo_agent import EchoAgent
+from .echo_agent import EchoAgent as EchoAgent

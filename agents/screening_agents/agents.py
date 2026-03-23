@@ -15,7 +15,7 @@ Agents:
   ReportCompilerAgent      — assembles the final screening report
 """
 
-from typing import Any, Dict, List
+from typing import Any, Dict
 from orchestrator.services.agent_registry import register_agent
 from agents.base_agent import BaseAgent
 

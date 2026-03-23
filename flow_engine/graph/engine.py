@@ -79,19 +79,16 @@ import orchestrator.services.config as config
 from flow_engine.graph.circuit_breaker import CircuitBreakerRegistry
 from flow_engine.graph.reasoning import (
     build_reflection_node,
-    compute_descendants,
     extract_confidence,
     prune_pending,
     select_consensus,
     should_reflect,
 )
 from flow_engine.graph.telemetry import GraphTelemetry
-from flow_engine.graph.epistemic import EpistemicStateTracker, extract_epistemic, default_epistemic
+from flow_engine.graph.epistemic import EpistemicStateTracker
 from flow_engine.graph.autonomy import (
     is_agent_registered,
-    make_agent_spec,
     spec_to_blueprint,
-    cleanup_dynamic_agents,
 )
 from flow_engine.workflows.sequence import (
     _resolve_refs,
@@ -258,7 +255,7 @@ async def a2a_activity(
             "timeout": 120
         }
     """
-    from a2a.client import A2AClient, A2AClientError
+    from a2a.client import A2AClient
     try:
         async with A2AClient(remote_endpoint, api_key=api_key, timeout=timeout) as client:
             # Build message: prefer params["message"] as text, rest as data
@@ -774,7 +771,11 @@ class GraphWorkflow:
                 f"blueprint_{node_id}" if node.get("blueprint") else node_id
             )
             iteration = execution_count.get(node_id, 0)
-            cb_state = "open" if node_id in cb._breakers and not cb.can_execute(node_id, self._nodes_executed) else "closed"
+            cb_state = (
+                "open"
+                if node_id in cb._breakers and not cb.can_execute(node_id, self._nodes_executed)
+                else "closed"
+            )
 
             t0 = workflow.now()
             with tel.node_span(node_id, agent_name, iteration, cb_state):
@@ -794,7 +795,6 @@ class GraphWorkflow:
                     duration = (workflow.now() - t0).total_seconds()
 
                     output = agent_result.get("output", {})
-                    confidence = extract_confidence(output)
 
                     # Record epistemic state for this node
                     upstream_ids = [

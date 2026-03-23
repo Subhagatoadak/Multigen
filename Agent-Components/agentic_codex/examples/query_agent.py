@@ -53,7 +53,10 @@ def query_step(ctx: Context) -> AgentStep:
         final_answer = ctx.llm.generate(prompt)
 
     memory.put("final_answer", final_answer)
-    return AgentStep(out_messages=[Message(role="assistant", content=final_answer)], state_updates={"base_answer": base_answer})
+    return AgentStep(
+        out_messages=[Message(role="assistant", content=final_answer)],
+        state_updates={"base_answer": base_answer},
+    )
 
 
 def build_agent() -> AgentBuilder:

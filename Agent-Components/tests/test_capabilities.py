@@ -115,7 +115,9 @@ def test_reinforcement_learning_capability_hooks_trainer() -> None:
     environment = {"reward": 0.75}
 
     def agent_step(ctx: Context) -> AgentStep:
-        return AgentStep(out_messages=[Message(role="assistant", content=f"step:{len(ctx.scratch.get('_last_steps', []))}")])
+        return AgentStep(out_messages=[
+            Message(role="assistant", content=f"step:{len(ctx.scratch.get('_last_steps', []))}")
+        ])
 
     trainer = DummyTrainer()
     builder = AgentBuilder(name="rl-agent", role="learner").with_step(agent_step).with_reinforcement_learning(

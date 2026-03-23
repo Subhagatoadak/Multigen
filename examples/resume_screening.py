@@ -18,8 +18,6 @@ Requirements:
 
 import argparse
 import json
-import sys
-import time
 
 import httpx
 
@@ -59,13 +57,17 @@ CANDIDATES = {
 # ── Agents to register ─────────────────────────────────────────────────────────
 
 AGENTS = [
-    {"name": "ResumeParserAgent",        "version": "1.0.0", "description": "Parses raw resume into structured profile"},
-    {"name": "SkillMatcherAgent",         "version": "1.0.0", "description": "Scores skill match against job requirements"},
+    {"name": "ResumeParserAgent",        "version": "1.0.0",
+     "description": "Parses raw resume into structured profile"},
+    {"name": "SkillMatcherAgent",         "version": "1.0.0",
+     "description": "Scores skill match against job requirements"},
     {"name": "ExperienceEvaluatorAgent",  "version": "1.0.0", "description": "Scores experience depth and seniority"},
     {"name": "CultureFitAgent",           "version": "1.0.0", "description": "Scores cultural alignment"},
     {"name": "ScoreAggregatorAgent",      "version": "1.0.0", "description": "Combines scores into overall decision"},
-    {"name": "InterviewSchedulerAgent",   "version": "1.0.0", "description": "Schedules interview for qualified candidates"},
-    {"name": "RejectionAgent",            "version": "1.0.0", "description": "Generates rejection for unqualified candidates"},
+    {"name": "InterviewSchedulerAgent",   "version": "1.0.0",
+     "description": "Schedules interview for qualified candidates"},
+    {"name": "RejectionAgent",            "version": "1.0.0",
+     "description": "Generates rejection for unqualified candidates"},
     {"name": "ReportCompilerAgent",       "version": "1.0.0", "description": "Compiles final screening report"},
 ]
 
@@ -152,7 +154,7 @@ def build_workflow(candidate: dict) -> dict:
                 "name": "route",
                 "conditional": [
                     {
-                        "condition": f"overall_score >= 70",
+                        "condition": "overall_score >= 70",
                         "then": {
                             "name":  "schedule_interview",
                             "agent": "InterviewSchedulerAgent",
@@ -264,12 +266,12 @@ def main() -> None:
     candidate = CANDIDATES[args.candidate]
 
     print(f"\n{'='*60}")
-    print(f"  MULTIGEN — Resume Screening Pipeline")
+    print("  MULTIGEN — Resume Screening Pipeline")
     print(f"  Candidate: {candidate['name']} ({args.candidate} profile)")
     print(f"{'='*60}")
 
     expected = _preview_overall_score(candidate)
-    print(f"\n📊 Expected scores:")
+    print("\n📊 Expected scores:")
     print(f"   Skills:      {_preview_skill_score(candidate):.1f}/100")
     print(f"   Experience:  {_preview_experience_score(candidate):.1f}/100")
     print(f"   Culture Fit: {_preview_culture_score(candidate):.1f}/100")
@@ -286,12 +288,12 @@ def main() -> None:
         print(f"   instance_id: {instance_id}")
 
     print(f"\n{'='*60}")
-    print(f"  Next steps:")
-    print(f"  1. Open Temporal UI → http://localhost:8080")
+    print("  Next steps:")
+    print("  1. Open Temporal UI → http://localhost:8080")
     print(f"  2. Find workflow ID: {instance_id}")
-    print(f"  3. Watch each step execute in real time")
-    print(f"  4. Check flow-worker logs:")
-    print(f"     docker-compose logs -f flow-worker temporal-worker")
+    print("  3. Watch each step execute in real time")
+    print("  4. Check flow-worker logs:")
+    print("     docker-compose logs -f flow-worker temporal-worker")
     print(f"{'='*60}\n")
 
 

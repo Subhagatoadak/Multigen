@@ -11,7 +11,6 @@ dispatch_tool(name, args) routes to the correct handler.
 """
 from __future__ import annotations
 
-import json
 import os
 from typing import Any, Dict
 
@@ -334,7 +333,10 @@ TOOL_REGISTRY = [
     },
     {
         "name": "multigen_skip_node",
-        "description": "Mark a node to be silently dropped (branch no-go). The node is skipped but its successors may still run via other edges.",
+        "description": (
+            "Mark a node to be silently dropped (branch no-go). "
+            "The node is skipped but its successors may still run via other edges."
+        ),
         "schema": {
             "type": "object",
             "properties": {
@@ -358,7 +360,11 @@ TOOL_REGISTRY = [
                 "workflow_id": {"type": "string"},
                 "source": {"type": "string", "description": "Source node ID."},
                 "target": {"type": "string", "description": "Target node ID."},
-                "condition": {"type": "string", "description": "Boolean expression. Empty = always route.", "default": ""},
+                "condition": {
+                    "type": "string",
+                    "description": "Boolean expression. Empty = always route.",
+                    "default": "",
+                },
             },
             "required": ["workflow_id", "source", "target"],
         },
@@ -427,7 +433,10 @@ TOOL_REGISTRY = [
     },
     {
         "name": "multigen_prune_branch",
-        "description": "Cancel a node and ALL reachable downstream descendants. Use to abandon a bad reasoning path entirely.",
+        "description": (
+            "Cancel a node and ALL reachable downstream descendants. "
+            "Use to abandon a bad reasoning path entirely."
+        ),
         "schema": {
             "type": "object",
             "properties": {
@@ -440,7 +449,10 @@ TOOL_REGISTRY = [
     },
     {
         "name": "multigen_get_health",
-        "description": "Get live circuit breaker status, error log, interrupt state, and dead letters from the running workflow.",
+        "description": (
+            "Get live circuit breaker status, error log, interrupt state, "
+            "and dead letters from the running workflow."
+        ),
         "schema": {
             "type": "object",
             "properties": {"workflow_id": {"type": "string"}},

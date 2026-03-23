@@ -29,7 +29,6 @@ Install as a script
 from __future__ import annotations
 
 import asyncio
-import importlib.util
 import json
 import os
 import sys
@@ -146,7 +145,7 @@ def cmd_run(
     data = resp.json()
     instance_id = data.get("instance_id") or data.get("workflow_id") or wf_id
 
-    click.echo(click.style(f"✓ Workflow submitted", fg="green") + f"  id={instance_id}")
+    click.echo(click.style("✓ Workflow submitted", fg="green") + f"  id={instance_id}")
 
     if watch:
         ctx.invoke(cmd_logs, workflow_id=instance_id)
@@ -205,7 +204,7 @@ def cmd_status(ctx: click.Context, workflow_id: str, json_out: bool) -> None:
     # Epistemic summary if available
     ep = data.get("epistemic_report", {}).get("summary", {})
     if ep:
-        click.echo(f"\nEpistemic summary:")
+        click.echo("\nEpistemic summary:")
         click.echo(f"  avg_confidence={ep.get('avg_confidence',0):.2f}  "
                    f"flagged={ep.get('nodes_flagged_for_human_review',0)}")
 

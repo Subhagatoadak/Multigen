@@ -1,7 +1,7 @@
 """Graph and mesh agent patterns."""
 from __future__ import annotations
 
-from typing import Dict, List, Mapping, MutableMapping, Sequence
+from typing import List, Mapping, MutableMapping, Sequence
 
 from ..core.agent import Agent, Context
 from ..core.orchestration.coordinator.base import CoordinatorBase

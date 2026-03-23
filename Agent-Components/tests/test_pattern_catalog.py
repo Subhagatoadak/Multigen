@@ -1,7 +1,7 @@
 """Tests for the pattern catalog metadata."""
 from __future__ import annotations
 
-from agentic_codex.patterns import CATALOG, list_categories, list_patterns
+from agentic_codex.patterns import list_categories, list_patterns
 
 
 def test_catalog_categories_present() -> None:

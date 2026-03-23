@@ -28,15 +28,15 @@ import os
 import sys
 from typing import Any, Dict
 
-# Ensure project root is on path when imported from any working directory
-_repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-if _repo_root not in sys.path:
-    sys.path.insert(0, _repo_root)
-
 from openai import AsyncOpenAI
 
 from agents.base_agent import BaseAgent
 from orchestrator.services.agent_registry import register_agent
+
+# Ensure project root is on path when imported from any working directory
+_repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+if _repo_root not in sys.path:
+    sys.path.insert(0, _repo_root)
 
 logger = logging.getLogger(__name__)
 

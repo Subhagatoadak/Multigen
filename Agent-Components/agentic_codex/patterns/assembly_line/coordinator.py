@@ -2,9 +2,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable, List, Mapping, Sequence
+from typing import List, Sequence
 
-from ...core.agent import Agent, Context
+from ...core.agent import Context
 from ...core.schemas import Message
 from ...core.orchestration.coordinator.base import CoordinatorBase, Stage
 

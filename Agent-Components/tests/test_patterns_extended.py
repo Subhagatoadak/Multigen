@@ -110,7 +110,10 @@ def _hub_step(name: str):
 
 
 def _router_step(ctx: Context) -> AgentStep:
-    return AgentStep(out_messages=[Message(role="assistant", content="route:guild")], state_updates={"guild": "retrieval"})
+    return AgentStep(
+        out_messages=[Message(role="assistant", content="route:guild")],
+        state_updates={"guild": "retrieval"},
+    )
 
 
 def _guild_member_step(name: str):

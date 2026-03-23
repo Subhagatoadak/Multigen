@@ -40,14 +40,14 @@ import sys
 import time
 from typing import Any, Dict
 
+from multigen.client import MultigenClient
+from multigen.models import FanOutNodeDef, FanOutRequest
+from examples.ma_due_diligence.workflow import build_ma_graph, build_payload
+
 # Ensure repo root is on path when run with -m
 _root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 if _root not in sys.path:
     sys.path.insert(0, _root)
-
-from multigen.client import MultigenClient
-from multigen.models import FanOutNodeDef, FanOutRequest, InjectNodeRequest
-from examples.ma_due_diligence.workflow import build_ma_graph, build_payload
 
 # ── Configuration ──────────────────────────────────────────────────────────────
 
@@ -248,7 +248,7 @@ async def run_demo(client: MultigenClient) -> None:
     _print_result("fan_out signal sent", fan_result)
 
     # Simulate CFO review time
-    print(f"\n  ⏳ Simulating CFO review pause (3 seconds)...")
+    print("\n  ⏳ Simulating CFO review pause (3 seconds)...")
     await asyncio.sleep(3)
     print("  ✅ CFO approved. Resuming workflow.")
 
@@ -336,10 +336,10 @@ async def run_demo(client: MultigenClient) -> None:
 
     rec = summary_output.get("headline_recommendation", "UNKNOWN")
     bid = summary_output.get("headline_numbers", {}).get("bid_range_usd_m", "?")
-    print(f"\n  ╔══════════════════════════════════════════════════╗")
+    print("\n  ╔══════════════════════════════════════════════════╗")
     print(f"  ║  RECOMMENDATION: {rec:<32}║")
     print(f"  ║  BID RANGE:      ${str(bid):<32}M ║")
-    print(f"  ╚══════════════════════════════════════════════════╝")
+    print("  ╚══════════════════════════════════════════════════╝")
     print()
 
 

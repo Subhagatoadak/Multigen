@@ -34,7 +34,6 @@ from agentic_codex import (
 from agentic_codex.core.schemas import AgentStep, Message
 
 from agents.base_agent import BaseAgent
-from agents.codex_adapter import make_coordinator_agent
 from orchestrator.services.agent_registry import register_agent
 
 

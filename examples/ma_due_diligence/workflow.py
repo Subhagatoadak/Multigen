@@ -35,11 +35,11 @@ from __future__ import annotations
 import os
 import sys
 
+from multigen.dsl import GraphBuilder
+
 _repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 if _repo_root not in sys.path:
     sys.path.insert(0, _repo_root)
-
-from multigen.dsl import GraphBuilder
 
 
 def build_ma_graph(

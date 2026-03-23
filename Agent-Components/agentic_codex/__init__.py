@@ -14,14 +14,23 @@ from .core.capabilities import (
     ReinforcementLearningCapability,
     JEPALearningCapability,
 )
-from .core.orchestration import GraphRunner, GraphNodeSpec, run_async, run_local, run_serial, TaskPlan, PlanNode, build_plan, simple_split
+from .core.orchestration import (
+    GraphRunner, GraphNodeSpec, run_async, run_local, run_serial,
+    TaskPlan, PlanNode, build_plan, simple_split,
+)
 from .core.orchestration import StepSpec, run_steps
 from .core.cancel import CancelToken
 from .core.llm import FunctionAdapter, EnvOpenAIAdapter
-from .core.embeddings import EmbeddingAdapter, FunctionEmbeddingAdapter, SpacyEmbeddingAdapter, HashEmbeddingAdapter, EnvOpenAIEmbeddingAdapter
+from .core.embeddings import (
+    EmbeddingAdapter, FunctionEmbeddingAdapter, SpacyEmbeddingAdapter,
+    HashEmbeddingAdapter, EnvOpenAIEmbeddingAdapter,
+)
 from .core.kernel import AgentKernel, kernel_from_step
 from .core.skills import SkillRegistry, BUILTIN_SKILLS
-from .core.memory import Scratchpad, EpisodicMemory, SemanticMemory, GraphMemory, CachedMemory, PersistentMemory, SQLiteMemory, VectorMemory
+from .core.memory import (
+    Scratchpad, EpisodicMemory, SemanticMemory, GraphMemory,
+    CachedMemory, PersistentMemory, SQLiteMemory, VectorMemory,
+)
 from .core.tools import (
     ToolAdapter,
     ToolPermissions,

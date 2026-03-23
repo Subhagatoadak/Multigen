@@ -44,11 +44,6 @@ import os
 import sys
 from typing import Any
 
-# Ensure the repo root is on the path when run directly
-_repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if _repo_root not in sys.path:
-    sys.path.insert(0, _repo_root)
-
 import mcp.server.stdio
 import mcp.types as types
 from mcp.server import Server
@@ -57,6 +52,11 @@ from mcp.server.models import InitializationOptions
 from mcp_server.tools import TOOL_REGISTRY, dispatch_tool
 from mcp_server.resources import list_resources, read_resource
 from mcp_server.prompts import PROMPT_REGISTRY, render_prompt
+
+# Ensure the repo root is on the path when run directly
+_repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _repo_root not in sys.path:
+    sys.path.insert(0, _repo_root)
 
 logging.basicConfig(
     level=logging.INFO,

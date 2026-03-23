@@ -1,7 +1,6 @@
 """Optional FastAPI service to run workflows and expose health/metrics."""
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import Any, Dict, Mapping
 
 try:  # pragma: no cover - optional dependency
