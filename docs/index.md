@@ -123,6 +123,12 @@ print(result.messages[-1].content)
 | Circuit breakers | ✅ | ❌ | ❌ | ❌ | ❌ |
 | MapReduce pattern | ✅ | ❌ | ⚠️ | ❌ | ❌ |
 | Pure Python API | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Safety (injection/PII) | ✅ | ❌ | ❌ | ❌ | ❌ |
+| MCTS / ToT / GoT planning | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Deadline + workflow retry | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Token streaming | ✅ | ⚠️ | ❌ | ❌ | ❌ |
+| Online prompt optimisation | ✅ | ❌ | ❌ | ❌ | ❌ |
+| A/B testing + canary rollout | ✅ | ❌ | ❌ | ❌ | ❌ |
 
 > See the [full comparison](comparison.md) for a detailed breakdown.
 

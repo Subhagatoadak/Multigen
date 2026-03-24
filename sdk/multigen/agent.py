@@ -152,6 +152,8 @@ class LLMAgent(BaseAgent):
         max_tokens: int = 2048,
         system_prompt: Optional[str] = None,
         output_key: str = "response",
+        working_memory: Optional[Any] = None,
+        working_memory_key: str = "_memory_context",
         **kwargs: Any,
     ) -> None:
         super().__init__(name, **kwargs)
@@ -162,8 +164,33 @@ class LLMAgent(BaseAgent):
         self.max_tokens = max_tokens
         self.system_prompt = system_prompt
         self.output_key = output_key
+        self._working_memory = working_memory
+        self._working_memory_key = working_memory_key
+
+    def _inject_working_memory(self, ctx: Context) -> Context:
+        """Inject the WorkingMemory window into *ctx* so templates can use it."""
+        if self._working_memory is None:
+            # Also check if context carries a working memory object
+            wm = ctx.get("_working_memory")
+            if wm is None:
+                return ctx
+        else:
+            wm = self._working_memory
+
+        try:
+            window = wm.window() if hasattr(wm, "window") else list(wm)
+            memory_text = "\n".join(
+                f"- {e}" if isinstance(e, str) else f"- {e.get('content', str(e))}"
+                for e in window
+            )
+            enriched = dict(ctx)
+            enriched[self._working_memory_key] = memory_text
+            return enriched
+        except Exception:
+            return ctx
 
     def _render(self, ctx: Context) -> str:
+        ctx = self._inject_working_memory(ctx)
         try:
             return self.prompt_template.format(**ctx)
         except KeyError:

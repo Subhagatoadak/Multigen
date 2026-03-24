@@ -1,11 +1,11 @@
 # Multigen
 
-**Enterprise-grade autonomous multi-agent orchestration framework with durable execution, epistemic transparency, and human-in-the-loop governance.**
+**Enterprise-grade autonomous multi-agent orchestration framework with durable execution, epistemic transparency, human-in-the-loop governance, and a full in-process Python SDK — zero external dependencies required.**
 
 [![CI](https://github.com/Subhagatoadak/Multigen/actions/workflows/ci.yml/badge.svg)](https://github.com/Subhagatoadak/Multigen/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue)](https://www.python.org)
 [![License](https://img.shields.io/badge/license-Apache%202.0-green)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.3.0--dev-orange)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.6.0--dev-orange)](CHANGELOG.md)
 [![Temporal](https://img.shields.io/badge/temporal-1.11-blueviolet)](https://temporal.io)
 [![OpenTelemetry](https://img.shields.io/badge/otel-enabled-brightgreen)](https://opentelemetry.io)
 
@@ -42,6 +42,31 @@ Built on top of [Temporal.io](https://temporal.io) for workflow durability, Apac
 | Real-time SSE streaming (node completion) | ✗ | ✗ | ✗ | ✗ | ✅ |
 | Agent2Agent (A2A) protocol support | ✗ | ✗ | ✗ | ✗ | ✅ |
 | Cross-worker agent hydration (MongoDB) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| **Local runtime — zero external deps** | ✗ | ✗ | ✗ | ✗ | ✅ |
+| **4-tier memory system** | ✗ | ✗ | Partial | Partial | ✅ |
+| **Multi-tier async caching** | ✗ | ✗ | ✗ | ✗ | ✅ |
+| **Operator step composition (`>>` `\|` `&`)** | ✗ | ✗ | ✗ | ✗ | ✅ |
+| **Hierarchical agent structures** | ✗ | ✗ | ✗ | ✗ | ✅ |
+| **Priority pub/sub + scatter-gather bus** | ✗ | ✗ | ✗ | ✗ | ✅ |
+| **Session management + reactive state** | ✗ | ✗ | ✗ | ✗ | ✅ |
+| **Trait-based inheritance + overloading** | ✗ | ✗ | ✗ | ✗ | ✅ |
+| **Agent profiler + rate limiter + batch exec** | ✗ | ✗ | ✗ | ✗ | ✅ |
+| **Time-travel debugging (snapshot/replay)** | ✗ | ✗ | ✗ | ✗ | ✅ |
+| **Vector memory + Ebbinghaus forgetting curve** | ✗ | ✗ | ✗ | Partial | ✅ |
+| **SQLite-backed durable persistence** | ✗ | ✗ | ✗ | ✗ | ✅ |
+| **Eval/measurement framework** | ✗ | ✗ | ✗ | ✗ | ✅ |
+| **Multi-model routing (cost/quality/latency)** | ✗ | ✗ | ✗ | ✗ | ✅ |
+| **Tool registry + sandboxing + permissions** | ✗ | ✗ | Partial | ✗ | ✅ |
+| **Planning: ToT / GoT / MCTS / ReAct** | ✗ | ✗ | ✗ | ✗ | ✅ |
+| **Workflow versioning + A/B testing + canary** | ✗ | ✗ | ✗ | ✗ | ✅ |
+| **Scheduling: cron, interval, event triggers** | ✗ | ✗ | ✗ | ✗ | ✅ |
+| **Continuous learning + few-shot library** | ✗ | ✗ | ✗ | ✗ | ✅ |
+| **Injection detection + PII redaction** | ✗ | ✗ | ✗ | ✗ | ✅ |
+| **Deadline management + workflow-level retry** | ✗ | ✗ | ✗ | ✗ | ✅ |
+| **Token streaming + partial result bus** | ✗ | ✗ | ✗ | ✗ | ✅ |
+| **Online prompt optimisation (bandit)** | ✗ | ✗ | ✗ | ✗ | ✅ |
+| **Hierarchical task decomp + AutoGPT queue** | ✗ | ✗ | Partial | ✗ | ✅ |
+| **WorkingMemory → LLM prompt wiring** | ✗ | ✗ | ✗ | ✗ | ✅ |
 
 ---
 
@@ -90,6 +115,66 @@ Uncertainty **propagates through the graph** — if upstream nodes have low conf
 - **Reflection loops** — automatically inject a critic agent when confidence falls below threshold
 - **Fan-out consensus** — run N competing agents in parallel, select best via `highest_confidence`, `aggregate`, `majority_vote`, or `first_success`
 - **Circuit breakers** — per-node failure tracking with automatic fallback routing and dead-letter capture
+
+### 6. Local Python SDK — Zero Dependencies
+
+The `multigen` Python package ships a complete in-process runtime. No Kafka, Temporal, MongoDB, or Docker required. **152 public exports** across 15 modules:
+
+| Module | Key classes |
+|--------|------------|
+| `chain`, `parallel`, `graph`, `state_machine` | `Chain`, `Parallel`, `Graph`, `StateMachine` |
+| `memory` | `ShortTermMemory`, `EpisodicMemory`, `WorkingMemory`, `SemanticMemory`, `MemoryManager` |
+| `advanced_memory` | `VectorMemory`, `ForgettingCurve`, `MemoryIndex`, `ContextualMemory`, `PersistentMemory` |
+| `cache` | `LRUCache`, `TTLCache`, `AsyncCache`, `MultiTierCache`, `@cached` |
+| `messaging` | `AdvancedMessageBus`, priority pub/sub, request/reply, scatter-gather, DLQ |
+| `compose` | `Step` with `>>`, `\|`, `&` operators; `BranchStep`, `LoopStep` |
+| `hierarchy` | `AgentHierarchy`, `AgentGroup`, `TypedStep`, `HierarchicalPipeline` |
+| `session` | `SessionManager`, `SessionContext`, `SessionMiddleware` |
+| `state_init` | `StateSchema`, `ReactiveState`, `ComputedState`, `StateValidator` |
+| `inheritance` | `InheritableAgent`, `Trait`, `build_agent`, `@overload`, `MultiMethod` |
+| `polymorphic` | `PolymorphicAgent`, `ShapeRegistry`, `TypeAdapter`, `DynamicAgent` |
+| `performance` | `AgentProfiler`, `BatchExecutor`, `ConnectionPool`, `RateLimiter` |
+| `debugger` + `snapshot` | `WorkflowDebugger`, time-travel replay, `SQLiteSnapshotStore` |
+
+```python
+# Zero-config local pipeline — no server needed
+import asyncio, sys
+sys.path.insert(0, 'sdk')
+
+from multigen import (
+    FunctionAgent, Chain,
+    MemoryManager, AdvancedMessageBus, AdvancedMessage,
+    Step, build_agent, LoggingTrait, RetryTrait,
+    SessionManager, ReactiveState, AgentProfiler,
+)
+
+async def main():
+    memory  = MemoryManager()
+    bus     = AdvancedMessageBus()
+    session = SessionManager()
+    profiler = AgentProfiler()
+
+    @bus.subscribe("pipeline.**")
+    async def on_event(msg): print(f"[event] {msg.topic}")
+
+    @profiler.profile("fetch")
+    async def fetch(ctx): return {**ctx, "data": [1, 2, 3]}
+
+    @profiler.profile("process")
+    async def process(ctx):
+        memory.remember("result", sum(ctx["data"]), tier="short")
+        return {"sum": sum(ctx["data"])}
+
+    async with session.with_session("demo") as sess:
+        pipeline = Step("fetch", fetch) >> Step("process", process)
+        result   = await pipeline.run({"_session": sess})
+        print(result)             # {'sum': 6}
+
+    print(profiler.report())
+    await bus.publish(AdvancedMessage(topic="pipeline.done", content=result))
+
+asyncio.run(main())
+```
 
 ---
 
@@ -219,7 +304,7 @@ pip install jupyter
 jupyter notebook notebooks/
 ```
 
-Start with `01_quickstart.ipynb` and progress through to `10_autonomy_transparency.ipynb`.
+Start with `01_quickstart.ipynb`. For local SDK features start at `12_local_sdk_agents.ipynb`.
 
 ---
 
@@ -650,15 +735,71 @@ Multigen/
 ├── messaging/kafka_client.py    # Kafka producer/consumer
 ├── capability_service/          # Agent capability directory microservice
 ├── mcp_server/                  # MCP server for AI assistants
-├── sdk/multigen/                # Python client SDK
+├── sdk/multigen/                # Python SDK (310+ public exports, zero deps)
 │   ├── client.py                # Async HTTP client
 │   ├── sync_client.py           # Sync wrapper (Jupyter-safe)
 │   ├── dsl.py                   # GraphBuilder, WorkflowBuilder
-│   └── models.py                # Pydantic request/response models
+│   ├── models.py                # Pydantic request/response models
+│   ├── agent.py                 # BaseAgent, FunctionAgent, LLMAgent (+ WorkingMemory wiring), …
+│   ├── chain.py                 # Chain, Pipeline, middleware
+│   ├── parallel.py              # Parallel, FanOut, MapReduce, Race, Batch
+│   ├── graph.py                 # Local Graph executor (DAG)
+│   ├── state_machine.py         # MCMC StateMachine
+│   ├── bus.py                   # InMemoryBus, Message
+│   ├── runtime.py               # Unified Runtime (local / Temporal / Kafka)
+│   ├── memory.py                # ShortTermMemory, EpisodicMemory, WorkingMemory,
+│   │                            #   SemanticMemory, MemoryManager
+│   ├── advanced_memory.py       # VectorMemory, ForgettingCurve, MemoryIndex,
+│   │                            #   ContextualMemory, PersistentMemory
+│   ├── cache.py                 # LRUCache, TTLCache, AsyncCache, MultiTierCache,
+│   │                            #   CacheManager, @cached
+│   ├── messaging.py             # AdvancedMessageBus, priority pub/sub,
+│   │                            #   request/reply, scatter-gather, DLQ
+│   ├── compose.py               # Step (>>, |, &), StepSequence, ParallelStep,
+│   │                            #   FanInStep, BranchStep, LoopStep, Compose
+│   ├── hierarchy.py             # AgentRole, AgentGroup, AgentHierarchy,
+│   │                            #   TypedStep, HierarchicalPipeline
+│   ├── session.py               # SessionManager, SessionContext, SessionMiddleware
+│   ├── state_init.py            # StateSchema, StateInitializer, ReactiveState,
+│   │                            #   ComputedState, StateValidator, StateTransition
+│   ├── inheritance.py           # InheritableAgent, Trait, LoggingTrait, RetryTrait,
+│   │                            #   build_agent, @mixin, @overload, MultiMethod
+│   ├── polymorphic.py           # PolymorphicAgent, ShapeRegistry, TypeAdapter,
+│   │                            #   MultiDispatch, DynamicAgent
+│   ├── performance.py           # AgentProfiler, BatchExecutor, ConnectionPool,
+│   │                            #   LazyValue, RateLimiter, ExecutionOptimizer
+│   ├── snapshot.py              # Snapshot, InMemorySnapshotStore, SQLiteSnapshotStore
+│   ├── debugger.py              # WorkflowDebugger (time-travel debugging)
+│   ├── persistence.py           # SQLiteCheckpointStore, DurableQueue,
+│   │                            #   CheckpointedRuntime, PersistentEpisodicMemory
+│   ├── eval.py                  # Evaluator, EvalSuite, Benchmark, LLMJudge, metrics
+│   ├── routing.py               # ModelPool, CostRouter, QualityRouter, AdaptiveRouter,
+│   │                            #   FallbackRouter, ModelRouter
+│   ├── tools.py                 # ToolRegistry, Sandbox, PermissionedRegistry,
+│   │                            #   ToolSpec, ToolValidator
+│   ├── planning.py              # TreeOfThoughts, GraphOfThoughts, ReActPlanner,
+│   │                            #   ChainOfThought, PlanAndExecute
+│   ├── versioning.py            # VersionedWorkflow, WorkflowDiff, ChangeLog,
+│   │                            #   SQLiteVersionStore
+│   ├── scheduler.py             # Scheduler, CronSchedule, IntervalSchedule, Trigger
+│   ├── learning.py              # AdaptivePrompt, OnlineLearner, FewShotSelector,
+│   │                            #   ContinuousLearner, ExperienceReplay
+│   ├── workflow_ab.py           # ABTest, CanaryRollout, RollbackManager,
+│   │                            #   CompatibilityChecker, TrafficSplit
+│   ├── safety.py                # InjectionDetector, PIIRedactor, OutputSanitizer,
+│   │                            #   SafetyGuard (14 injection patterns, 9 PII patterns)
+│   ├── resilience.py            # RetryPolicy, Deadline, DeadlineGuard,
+│   │                            #   DeadlineManager, WorkflowRetry
+│   ├── planning_advanced.py     # HierarchicalDecomposer, MCTSPlanner,
+│   │                            #   AutoGPTQueue, HierarchicalSummariser
+│   ├── streaming.py             # StreamingAgent, ParallelStreamer, StreamAggregator,
+│   │                            #   PartialResultBus, StreamToken
+│   └── optimization.py         # PromptBandit, FewShotLibrary, AgentSpecialisation,
+│                                #   EpisodicFeedbackLoop, OptimizationManager
 ├── examples/                    # End-to-end examples
 │   ├── resume_screening.py      # Resume screening pipeline
 │   └── ma_due_diligence/        # M&A due diligence graph workflow
-├── notebooks/                   # Jupyter notebooks (10 feature demos)
+├── notebooks/                   # Jupyter notebooks (01–42)
 ├── tests/                       # pytest test suite
 ├── docs/                        # Architecture diagrams, whitepapers
 ├── Agent-Components/            # agentic_codex submodule (tools, patterns)
@@ -719,6 +860,8 @@ See [docs/DEV.md](docs/DEV.md) for detailed development guide.
 
 ## Notebooks
 
+**Server-side workflows (require Docker stack):**
+
 | Notebook | What you'll learn |
 |---|---|
 | [01_quickstart](notebooks/01_quickstart.ipynb) | Connect to Multigen, run your first workflow |
@@ -731,6 +874,43 @@ See [docs/DEV.md](docs/DEV.md) for detailed development guide.
 | [08_observability](notebooks/08_observability.ipynb) | OTel tracing, Prometheus metrics, Temporal UI |
 | [09_mmm_autopilot](notebooks/09_mmm_autopilot.ipynb) | Full autopilot: hierarchical MMM with synthetic data |
 | [10_autonomy_transparency](notebooks/10_autonomy_transparency.ipynb) | Dynamic agents + human approval + epistemic transparency report |
+
+**Local SDK (zero external dependencies):**
+
+| Notebook | What you'll learn |
+|---|---|
+| [11_parallel_bfs_streaming_a2a](notebooks/11_parallel_bfs_streaming_a2a.ipynb) | Parallel BFS execution, SSE streaming, A2A protocol |
+| [12_local_sdk_agents](notebooks/12_local_sdk_agents.ipynb) | Local runtime, no server required |
+| [13_sequential_chains](notebooks/13_sequential_chains.ipynb) | Chain, Pipeline, logging/tracing middleware |
+| [14_parallel_execution](notebooks/14_parallel_execution.ipynb) | FanOut, MapReduce, Race, Batch |
+| [15_graph_dag_local](notebooks/15_graph_dag_local.ipynb) | Local Graph executor with conditional edges |
+| [16_mcmc_state_machine](notebooks/16_mcmc_state_machine.ipynb) | Probabilistic MCMC state machine |
+| [17_event_bus_messaging](notebooks/17_event_bus_messaging.ipynb) | InMemoryBus pub/sub |
+| [18_runtime_simulator_integration](notebooks/18_runtime_simulator_integration.ipynb) | Unified Runtime + simulator event push |
+| [19_resilience_patterns](notebooks/19_resilience_patterns.ipynb) | Retry, CircuitBreaker, MemoryAgent patterns |
+| [20_time_travel_debugging](notebooks/20_time_travel_debugging.ipynb) | Snapshot capture, replay, diff, SQLite persistence |
+| [21_memory_system](notebooks/21_memory_system.ipynb) | ShortTerm/Episodic/Working/Semantic memory, consolidation |
+| [22_caching](notebooks/22_caching.ipynb) | LRU, TTL, AsyncCache, MultiTier, stampede protection, @cached |
+| [23_step_composition](notebooks/23_step_composition.ipynb) | `>>`, `\|`, `&` operators, BranchStep, LoopStep, Compose |
+| [24_hierarchical_structures](notebooks/24_hierarchical_structures.ipynb) | AgentHierarchy, TypedStep, HierarchicalPipeline |
+| [25_advanced_messaging](notebooks/25_advanced_messaging.ipynb) | Priority pub/sub, request/reply, scatter-gather, DLQ, filters |
+| [26_session_and_state](notebooks/26_session_and_state.ipynb) | SessionManager, ReactiveState, ComputedState, StateValidator |
+| [27_inheritance_and_polymorphism](notebooks/27_inheritance_and_polymorphism.ipynb) | Traits, build_agent, @overload, MultiMethod, PolymorphicAgent |
+| [28_performance_and_advanced_memory](notebooks/28_performance_and_advanced_memory.ipynb) | AgentProfiler, BatchExecutor, VectorMemory, ForgettingCurve |
+| [29_persistence](notebooks/29_persistence.ipynb) | SQLiteCheckpointStore, DurableQueue, CheckpointedRuntime |
+| [30_eval_and_measurement](notebooks/30_eval_and_measurement.ipynb) | EvalSuite, Benchmark, LLMJudge, F1Score, Latency |
+| [31_multi_model_routing](notebooks/31_multi_model_routing.ipynb) | ModelPool, CostRouter, QualityRouter, AdaptiveRouter, FallbackRouter |
+| [32_tool_registry](notebooks/32_tool_registry.ipynb) | ToolRegistry, Sandbox, PermissionedRegistry |
+| [33_planning_tot_got](notebooks/33_planning_tot_got.ipynb) | TreeOfThoughts, GraphOfThoughts, ReActPlanner, PlanAndExecute |
+| [34_workflow_versioning](notebooks/34_workflow_versioning.ipynb) | VersionedWorkflow, WorkflowDiff, ChangeLog, SQLiteVersionStore |
+| [35_scheduling_triggers](notebooks/35_scheduling_triggers.ipynb) | Scheduler, CronSchedule, IntervalSchedule, Trigger |
+| [36_continuous_learning](notebooks/36_continuous_learning.ipynb) | AdaptivePrompt, OnlineLearner, FewShotSelector, ContinuousLearner |
+| [37_workflow_ab_safety](notebooks/37_workflow_ab_safety.ipynb) | ABTest, CanaryRollout, RollbackManager, SafetyGuard, PIIRedactor |
+| [38_resilience](notebooks/38_resilience.ipynb) | RetryPolicy, Deadline, DeadlineGuard, WorkflowRetry |
+| [39_advanced_planning](notebooks/39_advanced_planning.ipynb) | HierarchicalDecomposer, MCTSPlanner, AutoGPTQueue, HierarchicalSummariser |
+| [40_streaming](notebooks/40_streaming.ipynb) | StreamingAgent, ParallelStreamer, PartialResultBus |
+| [41_optimization](notebooks/41_optimization.ipynb) | PromptBandit, FewShotLibrary, AgentSpecialisation, OptimizationManager |
+| [42_working_memory_wiring](notebooks/42_working_memory_wiring.ipynb) | LLMAgent + WorkingMemory integration, template injection |
 
 ---
 
