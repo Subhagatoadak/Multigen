@@ -1,6 +1,6 @@
 # Multigen
 
-**Enterprise-grade autonomous multi-agent orchestration framework with durable execution, epistemic transparency, human-in-the-loop governance, and a full in-process Python SDK — zero external dependencies required.**
+**Enterprise-grade autonomous multi-agent orchestration framework with durable execution, epistemic transparency, human-in-the-loop governance, safety guardrails, online optimization, and a full in-process Python SDK — zero external dependencies required.**
 
 [![CI](https://github.com/Subhagatoadak/Multigen/actions/workflows/ci.yml/badge.svg)](https://github.com/Subhagatoadak/Multigen/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue)](https://www.python.org)
@@ -21,52 +21,106 @@ Built on top of [Temporal.io](https://temporal.io) for workflow durability, Apac
 
 ## Why Multigen?
 
-| Capability | LangGraph | CrewAI | AutoGen | LlamaIndex Workflows | **Multigen** |
-|---|---|---|---|---|---|
+> ✅ = Full support &nbsp;&nbsp; Partial = Partial/manual &nbsp;&nbsp; ✗ = Not supported
+
+### Orchestration & Execution
+
+| Capability | LangGraph | CrewAI | AutoGen | LlamaIndex | **Multigen** |
+| --- | :---: | :---: | :---: | :---: | :---: |
 | Declarative workflow DSL | Partial | ✗ | ✗ | ✗ | ✅ |
 | Durable execution (crash recovery) | ✗ | ✗ | ✗ | ✗ | ✅ Temporal |
 | Real-time runtime control signals | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Dynamic agent creation + approval | ✗ | ✗ | Partial | ✗ | ✅ |
+| Dynamic agent creation + human approval | ✗ | ✗ | Partial | ✗ | ✅ |
 | Epistemic transparency per node | ✗ | ✗ | ✗ | ✗ | ✅ |
 | Circuit breakers per node | ✗ | ✗ | ✗ | ✗ | ✅ |
 | Reflection / self-critique loops | Partial | ✗ | Partial | ✗ | ✅ |
 | Fan-out consensus reasoning | ✗ | ✗ | Partial | ✗ | ✅ |
 | Human-in-the-loop approval gates | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Kafka-based distributed messaging | ✗ | ✗ | ✗ | ✗ | ✅ |
-| OpenTelemetry + Prometheus | ✗ | ✗ | ✗ | ✗ | ✅ |
-| MCP server (Claude/Cursor/Windsurf) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Self-registering agent decorator | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Parallel BFS execution (dependency-aware) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Explicit `depends_on` node dependencies | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Parallel BFS (dependency-aware) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Explicit `depends_on` node deps | ✗ | ✗ | ✗ | ✗ | ✅ |
 | Partition-aware fan-out (multi-queue) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Real-time SSE streaming (node completion) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Agent2Agent (A2A) protocol support | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Graph (DAG) execution | ✅ | ✗ | Partial | ✗ | ✅ |
+| MCMC probabilistic state machine | ✗ | ✗ | ✗ | ✗ | ✅ |
+| FanOut / MapReduce / Race / Batch | ✗ | ✗ | ✗ | ✗ | ✅ |
+
+### Memory & State
+
+| Capability | LangGraph | CrewAI | AutoGen | LlamaIndex | **Multigen** |
+| --- | :---: | :---: | :---: | :---: | :---: |
+| Short-term / episodic / working memory | Partial | ✗ | Partial | Partial | ✅ |
+| Semantic memory (namespace + tags) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Vector memory (embedding-based recall) | ✗ | ✗ | ✗ | ✅ | ✅ |
+| Ebbinghaus forgetting curve | ✗ | ✗ | ✗ | ✗ | ✅ |
+| WorkingMemory → LLM prompt wiring | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Session management + middleware | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Reactive / computed state | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Multi-tier async caching (LRU+TTL) | ✗ | ✗ | ✗ | ✗ | ✅ |
+
+### Planning & Reasoning
+
+| Capability | LangGraph | CrewAI | AutoGen | LlamaIndex | **Multigen** |
+| --- | :---: | :---: | :---: | :---: | :---: |
+| Chain-of-Thought | ✗ | ✗ | Partial | ✗ | ✅ |
+| Tree of Thoughts (ToT) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Graph of Thoughts (GoT) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| ReAct (Reason + Act loop) | Partial | ✗ | Partial | ✗ | ✅ |
+| StepBack + PlanAndExecute | ✗ | ✗ | ✗ | ✗ | ✅ |
+| MCTS-based planning (UCB1) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Hierarchical task decomposition | ✗ | ✗ | ✗ | ✗ | ✅ |
+| AutoGPT-style task queue | ✗ | ✗ | Partial | ✗ | ✅ |
+| Hierarchical summarisation | ✗ | ✗ | ✗ | ✗ | ✅ |
+
+### Safety & Resilience
+
+| Capability | LangGraph | CrewAI | AutoGen | LlamaIndex | **Multigen** |
+| --- | :---: | :---: | :---: | :---: | :---: |
+| Injection detection (14 patterns) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Output sanitization | ✗ | ✗ | ✗ | ✗ | ✅ |
+| PII redaction (9 types, 3 modes) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Deadline management | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Workflow-level retry + exp. backoff | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Per-node circuit breaker | ✗ | ✗ | ✗ | ✗ | ✅ |
+| RetryAgent built-in | ✗ | ✗ | ✗ | ✗ | ✅ |
+
+### Optimization & Learning
+
+| Capability | LangGraph | CrewAI | AutoGen | LlamaIndex | **Multigen** |
+| --- | :---: | :---: | :---: | :---: | :---: |
+| Online prompt optimisation (bandit) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Few-shot library (scored, retrieval) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Agent specialisation by performance | ✗ | ✗ | ✗ | ✗ | ✅ |
+| EpisodicMemory → prompt feedback | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Continuous learner (RLHF-style) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Experience replay | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Adaptive prompts (auto few-shot) | ✗ | ✗ | ✗ | ✗ | ✅ |
+
+### Observability & DevEx
+
+| Capability | LangGraph | CrewAI | AutoGen | LlamaIndex | **Multigen** |
+| --- | :---: | :---: | :---: | :---: | :---: |
+| OpenTelemetry + Prometheus | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Time-travel debugging (snapshot/replay) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Agent profiler + execution reports | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Token streaming + partial result bus | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Eval/measurement framework | ✗ | ✗ | ✗ | ✗ | ✅ |
+| A/B testing + canary rollout | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Workflow versioning + rollback | ✗ | ✗ | ✗ | ✗ | ✅ |
+| MCP server (Claude/Cursor/Windsurf) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Real-time SSE streaming | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Agent2Agent (A2A) protocol | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Visual simulator dashboard | ✗ | ✗ | ✗ | ✗ | ✅ |
+
+### Infrastructure & Scale
+
+| Capability | LangGraph | CrewAI | AutoGen | LlamaIndex | **Multigen** |
+| --- | :---: | :---: | :---: | :---: | :---: |
+| Local runtime — zero external deps | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Kafka-based distributed messaging | ✗ | ✗ | ✗ | ✗ | ✅ |
+| SQLite-backed durable persistence | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Scheduling (cron, interval, triggers) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Multi-model routing (cost/quality/latency) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Tool registry + sandboxing + permissions | ✗ | ✗ | Partial | ✗ | ✅ |
 | Cross-worker agent hydration (MongoDB) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| **Local runtime — zero external deps** | ✗ | ✗ | ✗ | ✗ | ✅ |
-| **4-tier memory system** | ✗ | ✗ | Partial | Partial | ✅ |
-| **Multi-tier async caching** | ✗ | ✗ | ✗ | ✗ | ✅ |
-| **Operator step composition (`>>` `\|` `&`)** | ✗ | ✗ | ✗ | ✗ | ✅ |
-| **Hierarchical agent structures** | ✗ | ✗ | ✗ | ✗ | ✅ |
-| **Priority pub/sub + scatter-gather bus** | ✗ | ✗ | ✗ | ✗ | ✅ |
-| **Session management + reactive state** | ✗ | ✗ | ✗ | ✗ | ✅ |
-| **Trait-based inheritance + overloading** | ✗ | ✗ | ✗ | ✗ | ✅ |
-| **Agent profiler + rate limiter + batch exec** | ✗ | ✗ | ✗ | ✗ | ✅ |
-| **Time-travel debugging (snapshot/replay)** | ✗ | ✗ | ✗ | ✗ | ✅ |
-| **Vector memory + Ebbinghaus forgetting curve** | ✗ | ✗ | ✗ | Partial | ✅ |
-| **SQLite-backed durable persistence** | ✗ | ✗ | ✗ | ✗ | ✅ |
-| **Eval/measurement framework** | ✗ | ✗ | ✗ | ✗ | ✅ |
-| **Multi-model routing (cost/quality/latency)** | ✗ | ✗ | ✗ | ✗ | ✅ |
-| **Tool registry + sandboxing + permissions** | ✗ | ✗ | Partial | ✗ | ✅ |
-| **Planning: ToT / GoT / MCTS / ReAct** | ✗ | ✗ | ✗ | ✗ | ✅ |
-| **Workflow versioning + A/B testing + canary** | ✗ | ✗ | ✗ | ✗ | ✅ |
-| **Scheduling: cron, interval, event triggers** | ✗ | ✗ | ✗ | ✗ | ✅ |
-| **Continuous learning + few-shot library** | ✗ | ✗ | ✗ | ✗ | ✅ |
-| **Injection detection + PII redaction** | ✗ | ✗ | ✗ | ✗ | ✅ |
-| **Deadline management + workflow-level retry** | ✗ | ✗ | ✗ | ✗ | ✅ |
-| **Token streaming + partial result bus** | ✗ | ✗ | ✗ | ✗ | ✅ |
-| **Online prompt optimisation (bandit)** | ✗ | ✗ | ✗ | ✗ | ✅ |
-| **Hierarchical task decomp + AutoGPT queue** | ✗ | ✗ | Partial | ✗ | ✅ |
-| **WorkingMemory → LLM prompt wiring** | ✗ | ✗ | ✗ | ✗ | ✅ |
 
 ---
 
@@ -118,23 +172,40 @@ Uncertainty **propagates through the graph** — if upstream nodes have low conf
 
 ### 6. Local Python SDK — Zero Dependencies
 
-The `multigen` Python package ships a complete in-process runtime. No Kafka, Temporal, MongoDB, or Docker required. **152 public exports** across 15 modules:
+The `multigen` Python package ships a complete in-process runtime. No Kafka, Temporal, MongoDB, or Docker required. **329 public exports** across 30 modules (v0.6.0):
 
-| Module | Key classes |
-|--------|------------|
-| `chain`, `parallel`, `graph`, `state_machine` | `Chain`, `Parallel`, `Graph`, `StateMachine` |
+| Module | Key classes / functions |
+| --- | --- |
+| `agent` | `FunctionAgent`, `LLMAgent` (WorkingMemory wiring), `RouterAgent`, `CircuitBreakerAgent`, `RetryAgent`, `MemoryAgent`, `@agent` |
+| `chain`, `parallel` | `Chain`, `Pipeline`, `Parallel`, `FanOut`, `MapReduce`, `Race`, `Batch` |
+| `graph`, `state_machine` | `Graph`, `StateMachine`, `Sampler`, `EnsembleResult` |
+| `bus`, `runtime` | `InMemoryBus`, `Message`, `Runtime` |
 | `memory` | `ShortTermMemory`, `EpisodicMemory`, `WorkingMemory`, `SemanticMemory`, `MemoryManager` |
 | `advanced_memory` | `VectorMemory`, `ForgettingCurve`, `MemoryIndex`, `ContextualMemory`, `PersistentMemory` |
-| `cache` | `LRUCache`, `TTLCache`, `AsyncCache`, `MultiTierCache`, `@cached` |
-| `messaging` | `AdvancedMessageBus`, priority pub/sub, request/reply, scatter-gather, DLQ |
-| `compose` | `Step` with `>>`, `\|`, `&` operators; `BranchStep`, `LoopStep` |
-| `hierarchy` | `AgentHierarchy`, `AgentGroup`, `TypedStep`, `HierarchicalPipeline` |
-| `session` | `SessionManager`, `SessionContext`, `SessionMiddleware` |
-| `state_init` | `StateSchema`, `ReactiveState`, `ComputedState`, `StateValidator` |
-| `inheritance` | `InheritableAgent`, `Trait`, `build_agent`, `@overload`, `MultiMethod` |
-| `polymorphic` | `PolymorphicAgent`, `ShapeRegistry`, `TypeAdapter`, `DynamicAgent` |
-| `performance` | `AgentProfiler`, `BatchExecutor`, `ConnectionPool`, `RateLimiter` |
+| `cache` | `LRUCache`, `TTLCache`, `AsyncCache`, `MultiTierCache`, `CacheManager`, `@cached` |
+| `messaging` | `AdvancedMessageBus`, `PriorityMessageQueue`, `MessageRouter`, `MessagePipeline`, `DeadLetterQueue` |
+| `compose` | `Step` (`>>`, `\|`, `&`), `BranchStep`, `LoopStep`, `FanInStep`, `Compose` |
+| `hierarchy` | `AgentHierarchy`, `AgentGroup`, `AgentRole`, `TypedStep`, `HierarchicalPipeline` |
+| `session` | `SessionManager`, `SessionContext`, `SessionMiddleware`, `SessionStore` |
+| `state_init` | `StateSchema`, `ReactiveState`, `ComputedState`, `StateValidator`, `StateTransition` |
+| `inheritance` | `InheritableAgent`, `Trait`, `LoggingTrait`, `RetryTrait`, `build_agent`, `@overload`, `MultiMethod` |
+| `polymorphic` | `PolymorphicAgent`, `ShapeRegistry`, `TypeAdapter`, `MultiDispatch`, `DynamicAgent` |
+| `performance` | `AgentProfiler`, `BatchExecutor`, `ConnectionPool`, `LazyValue`, `RateLimiter` |
 | `debugger` + `snapshot` | `WorkflowDebugger`, time-travel replay, `SQLiteSnapshotStore` |
+| `persistence` | `SQLiteCheckpointStore`, `DurableQueue`, `CheckpointedRuntime`, `PersistentEpisodicMemory` |
+| `eval` | `Evaluator`, `EvalSuite`, `Benchmark`, `LLMJudge`, `F1Score`, `Latency`, `TokenCount` |
+| `routing` | `ModelPool`, `CostRouter`, `QualityRouter`, `LatencyRouter`, `AdaptiveRouter`, `FallbackRouter` |
+| `tools` | `ToolRegistry`, `Tool`, `Sandbox`, `SandboxedTool`, `PermissionPolicy`, `PermissionedRegistry` |
+| `planning` | `ChainOfThought`, `TreeOfThoughts`, `GraphOfThoughts`, `ReActPlanner`, `PlanAndExecute` |
+| `planning_advanced` | `HierarchicalDecomposer`, `MCTSPlanner`, `AutoGPTQueue`, `HierarchicalSummariser` |
+| `versioning` | `VersionedWorkflow`, `WorkflowDiff`, `ChangeLog`, `SQLiteVersionStore` |
+| `scheduler` | `Scheduler`, `CronSchedule`, `IntervalSchedule`, `Trigger`, `ScheduledJob` |
+| `learning` | `AdaptivePrompt`, `OnlineLearner`, `FewShotSelector`, `ContinuousLearner`, `ExperienceReplay` |
+| `workflow_ab` | `ABTest`, `CanaryRollout`, `RollbackManager`, `CompatibilityChecker`, `TrafficSplit` |
+| `safety` | `InjectionDetector`, `OutputSanitizer`, `PIIRedactor`, `PIIDetector`, `SafetyGuard` |
+| `resilience` | `RetryPolicy`, `Deadline`, `DeadlineGuard`, `DeadlineManager`, `WorkflowRetry` |
+| `streaming` | `StreamingAgent`, `ParallelStreamer`, `StreamAggregator`, `PartialResultBus`, `StreamToken` |
+| `optimization` | `PromptBandit`, `FewShotLibrary`, `AgentSpecialisation`, `EpisodicFeedbackLoop`, `OptimizationManager` |
 
 ```python
 # Zero-config local pipeline — no server needed
