@@ -5,7 +5,7 @@
 [![CI](https://github.com/Subhagatoadak/Multigen/actions/workflows/ci.yml/badge.svg)](https://github.com/Subhagatoadak/Multigen/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue)](https://www.python.org)
 [![License](https://img.shields.io/badge/license-Apache%202.0-green)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.6.0--dev-orange)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.7.0-orange)](CHANGELOG.md)
 [![Temporal](https://img.shields.io/badge/temporal-1.11-blueviolet)](https://temporal.io)
 [![OpenTelemetry](https://img.shields.io/badge/otel-enabled-brightgreen)](https://opentelemetry.io)
 
@@ -121,6 +121,66 @@ Built on top of [Temporal.io](https://temporal.io) for workflow durability, Apac
 | Multi-model routing (cost/quality/latency) | ✗ | ✗ | ✗ | ✗ | ✅ |
 | Tool registry + sandboxing + permissions | ✗ | ✗ | Partial | ✗ | ✅ |
 | Cross-worker agent hydration (MongoDB) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Multi-tenancy (isolation, quotas, billing) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Distributed memory sync (MVCC, vector clocks) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Dry-run simulation + cost estimation | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Load simulation (P95/P99 latency reports) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Graph diff (ASCII visualisation of workflow changes) | ✗ | ✗ | ✗ | ✗ | ✅ |
+
+### Knowledge & LLM
+
+| Capability | LangGraph | CrewAI | AutoGen | LlamaIndex | **Multigen** |
+| --- | :---: | :---: | :---: | :---: | :---: |
+| Unified LLM adapter (OpenAI / Ollama / local) | Partial | ✗ | Partial | Partial | ✅ |
+| Token budget with hard stop | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Context window auto-management (truncate/summarise) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Structured output (JSON schema validation) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| LLM response cache (SHA256, LRU eviction) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| RAG chunking strategies (fixed/sentence/recursive) | ✗ | ✗ | ✗ | ✅ | ✅ |
+| Hybrid retrieval (BM25 + vector + RRF fusion) | ✗ | ✗ | ✗ | Partial | ✅ |
+| Citation tracking per retrieval | ✗ | ✗ | ✗ | Partial | ✅ |
+| Retrieval feedback (weight boost/decay per chunk) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Multi-index routing across knowledge bases | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Knowledge graph (entities, facts, relationships) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Fact confidence scoring + provenance tracking | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Contradiction detection across knowledge sources | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Knowledge TTL (auto-expiry of stale facts) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Domain ontology (hierarchical type taxonomy) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Cross-agent knowledge sharing | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Versioned prompt registry (centralised control plane) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Prompt compilation (variables, conditionals, loops) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Prompt inheritance (base + block overrides) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Prompt A/B testing with score attribution | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Prompt RBAC (reader / writer / admin roles) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Prompt review workflow (draft → approved → live) | ✗ | ✗ | ✗ | ✗ | ✅ |
+
+### Security & Compliance
+
+| Capability | LangGraph | CrewAI | AutoGen | LlamaIndex | **Multigen** |
+| --- | :---: | :---: | :---: | :---: | :---: |
+| API key management (issue/validate/revoke/scope) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| HS256 JWT (sign/verify — stdlib, no PyJWT) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Data classification (PUBLIC → RESTRICTED labels) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Network policy (URL allowlist / denylist for agents) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Compliance scan (GDPR/HIPAA rules pre-workflow) | ✗ | ✗ | ✗ | ✗ | ✅ |
+
+### Enterprise Observability & Governance
+
+| Capability | LangGraph | CrewAI | AutoGen | LlamaIndex | **Multigen** |
+| --- | :---: | :---: | :---: | :---: | :---: |
+| Causal attribution (backward blame propagation) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Epistemic debt scoring (accumulated uncertainty) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Counterfactual replay (what-if node patching) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Decision audit trail (human-readable log) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Agent SLA monitoring (latency/quality/error-rate) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Shadow execution (run new agent alongside primary) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Capability versioning + deprecation management | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Regression suites + golden datasets | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Score drift alerting (auto-rollback on drop) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Outcome ingestion API (delayed/deferred rewards) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Cross-workflow feedback aggregation (RRF) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Webhook routing (glob pattern event dispatch) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Document ingestion → agent context pipeline | ✗ | ✗ | ✗ | Partial | ✅ |
 
 ---
 
@@ -172,7 +232,7 @@ Uncertainty **propagates through the graph** — if upstream nodes have low conf
 
 ### 6. Local Python SDK — Zero Dependencies
 
-The `multigen` Python package ships a complete in-process runtime. No Kafka, Temporal, MongoDB, or Docker required. **329 public exports** across 30 modules (v0.6.0):
+The `multigen` Python package ships a complete in-process runtime. No Kafka, Temporal, MongoDB, or Docker required. **476 public exports** across 43 modules (v0.7.0):
 
 | Module | Key classes / functions |
 | --- | --- |
@@ -206,6 +266,20 @@ The `multigen` Python package ships a complete in-process runtime. No Kafka, Tem
 | `resilience` | `RetryPolicy`, `Deadline`, `DeadlineGuard`, `DeadlineManager`, `WorkflowRetry` |
 | `streaming` | `StreamingAgent`, `ParallelStreamer`, `StreamAggregator`, `PartialResultBus`, `StreamToken` |
 | `optimization` | `PromptBandit`, `FewShotLibrary`, `AgentSpecialisation`, `EpisodicFeedbackLoop`, `OptimizationManager` |
+| `dsl` | `WorkflowBuilder`, `GraphBuilder`, `branch()`, `when()`, `otherwise()` — fluent workflow DSL |
+| `tenancy` | `TenantRegistry`, `TenantScope`, `UsageTracker`, `QuotaExceededError`, `TenantManager` |
+| `memory_sync` | `MVCCMemoryStore`, `VectorClock`, `MemorySyncProtocol`, `DistributedWorkingMemory`, `MemoryCoordinator` |
+| `eval_longitudinal` | `GoldenDataset`, `RegressionSuite`, `VersionScoreHistory`, `DriftAlerter`, `LongitudinalEvalManager` |
+| `feedback_loop` | `OutcomeStore`, `DelayedRewardBuffer`, `RewardShaper`, `HumanFeedbackStore`, `FeedbackLoopManager` |
+| `observability` | `CausalAttributor`, `EpistemicDebt`, `DecisionAuditTrail`, `CounterfactualReplayer`, `PatternMiner` |
+| `lifecycle` | `AgentDependencyGraph`, `SLAMonitor`, `ShadowExecutor`, `CapabilityRouter`, `AgentLifecycleManager` |
+| `connectors` | `WebhookRouter`, `ConnectorRegistry`, `EventDrivenBranchManager`, `DocumentIngester`, `IngestionPipeline` |
+| `simulator` | `DryRunSimulator`, `MockInjector`, `LoadSimulator`, `CostEstimator`, `GraphDiffVisualiser` |
+| `llm_adapter` | `EchoAdapter`, `OpenAIAdapter`, `OllamaAdapter`, `TokenBudget`, `LLMCache`, `LLMRouter`, `StructuredOutputParser` |
+| `rag` | `FixedChunker`, `SentenceChunker`, `HybridIndex`, `CitationTracker`, `RetrievalFeedback`, `RAGPipeline` |
+| `prompt_registry` | `PromptRegistry`, `PromptTemplate`, `PromptInheritance`, `PromptABTest`, `PromptAccessControl`, `PromptManager` |
+| `knowledge` | `KnowledgeGraph`, `Fact`, `Ontology`, `ContradictionDetector`, `KnowledgeManager` |
+| `security` | `APIKeyManager`, `JWTManager`, `DataClassification`, `NetworkPolicy`, `ComplianceScan`, `SecurityManager` |
 
 ```python
 # Zero-config local pipeline — no server needed
@@ -375,7 +449,7 @@ pip install jupyter
 jupyter notebook notebooks/
 ```
 
-Start with `01_quickstart.ipynb`. For local SDK features start at `12_local_sdk_agents.ipynb`.
+Start with `00_index.ipynb` for a guided tour of all 57 notebooks by topic. For the quickstart go to `01_quickstart.ipynb`. For local SDK features start at `12_local_sdk_agents.ipynb`.
 
 ---
 
@@ -870,7 +944,7 @@ Multigen/
 ├── examples/                    # End-to-end examples
 │   ├── resume_screening.py      # Resume screening pipeline
 │   └── ma_due_diligence/        # M&A due diligence graph workflow
-├── notebooks/                   # Jupyter notebooks (01–42)
+├── notebooks/                   # Jupyter notebooks (00 index + 01–56)
 ├── tests/                       # pytest test suite
 ├── docs/                        # Architecture diagrams, whitepapers
 ├── Agent-Components/            # agentic_codex submodule (tools, patterns)
@@ -982,6 +1056,27 @@ See [docs/DEV.md](docs/DEV.md) for detailed development guide.
 | [40_streaming](notebooks/40_streaming.ipynb) | StreamingAgent, ParallelStreamer, PartialResultBus |
 | [41_optimization](notebooks/41_optimization.ipynb) | PromptBandit, FewShotLibrary, AgentSpecialisation, OptimizationManager |
 | [42_working_memory_wiring](notebooks/42_working_memory_wiring.ipynb) | LLMAgent + WorkingMemory integration, template injection |
+
+**v0.7.0 — Enterprise & Platform (zero external dependencies):**
+
+| Notebook | What you'll learn |
+|---|---|
+| [43_tenancy](notebooks/43_tenancy.ipynb) | TenantRegistry, usage quotas, billing, TenantScope, QuotaExceededError |
+| [44_memory_sync](notebooks/44_memory_sync.ipynb) | MVCCMemoryStore, vector clocks, conflict resolution, MemoryCoordinator |
+| [45_eval_longitudinal](notebooks/45_eval_longitudinal.ipynb) | GoldenDataset, RegressionSuite, score drift alerting, auto-rollback |
+| [46_feedback_loop](notebooks/46_feedback_loop.ipynb) | OutcomeStore, delayed rewards, RewardShaper, cross-workflow aggregation |
+| [47_observability](notebooks/47_observability.ipynb) | CausalAttributor, EpistemicDebt, CounterfactualReplayer, PatternMiner |
+| [48_lifecycle](notebooks/48_lifecycle.ipynb) | SLAMonitor, ShadowExecutor, CapabilityRouter, AgentDependencyGraph |
+| [49_connectors](notebooks/49_connectors.ipynb) | WebhookRouter, ConnectorRegistry, DocumentIngester, IngestionPipeline |
+| [50_simulator](notebooks/50_simulator.ipynb) | DryRunSimulator, MockInjector, LoadSimulator (P95/P99), CostEstimator |
+| [51_llm_adapter](notebooks/51_llm_adapter.ipynb) | EchoAdapter, OpenAIAdapter, OllamaAdapter, TokenBudget, LLMCache |
+| [52_rag](notebooks/52_rag.ipynb) | Chunkers, BM25Index, HybridIndex (RRF), CitationTracker, RAGPipeline |
+| [53_prompt_registry](notebooks/53_prompt_registry.ipynb) | PromptRegistry, PromptTemplate, PromptABTest, PromptAccessControl |
+| [54_knowledge](notebooks/54_knowledge.ipynb) | KnowledgeGraph, ContradictionDetector, Ontology, cross-agent sharing |
+| [55_security](notebooks/55_security.ipynb) | APIKeyManager, JWTManager, NetworkPolicy, ComplianceScan, SecurityManager |
+| [56_dsl_workflow_builder](notebooks/56_dsl_workflow_builder.ipynb) | WorkflowBuilder, GraphBuilder, branch/when/otherwise, circuit breakers |
+
+> **New to Multigen?** Open [`00_index.ipynb`](notebooks/00_index.ipynb) for a guided tour of all 57 notebooks organised by functional area.
 
 ---
 

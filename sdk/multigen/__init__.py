@@ -447,7 +447,204 @@ from .optimization import (
     PromptVariant,
 )
 
-__version__ = "0.6.0"
+# ── Multi-tenancy ─────────────────────────────────────────────────────────────
+from .tenancy import (
+    Tenant,
+    TenantRegistry,
+    TenantScope,
+    TenantAwareRegistry,
+    TenantManager,
+    UsageRecord,
+    UsageSummary,
+    UsageTracker,
+    QuotaExceededError,
+    current_tenant,
+    inject_tenant,
+)
+
+# ── Distributed memory coherence ─────────────────────────────────────────────
+from .memory_sync import (
+    ConflictError,
+    ConflictResolutionMode,
+    DistributedWorkingMemory,
+    MemoryCoordinator,
+    MemorySyncProtocol,
+    MVCCMemoryStore,
+    SyncReport,
+    VersionedEntry,
+    WorkingMemoryEntry,
+)
+
+# ── Longitudinal evaluation ───────────────────────────────────────────────────
+from .eval_longitudinal import (
+    DriftAlert,
+    DriftAlerter,
+    EvalRollbackManager,
+    GoldenDataset,
+    GoldenExample,
+    LongitudinalEvalManager,
+    RegressionResult,
+    RegressionSuite,
+    ScoreEntry,
+    VersionScoreHistory,
+)
+
+# ── Feedback loop closure ──────────────────────────────────────────────────────
+from .feedback_loop import (
+    AggregatedSignal,
+    CrossWorkflowAggregator,
+    DelayedRewardBuffer,
+    FeedbackLoopManager,
+    HumanFeedback,
+    HumanFeedbackStore,
+    Outcome,
+    OutcomeStore,
+    PendingOutcome,
+    RewardShaper,
+)
+
+# ── Semantic observability ────────────────────────────────────────────────────
+from .observability import (
+    AuditEvent,
+    BlameResult,
+    CausalAttributor,
+    CounterfactualReplayer,
+    CounterfactualResult,
+    DecisionAuditTrail,
+    EpistemicDebt,
+    EpistemicDebtReport,
+    NodeRecord,
+    Pattern,
+    PatternMiner,
+    WorkflowRunSummary,
+)
+
+# ── Agent lifecycle management ────────────────────────────────────────────────
+from .lifecycle import (
+    AgentDependencyGraph,
+    AgentLifecycleManager,
+    CapabilityRouter,
+    CapabilityVersion,
+    DeprecationNotice,
+    SLAContract,
+    SLAMonitor,
+    SLAViolation,
+    ShadowExecutor,
+    ShadowResult,
+)
+
+# ── External connectors ───────────────────────────────────────────────────────
+from .connectors import (
+    BranchCondition,
+    ConnectorRegistry,
+    ConnectorResult,
+    DocumentChunk,
+    DocumentIngester,
+    EventDrivenBranchManager,
+    HttpConnector,
+    IngestionPipeline,
+    LoggingConnector,
+    OutboundConnector,
+    WebhookEvent,
+    WebhookRouter,
+)
+
+# ── Simulator (dry-run, load test, cost estimator, graph diff) ────────────────
+from .simulator import (
+    CostEstimator as SimCostEstimator,
+    CostForecast,
+    DryRunResult,
+    DryRunSimulator,
+    GraphDiff,
+    GraphDiffVisualiser,
+    LoadReport,
+    LoadScenario,
+    LoadSimulator,
+    MockInjector,
+    NodeCostSpec,
+)
+
+# ── LLM adapter layer ─────────────────────────────────────────────────────────
+from .llm_adapter import (
+    BudgetExceededError,
+    ContextWindowManager,
+    EchoAdapter,
+    LLMAdapter,
+    LLMCache,
+    LLMMessage,
+    LLMRequest,
+    LLMResponse,
+    LLMRouter,
+    OllamaAdapter,
+    OpenAIAdapter,
+    StructuredOutputParser,
+    TokenBudget,
+)
+
+# ── RAG pipeline ──────────────────────────────────────────────────────────────
+from .rag import (
+    BM25Index,
+    Chunk,
+    Citation,
+    CitationTracker,
+    FixedChunker,
+    HybridIndex,
+    InMemoryVectorIndex,
+    MultiIndexRouter,
+    OpenAIEmbedder,
+    RAGPipeline,
+    RandomEmbedder,
+    RecursiveChunker,
+    RetrievalFeedback,
+    SentenceChunker,
+)
+
+# ── Prompt registry & control plane ──────────────────────────────────────────
+from .prompt_registry import (
+    PermissionDeniedError,
+    PromptABResult,
+    PromptABTest,
+    PromptAccessControl,
+    PromptInheritance,
+    PromptManager,
+    PromptRegistry,
+    PromptReviewWorkflow,
+    PromptTemplate,
+    PromptVersion,
+    ReviewRequest,
+)
+
+# ── Knowledge management ──────────────────────────────────────────────────────
+from .knowledge import (
+    Contradiction,
+    ContradictionDetector,
+    Entity,
+    Fact,
+    KnowledgeGraph,
+    KnowledgeManager,
+    Ontology,
+    Relationship,
+)
+
+# ── Security & compliance ─────────────────────────────────────────────────────
+from .security import (
+    APIKey,
+    APIKeyManager,
+    ComplianceReport,
+    ComplianceRule,
+    ComplianceScan,
+    ComplianceViolation,
+    DataClassification,
+    InvalidAPIKeyError,
+    JWTError,
+    JWTManager,
+    NetworkPolicy,
+    NetworkPolicyViolation,
+    SecurityManager,
+    WorkflowClassifier,
+)
+
+__version__ = "0.7.0"
 
 __all__ = [
     # Clients
@@ -570,4 +767,60 @@ __all__ = [
     # Optimization
     "AgentSpecialisation", "EpisodicFeedbackLoop", "FewShotLibrary",
     "FewShotLibraryEntry", "OptimizationManager", "PromptBandit", "PromptVariant",
+    # Multi-tenancy
+    "Tenant", "TenantRegistry", "TenantScope", "TenantAwareRegistry",
+    "TenantManager", "UsageRecord", "UsageSummary", "UsageTracker",
+    "QuotaExceededError", "current_tenant", "inject_tenant",
+    # Distributed memory coherence
+    "ConflictError", "ConflictResolutionMode", "DistributedWorkingMemory",
+    "MemoryCoordinator", "MemorySyncProtocol", "MVCCMemoryStore",
+    "SyncReport", "VersionedEntry", "WorkingMemoryEntry",
+    # Longitudinal evaluation
+    "DriftAlert", "DriftAlerter", "EvalRollbackManager", "GoldenDataset",
+    "GoldenExample", "LongitudinalEvalManager", "RegressionResult",
+    "RegressionSuite", "ScoreEntry", "VersionScoreHistory",
+    # Feedback loop
+    "AggregatedSignal", "CrossWorkflowAggregator", "DelayedRewardBuffer",
+    "FeedbackLoopManager", "HumanFeedback", "HumanFeedbackStore",
+    "Outcome", "OutcomeStore", "PendingOutcome", "RewardShaper",
+    # Semantic observability
+    "AuditEvent", "BlameResult", "CausalAttributor", "CounterfactualReplayer",
+    "CounterfactualResult", "DecisionAuditTrail", "EpistemicDebt",
+    "EpistemicDebtReport", "NodeRecord", "Pattern", "PatternMiner",
+    "WorkflowRunSummary",
+    # Agent lifecycle management
+    "AgentDependencyGraph", "AgentLifecycleManager", "CapabilityRouter",
+    "CapabilityVersion", "DeprecationNotice", "SLAContract", "SLAMonitor",
+    "SLAViolation", "ShadowExecutor", "ShadowResult",
+    # External connectors
+    "BranchCondition", "ConnectorRegistry", "ConnectorResult", "DocumentChunk",
+    "DocumentIngester", "EventDrivenBranchManager", "HttpConnector",
+    "IngestionPipeline", "LoggingConnector", "OutboundConnector",
+    "WebhookEvent", "WebhookRouter",
+    # Simulator
+    "SimCostEstimator", "CostForecast", "DryRunResult", "DryRunSimulator",
+    "GraphDiff", "GraphDiffVisualiser", "LoadReport", "LoadScenario",
+    "LoadSimulator", "MockInjector", "NodeCostSpec",
+    # LLM adapter layer
+    "BudgetExceededError", "ContextWindowManager", "EchoAdapter", "LLMAdapter",
+    "LLMCache", "LLMMessage", "LLMRequest", "LLMResponse", "LLMRouter",
+    "OllamaAdapter", "OpenAIAdapter", "StructuredOutputParser", "TokenBudget",
+    # RAG pipeline
+    "BM25Index", "Chunk", "Citation", "CitationTracker", "FixedChunker",
+    "HybridIndex", "InMemoryVectorIndex", "MultiIndexRouter", "OpenAIEmbedder",
+    "RAGPipeline", "RandomEmbedder", "RecursiveChunker", "RetrievalFeedback",
+    "SentenceChunker",
+    # Prompt registry
+    "PermissionDeniedError", "PromptABResult", "PromptABTest",
+    "PromptAccessControl", "PromptInheritance", "PromptManager",
+    "PromptRegistry", "PromptReviewWorkflow", "PromptTemplate",
+    "PromptVersion", "ReviewRequest",
+    # Knowledge management
+    "Contradiction", "ContradictionDetector", "Entity", "Fact",
+    "KnowledgeGraph", "KnowledgeManager", "Ontology", "Relationship",
+    # Security & compliance
+    "APIKey", "APIKeyManager", "ComplianceReport", "ComplianceRule",
+    "ComplianceScan", "ComplianceViolation", "DataClassification",
+    "InvalidAPIKeyError", "JWTError", "JWTManager", "NetworkPolicy",
+    "NetworkPolicyViolation", "SecurityManager", "WorkflowClassifier",
 ]
