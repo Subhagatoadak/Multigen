@@ -51,10 +51,9 @@ import json
 import re
 import secrets
 import time
-import uuid
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Set
+from typing import Any, Callable, Dict, List, Optional
 
 
 # ── API Key Management ────────────────────────────────────────────────────────
@@ -246,8 +245,8 @@ class NetworkPolicy:
     Usage::
 
         policy = NetworkPolicy(default_deny=True)
-        policy.allow(r"https://api\.openai\.com/.*")
-        policy.allow(r"https://api\.anthropic\.com/.*")
+        policy.allow("https://api\\.openai\\.com/.*")
+        policy.allow("https://api\\.anthropic\\.com/.*")
         policy.check("https://api.openai.com/v1/chat/completions")   # OK
         policy.check("https://evil.com/steal")   # raises NetworkPolicyViolation
     """

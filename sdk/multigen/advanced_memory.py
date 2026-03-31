@@ -32,7 +32,7 @@ import math
 import time
 import uuid
 from collections import defaultdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
@@ -512,7 +512,7 @@ class ContextualMemory:
         # Retrieve actual content from vector store.
         contents: List[Any] = []
         for key in ranked_keys:
-            hits = self.vector.search_by_vector([], top_k=len(self.vector))
+            self.vector.search_by_vector([], top_k=len(self.vector))
             # Fall back: search by key name in the vector store internal records.
             content = self._fetch_content_by_key(key)
             if content is not None:

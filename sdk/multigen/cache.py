@@ -8,7 +8,7 @@ import time
 from collections import OrderedDict
 from dataclasses import dataclass, field
 from functools import wraps
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, Optional
 
 
 # ── Cache Entry ───────────────────────────────────────────────────────────────

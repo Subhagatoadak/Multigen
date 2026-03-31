@@ -44,10 +44,9 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import math
 import random
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
@@ -237,7 +236,7 @@ class DeadlineGuard:
         remaining = self._deadline.remaining_s()
         if remaining <= 0:
             await self._handle_breach()
-            raise DeadlineError(f"Deadline already expired before call")
+            raise DeadlineError("Deadline already expired before call")
         try:
             if asyncio.iscoroutinefunction(fn):
                 coro = fn(*args, **kwargs)

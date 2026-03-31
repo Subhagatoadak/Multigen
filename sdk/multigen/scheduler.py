@@ -47,13 +47,11 @@ Usage::
 from __future__ import annotations
 
 import asyncio
-import json
 import logging
-import sqlite3
 import time
 import uuid
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -423,9 +421,15 @@ class Scheduler:
         for attempt in range(job.max_retries + 1):
             try:
                 if event_data is not None:
-                    coro = job.fn(event_data) if asyncio.iscoroutinefunction(job.fn) else asyncio.get_event_loop().run_in_executor(None, job.fn, event_data)
+                    coro = (
+                        job.fn(event_data) if asyncio.iscoroutinefunction(job.fn)
+                        else asyncio.get_event_loop().run_in_executor(None, job.fn, event_data)
+                    )
                 else:
-                    coro = job.fn() if asyncio.iscoroutinefunction(job.fn) else asyncio.get_event_loop().run_in_executor(None, job.fn)
+                    coro = (
+                        job.fn() if asyncio.iscoroutinefunction(job.fn)
+                        else asyncio.get_event_loop().run_in_executor(None, job.fn)
+                    )
                 output = await asyncio.wait_for(coro, timeout=job.timeout_s)
                 result.output = output
                 result.finished_at = time.time()

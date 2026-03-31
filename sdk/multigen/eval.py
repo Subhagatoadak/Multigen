@@ -51,7 +51,6 @@ from __future__ import annotations
 
 import asyncio
 import json
-import math
 import re
 import time
 import uuid
@@ -725,7 +724,7 @@ class Evaluator:
                         )
                     else:
                         scores[metric.name] = metric.score(case, output, latency_ms)
-                except Exception as exc:
+                except Exception:
                     scores[metric.name] = 0.0
 
             result = EvalResult(

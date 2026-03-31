@@ -8,10 +8,7 @@ and a combined optimizer for async agent workloads.
 from __future__ import annotations
 
 import asyncio
-import dataclasses
-import heapq
 import time
-from collections import defaultdict
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from typing import (

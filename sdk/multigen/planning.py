@@ -44,11 +44,9 @@ Usage::
 from __future__ import annotations
 
 import asyncio
-import math
 import uuid
 from dataclasses import dataclass, field
-from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional
 
 
 # ── ThoughtNode ────────────────────────────────────────────────────────────────
@@ -175,18 +173,19 @@ class ChainOfThought(Planner):
 
     async def think(self, problem: str, ctx: Optional[Dict[str, Any]] = None) -> ThoughtNode:
         thoughts: List[str] = []
-        current = problem
 
         for i in range(self.n_steps):
             prompt = (
                 f"Problem: {problem}\n"
-                + (f"Previous thoughts:\n" + "\n".join(f"Step {j+1}: {t}" for j, t in enumerate(thoughts)) + "\n" if thoughts else "")
+                + (
+                    "Previous thoughts:\n"
+                    + "\n".join(f"Step {j+1}: {t}" for j, t in enumerate(thoughts))
+                    + "\n" if thoughts else ""
+                )
                 + f"Step {i+1}: Think carefully and reason one step further."
             )
             step_thought = await self._call(prompt)
             thoughts.append(step_thought)
-            current = step_thought
-
         # Final synthesis
         final_prompt = (
             f"Problem: {problem}\n"

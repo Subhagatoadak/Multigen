@@ -61,9 +61,9 @@ import sqlite3
 import time
 import uuid
 from contextlib import contextmanager
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 from .session import SessionContext, SessionState, SessionStore
 from .memory import Episode, EpisodicMemory, MemoryEntry, ShortTermMemory

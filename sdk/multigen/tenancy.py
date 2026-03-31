@@ -34,12 +34,11 @@ Usage::
 """
 from __future__ import annotations
 
-import asyncio
 import time
 import uuid
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 # ── Tenant descriptor ─────────────────────────────────────────────────────────
 

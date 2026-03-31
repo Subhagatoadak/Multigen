@@ -49,7 +49,7 @@ import json
 import time
 import urllib.request
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Type
+from typing import Any, Dict, List, Optional
 
 
 # ── Data structures ───────────────────────────────────────────────────────────

@@ -53,7 +53,6 @@ import sqlite3
 import time
 import uuid
 from abc import ABC, abstractmethod
-from contextlib import contextmanager
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -477,8 +476,8 @@ class VersionedWorkflow:
         tv = self._local_versions.get(to_version)
         if fv is None or tv is None:
             raise KeyError(
-                f"Version(s) not found locally. "
-                f"Use await wf.get() first for persisted versions."
+                "Version(s) not found locally. "
+                "Use await wf.get() first for persisted versions."
             )
         return _diff_definitions(
             fv.definition, tv.definition, self.name, from_version, to_version

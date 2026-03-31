@@ -38,7 +38,7 @@ import hashlib
 import re
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 
 # ── InjectionPattern ──────────────────────────────────────────────────────────
@@ -278,7 +278,11 @@ BUILTIN_PII_PATTERNS: List[PIIPattern] = [
     PIIPattern("email",        r"\b[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}\b"),
     PIIPattern("phone_us",     r"\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b"),
     PIIPattern("ssn",          r"\b\d{3}-\d{2}-\d{4}\b"),
-    PIIPattern("credit_card",  r"\b(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|6(?:011|5[0-9]{2})[0-9]{12})\b"),
+    PIIPattern(
+        "credit_card",
+        r"\b(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13}"
+        r"|3(?:0[0-5]|[68][0-9])[0-9]{11}|6(?:011|5[0-9]{2})[0-9]{12})\b",
+    ),
     PIIPattern("ip_address",   r"\b(?:\d{1,3}\.){3}\d{1,3}\b"),
     PIIPattern("date_of_birth",r"\b(?:0[1-9]|1[0-2])[/-](?:0[1-9]|[12]\d|3[01])[/-](?:19|20)\d{2}\b"),
     PIIPattern("us_zip",       r"\b\d{5}(?:-\d{4})?\b"),

@@ -132,7 +132,7 @@ class CompatibilityChecker:
 
         for key in sorted(old_keys & new_keys):
             ov, nv = old[key], new[key]
-            if type(ov) != type(nv):
+            if not isinstance(ov, type(nv)) or not isinstance(nv, type(ov)):
                 report.changed.append(key)
                 if key in self._breaking_keys:
                     report.breaking.append(f"type_change:{key}({type(ov).__name__}→{type(nv).__name__})")
@@ -303,7 +303,7 @@ class WorkflowRouter:
             else:
                 result = agent(ctx)
             return result, decision
-        except Exception as e:
+        except Exception:
             self._errors[label] += 1
             raise
 

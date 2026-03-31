@@ -21,7 +21,13 @@
       "Bash(/opt/anaconda3/bin/python -c \"import mcp; import fastapi; import starlette; print\\(''mcp:'', mcp.__version__\\); print\\(''fastapi:'', fastapi.__version__\\); print\\(''starlette:'', starlette.__version__\\)\")",
       "Bash(/opt/anaconda3/bin/python -c \"import mcp; import fastapi; import starlette; print\\(''fastapi:'', fastapi.__version__\\); print\\(''starlette:'', starlette.__version__\\); print\\(''mcp: ok''\\)\")",
       "Bash(/opt/anaconda3/bin/python -c \":*)",
-      "Bash(head -10 grep -n \"^TOOL\\\\|^RESOURCE\\\\|^PROMPT\" /Users/subhagatoadak/Documents/github/Multigen/mcp_server/resources.py /Users/subhagatoadak/Documents/github/Multigen/mcp_server/prompts.py)"
+      "Bash(head -10 grep -n \"^TOOL\\\\|^RESOURCE\\\\|^PROMPT\" /Users/subhagatoadak/Documents/github/Multigen/mcp_server/resources.py /Users/subhagatoadak/Documents/github/Multigen/mcp_server/prompts.py)",
+      "Bash(/tmp/ruff_env/bin/pip install:*)",
+      "Bash(/tmp/ruff_env/bin/ruff check:*)",
+      "Bash(brew install:*)",
+      "Bash(curl -LsSf https://astral.sh/ruff/install.sh)",
+      "Bash(sh)",
+      "Bash(/Users/subhagatoadak/.local/bin/ruff check:*)"
     ],
     "additionalDirectories": [
       "/Users/subhagatoadak/Documents/github/Multigen/Agent-Components/.git",
