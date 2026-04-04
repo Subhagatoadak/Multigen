@@ -5,7 +5,7 @@
 [![CI](https://github.com/Subhagatoadak/Multigen/actions/workflows/ci.yml/badge.svg)](https://github.com/Subhagatoadak/Multigen/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue)](https://www.python.org)
 [![License](https://img.shields.io/badge/license-Apache%202.0-green)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.7.0-orange)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.8.0-orange)](CHANGELOG.md)
 [![Temporal](https://img.shields.io/badge/temporal-1.11-blueviolet)](https://temporal.io)
 [![OpenTelemetry](https://img.shields.io/badge/otel-enabled-brightgreen)](https://opentelemetry.io)
 
@@ -232,7 +232,7 @@ Uncertainty **propagates through the graph** — if upstream nodes have low conf
 
 ### 6. Local Python SDK — Zero Dependencies
 
-The `multigen` Python package ships a complete in-process runtime. No Kafka, Temporal, MongoDB, or Docker required. **476 public exports** across 43 modules (v0.7.0):
+The `multigen` Python package ships a complete in-process runtime. No Kafka, Temporal, MongoDB, or Docker required. **539 public exports** across 49 modules (v0.8.0):
 
 | Module | Key classes / functions |
 | --- | --- |
@@ -280,6 +280,12 @@ The `multigen` Python package ships a complete in-process runtime. No Kafka, Tem
 | `prompt_registry` | `PromptRegistry`, `PromptTemplate`, `PromptInheritance`, `PromptABTest`, `PromptAccessControl`, `PromptManager` |
 | `knowledge` | `KnowledgeGraph`, `Fact`, `Ontology`, `ContradictionDetector`, `KnowledgeManager` |
 | `security` | `APIKeyManager`, `JWTManager`, `DataClassification`, `NetworkPolicy`, `ComplianceScan`, `SecurityManager` |
+| `telemetry` | `ObservabilityManager`, `Trace`, `Generation`, `Session`, `Score`, `AgentSpan`, `TraceContext`, `Meter`, `StructuredLogger`, `EpistemicAttribute`, `get_telemetry` |
+| `agent_trust` | `AgentAttestor`, `AgentCapability`, `CapabilityLedger`, `WorkflowProvenanceChain`, `OutputWatermarker`, `TrustScorer`, `AgentTrustManager` |
+| `adversarial` | `GoalHijackDetector`, `MemoryPoisonDetector`, `TenantLeakageDetector`, `RewardHackDetector`, `SleeperAgentDetector`, `AdversarialDefenseManager` |
+| `red_team` | `AdversarialInputGenerator`, `JailbreakScorer`, `CanaryTrapInserter`, `EmergentBehaviorDetector`, `RedTeamOrchestrator`, `RedTeamReport` |
+| `behavioral` | `BehavioralProfiler`, `KLDriftMonitor`, `LatencyAnomalyDetector`, `InterAgentCommunicationMonitor`, `BehavioralAnomalyDetector` |
+| `eval_advanced` | `EpistemicCalibrationScore`, `CounterfactualRobustnessScore`, `HallucinationRateWithConfidence`, `ValueAlignmentScore`, `AdvancedEvalSuite` |
 
 ```python
 # Zero-config local pipeline — no server needed
@@ -449,7 +455,7 @@ pip install jupyter
 jupyter notebook notebooks/
 ```
 
-Start with `00_index.ipynb` for a guided tour of all 57 notebooks by topic. For the quickstart go to `01_quickstart.ipynb`. For local SDK features start at `12_local_sdk_agents.ipynb`.
+Start with `00_index.ipynb` for a guided tour of all 61 notebooks by topic. For the quickstart go to `01_quickstart.ipynb`. For local SDK features start at `12_local_sdk_agents.ipynb`.
 
 ---
 
@@ -1076,7 +1082,17 @@ See [docs/DEV.md](docs/DEV.md) for detailed development guide.
 | [55_security](notebooks/55_security.ipynb) | APIKeyManager, JWTManager, NetworkPolicy, ComplianceScan, SecurityManager |
 | [56_dsl_workflow_builder](notebooks/56_dsl_workflow_builder.ipynb) | WorkflowBuilder, GraphBuilder, branch/when/otherwise, circuit breakers |
 
-> **New to Multigen?** Open [`00_index.ipynb`](notebooks/00_index.ipynb) for a guided tour of all 57 notebooks organised by functional area.
+**v0.8.0 — Security, Observability & Advanced Evaluation (zero external dependencies):**
+
+| Notebook | What you'll learn |
+| --- | --- |
+| [57_telemetry](notebooks/57_telemetry.ipynb) | ObservabilityManager, Trace/Generation/Session/Score (Langfuse-style), W3C distributed tracing, Prometheus metrics, structured logging, multi-tenant observability, EpistemicAttribute |
+| [58_agent_trust](notebooks/58_agent_trust.ipynb) | AgentAttestor (HMAC code attestation), CapabilityLedger (append-only audit), WorkflowProvenanceChain (Merkle-linked), OutputWatermarker (zero-width Unicode), TrustScorer |
+| [59_adversarial_red_team](notebooks/59_adversarial_red_team.ipynb) | GoalHijackDetector (cosine TF), MemoryPoisonDetector, TenantLeakageDetector (n-gram), SleeperAgentDetector; AdversarialInputGenerator, JailbreakScorer, CanaryTrapInserter, RedTeamOrchestrator |
+| [60_behavioral_anomaly](notebooks/60_behavioral_anomaly.ipynb) | BehavioralProfiler, KLDriftMonitor (KL divergence), LatencyAnomalyDetector (z-score), InterAgentCommunicationMonitor, BehavioralAnomalyDetector |
+| [61_eval_advanced](notebooks/61_eval_advanced.ipynb) | EpistemicCalibrationScore, CounterfactualRobustnessScore, SemanticConsistencyUnderParaphrase, InstructionFollowingFidelity, ValueAlignmentScore, HallucinationRateWithConfidence, MultiHopReasoningTrace, TemporalReasoningAccuracy, AdvancedEvalSuite |
+
+> **New to Multigen?** Open [`00_index.ipynb`](notebooks/00_index.ipynb) for a guided tour of all 61 notebooks organised by functional area.
 
 ---
 

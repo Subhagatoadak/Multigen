@@ -27,7 +27,12 @@
       "Bash(brew install:*)",
       "Bash(curl -LsSf https://astral.sh/ruff/install.sh)",
       "Bash(sh)",
-      "Bash(/Users/subhagatoadak/.local/bin/ruff check:*)"
+      "Bash(/Users/subhagatoadak/.local/bin/ruff check:*)",
+      "Bash(python -c \"from multigen import ObservabilityManager, Trace, Generation, Session, Score, get_telemetry; print\\(''telemetry OK''\\)\")",
+      "Bash(sed -i '' 's/    SessionStore,$/    TelemetrySessionStore,/' /Users/subhagatoadak/Documents/github/Multigen/sdk/multigen/__init__.py)",
+      "Bash(sed -i '' 's/    Capability,$/    AgentCapability,/' /Users/subhagatoadak/Documents/github/Multigen/sdk/multigen/__init__.py)",
+      "Bash(sed -i '' 's/    DriftAlert,$/    BehavioralDriftAlert,/' /Users/subhagatoadak/Documents/github/Multigen/sdk/multigen/__init__.py)",
+      "Bash(python -c \"import multigen; print\\(f''''v{multigen.__version__} — {len\\(multigen.__all__\\)} exports''''\\)\")"
     ],
     "additionalDirectories": [
       "/Users/subhagatoadak/Documents/github/Multigen/Agent-Components/.git",
