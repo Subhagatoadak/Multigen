@@ -1,6 +1,6 @@
 # Multigen
 
-**Enterprise-grade autonomous multi-agent orchestration framework with durable execution, epistemic transparency, human-in-the-loop governance, safety guardrails, online optimization, and a full in-process Python SDK — zero external dependencies required.**
+**Enterprise-grade autonomous multi-agent orchestration framework with durable execution, epistemic transparency, human-in-the-loop governance, safety guardrails, online optimization, and a full in-process Python SDK.**
 
 [![CI](https://github.com/Subhagatoadak/Multigen/actions/workflows/ci.yml/badge.svg)](https://github.com/Subhagatoadak/Multigen/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue)](https://www.python.org)
@@ -23,164 +23,165 @@ Built on top of [Temporal.io](https://temporal.io) for workflow durability, Apac
 
 > ✅ = Full support &nbsp;&nbsp; Partial = Partial/manual &nbsp;&nbsp; ✗ = Not supported
 
-### Orchestration & Execution
+## Orchestration & Execution
 
-| Capability | LangGraph | CrewAI | AutoGen | LlamaIndex | **Multigen** |
-| --- | :---: | :---: | :---: | :---: | :---: |
-| Declarative workflow DSL | Partial | ✗ | ✗ | ✗ | ✅ |
-| Durable execution (crash recovery) | ✗ | ✗ | ✗ | ✗ | ✅ Temporal |
-| Real-time runtime control signals | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Dynamic agent creation + human approval | ✗ | ✗ | Partial | ✗ | ✅ |
-| Epistemic transparency per node | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Circuit breakers per node | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Reflection / self-critique loops | Partial | ✗ | Partial | ✗ | ✅ |
-| Fan-out consensus reasoning | ✗ | ✗ | Partial | ✗ | ✅ |
-| Human-in-the-loop approval gates | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Parallel BFS (dependency-aware) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Explicit `depends_on` node deps | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Partition-aware fan-out (multi-queue) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Graph (DAG) execution | ✅ | ✗ | Partial | ✗ | ✅ |
-| MCMC probabilistic state machine | ✗ | ✗ | ✗ | ✗ | ✅ |
-| FanOut / MapReduce / Race / Batch | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Capability                                   | **Multigen** |
+| -------------------------------------------- | :----------: |
+| Declarative workflow DSL                     |       ✅      |
+| Durable execution and crash recovery         |  ✅ Temporal  |
+| Real-time runtime control signals            |       ✅      |
+| Dynamic agent creation with human approval   |       ✅      |
+| Epistemic transparency per node              |       ✅      |
+| Circuit breakers per node                    |       ✅      |
+| Reflection and self-critique loops           |       ✅      |
+| Fan-out consensus reasoning                  |       ✅      |
+| Human-in-the-loop approval gates             |       ✅      |
+| Parallel BFS with dependency awareness       |       ✅      |
+| Explicit `depends_on` node dependencies      |       ✅      |
+| Partition-aware fan-out with multiple queues |       ✅      |
+| Graph and DAG execution                      |       ✅      |
+| MCMC probabilistic state machine             |       ✅      |
+| FanOut, MapReduce, Race, and Batch execution |       ✅      |
 
-### Memory & State
+## Memory & State
 
-| Capability | LangGraph | CrewAI | AutoGen | LlamaIndex | **Multigen** |
-| --- | :---: | :---: | :---: | :---: | :---: |
-| Short-term / episodic / working memory | Partial | ✗ | Partial | Partial | ✅ |
-| Semantic memory (namespace + tags) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Vector memory (embedding-based recall) | ✗ | ✗ | ✗ | ✅ | ✅ |
-| Ebbinghaus forgetting curve | ✗ | ✗ | ✗ | ✗ | ✅ |
-| WorkingMemory → LLM prompt wiring | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Session management + middleware | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Reactive / computed state | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Multi-tier async caching (LRU+TTL) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Capability                                       | **Multigen** |
+| ------------------------------------------------ | :----------: |
+| Short-term, episodic, and working memory         |       ✅      |
+| Semantic memory with namespaces and tags         |       ✅      |
+| Vector memory with embedding-based recall        |       ✅      |
+| Ebbinghaus forgetting curve                      |       ✅      |
+| Working memory integration with LLM prompts      |       ✅      |
+| Session management and middleware                |       ✅      |
+| Reactive and computed state                      |       ✅      |
+| Multi-tier asynchronous caching with LRU and TTL |       ✅      |
 
-### Planning & Reasoning
+## Planning & Reasoning
 
-| Capability | LangGraph | CrewAI | AutoGen | LlamaIndex | **Multigen** |
-| --- | :---: | :---: | :---: | :---: | :---: |
-| Chain-of-Thought | ✗ | ✗ | Partial | ✗ | ✅ |
-| Tree of Thoughts (ToT) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Graph of Thoughts (GoT) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| ReAct (Reason + Act loop) | Partial | ✗ | Partial | ✗ | ✅ |
-| StepBack + PlanAndExecute | ✗ | ✗ | ✗ | ✗ | ✅ |
-| MCTS-based planning (UCB1) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Hierarchical task decomposition | ✗ | ✗ | ✗ | ✗ | ✅ |
-| AutoGPT-style task queue | ✗ | ✗ | Partial | ✗ | ✅ |
-| Hierarchical summarisation | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Capability                       | **Multigen** |
+| -------------------------------- | :----------: |
+| Chain-of-Thought reasoning       |       ✅      |
+| Tree of Thoughts                 |       ✅      |
+| Graph of Thoughts                |       ✅      |
+| ReAct reasoning and action loops |       ✅      |
+| StepBack and Plan-and-Execute    |       ✅      |
+| MCTS-based planning with UCB1    |       ✅      |
+| Hierarchical task decomposition  |       ✅      |
+| AutoGPT-style task queue         |       ✅      |
+| Hierarchical summarisation       |       ✅      |
 
-### Safety & Resilience
+## Safety & Resilience
 
-| Capability | LangGraph | CrewAI | AutoGen | LlamaIndex | **Multigen** |
-| --- | :---: | :---: | :---: | :---: | :---: |
-| Injection detection (14 patterns) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Output sanitization | ✗ | ✗ | ✗ | ✗ | ✅ |
-| PII redaction (9 types, 3 modes) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Deadline management | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Workflow-level retry + exp. backoff | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Per-node circuit breaker | ✗ | ✗ | ✗ | ✗ | ✅ |
-| RetryAgent built-in | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Capability                                      | **Multigen** |
+| ----------------------------------------------- | :----------: |
+| Injection detection with 14 patterns            |       ✅      |
+| Output sanitisation                             |       ✅      |
+| PII redaction with nine types and three modes   |       ✅      |
+| Deadline management                             |       ✅      |
+| Workflow-level retries with exponential backoff |       ✅      |
+| Per-node circuit breakers                       |       ✅      |
+| Built-in RetryAgent                             |       ✅      |
 
-### Optimization & Learning
+## Optimisation & Learning
 
-| Capability | LangGraph | CrewAI | AutoGen | LlamaIndex | **Multigen** |
-| --- | :---: | :---: | :---: | :---: | :---: |
-| Online prompt optimisation (bandit) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Few-shot library (scored, retrieval) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Agent specialisation by performance | ✗ | ✗ | ✗ | ✗ | ✅ |
-| EpisodicMemory → prompt feedback | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Continuous learner (RLHF-style) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Experience replay | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Adaptive prompts (auto few-shot) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Capability                                         | **Multigen** |
+| -------------------------------------------------- | :----------: |
+| Online prompt optimisation using bandits           |       ✅      |
+| Scored and retrievable few-shot library            |       ✅      |
+| Agent specialisation based on performance          |       ✅      |
+| Episodic memory feedback into prompts              |       ✅      |
+| Continuous RLHF-style learner                      |       ✅      |
+| Experience replay                                  |       ✅      |
+| Adaptive prompts with automatic few-shot selection |       ✅      |
 
-### Observability & DevEx
+## Observability & Developer Experience
 
-| Capability | LangGraph | CrewAI | AutoGen | LlamaIndex | **Multigen** |
-| --- | :---: | :---: | :---: | :---: | :---: |
-| OpenTelemetry + Prometheus | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Time-travel debugging (snapshot/replay) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Agent profiler + execution reports | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Token streaming + partial result bus | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Eval/measurement framework | ✗ | ✗ | ✗ | ✗ | ✅ |
-| A/B testing + canary rollout | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Workflow versioning + rollback | ✗ | ✗ | ✗ | ✗ | ✅ |
-| MCP server (Claude/Cursor/Windsurf) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Real-time SSE streaming | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Agent2Agent (A2A) protocol | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Visual simulator dashboard | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Capability                                          | **Multigen** |
+| --------------------------------------------------- | :----------: |
+| OpenTelemetry and Prometheus integration            |       ✅      |
+| Time-travel debugging with snapshots and replay     |       ✅      |
+| Agent profiler and execution reports                |       ✅      |
+| Token streaming and partial-result bus              |       ✅      |
+| Evaluation and measurement framework                |       ✅      |
+| A/B testing and canary rollout                      |       ✅      |
+| Workflow versioning and rollback                    |       ✅      |
+| MCP server support for Claude, Cursor, and Windsurf |       ✅      |
+| Real-time SSE streaming                             |       ✅      |
+| Agent2Agent protocol support                        |       ✅      |
+| Visual simulator dashboard                          |       ✅      |
 
-### Infrastructure & Scale
+## Infrastructure & Scale
 
-| Capability | LangGraph | CrewAI | AutoGen | LlamaIndex | **Multigen** |
-| --- | :---: | :---: | :---: | :---: | :---: |
-| Local runtime — zero external deps | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Kafka-based distributed messaging | ✗ | ✗ | ✗ | ✗ | ✅ |
-| SQLite-backed durable persistence | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Scheduling (cron, interval, triggers) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Multi-model routing (cost/quality/latency) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Tool registry + sandboxing + permissions | ✗ | ✗ | Partial | ✗ | ✅ |
-| Cross-worker agent hydration (MongoDB) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Multi-tenancy (isolation, quotas, billing) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Distributed memory sync (MVCC, vector clocks) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Dry-run simulation + cost estimation | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Load simulation (P95/P99 latency reports) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Graph diff (ASCII visualisation of workflow changes) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Capability                                                      | **Multigen** |
+| --------------------------------------------------------------- | :----------: |
+| Local runtime with zero external dependencies                   |       ✅      |
+| Kafka-based distributed messaging                               |       ✅      |
+| SQLite-backed durable persistence                               |       ✅      |
+| Cron, interval, and event-trigger scheduling                    |       ✅      |
+| Multi-model routing by cost, quality, and latency               |       ✅      |
+| Tool registry, sandboxing, and permissions                      |       ✅      |
+| Cross-worker agent hydration using MongoDB                      |       ✅      |
+| Multi-tenancy with isolation, quotas, and billing               |       ✅      |
+| Distributed memory synchronisation using MVCC and vector clocks |       ✅      |
+| Dry-run simulation and cost estimation                          |       ✅      |
+| Load simulation with P95 and P99 latency reports                |       ✅      |
+| ASCII graph diff for workflow changes                           |       ✅      |
 
-### Knowledge & LLM
+## Knowledge & LLM
 
-| Capability | LangGraph | CrewAI | AutoGen | LlamaIndex | **Multigen** |
-| --- | :---: | :---: | :---: | :---: | :---: |
-| Unified LLM adapter (OpenAI / Ollama / local) | Partial | ✗ | Partial | Partial | ✅ |
-| Token budget with hard stop | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Context window auto-management (truncate/summarise) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Structured output (JSON schema validation) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| LLM response cache (SHA256, LRU eviction) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| RAG chunking strategies (fixed/sentence/recursive) | ✗ | ✗ | ✗ | ✅ | ✅ |
-| Hybrid retrieval (BM25 + vector + RRF fusion) | ✗ | ✗ | ✗ | Partial | ✅ |
-| Citation tracking per retrieval | ✗ | ✗ | ✗ | Partial | ✅ |
-| Retrieval feedback (weight boost/decay per chunk) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Multi-index routing across knowledge bases | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Knowledge graph (entities, facts, relationships) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Fact confidence scoring + provenance tracking | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Contradiction detection across knowledge sources | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Knowledge TTL (auto-expiry of stale facts) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Domain ontology (hierarchical type taxonomy) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Cross-agent knowledge sharing | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Versioned prompt registry (centralised control plane) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Prompt compilation (variables, conditionals, loops) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Prompt inheritance (base + block overrides) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Prompt A/B testing with score attribution | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Prompt RBAC (reader / writer / admin roles) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Prompt review workflow (draft → approved → live) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Capability                                                    | **Multigen** |
+| ------------------------------------------------------------- | :----------: |
+| Unified LLM adapter for OpenAI, Ollama, and local models      |       ✅      |
+| Token budget with hard-stop enforcement                       |       ✅      |
+| Automatic context-window management                           |       ✅      |
+| Structured output with JSON Schema validation                 |       ✅      |
+| LLM response cache using SHA-256 and LRU eviction             |       ✅      |
+| Fixed, sentence-based, and recursive RAG chunking             |       ✅      |
+| Hybrid retrieval using BM25, vector search, and RRF           |       ✅      |
+| Citation tracking for individual retrievals                   |       ✅      |
+| Retrieval feedback with chunk-level weight boosting and decay |       ✅      |
+| Multi-index routing across knowledge bases                    |       ✅      |
+| Knowledge graph with entities, facts, and relationships       |       ✅      |
+| Fact confidence scoring and provenance tracking               |       ✅      |
+| Contradiction detection across knowledge sources              |       ✅      |
+| Knowledge TTL and automatic stale-fact expiry                 |       ✅      |
+| Hierarchical domain ontology                                  |       ✅      |
+| Cross-agent knowledge sharing                                 |       ✅      |
+| Versioned prompt registry with centralised control            |       ✅      |
+| Prompt compilation with variables, conditionals, and loops    |       ✅      |
+| Prompt inheritance with base prompts and block overrides      |       ✅      |
+| Prompt A/B testing with score attribution                     |       ✅      |
+| Prompt RBAC with reader, writer, and administrator roles      |       ✅      |
+| Prompt review workflow from draft to approval and production  |       ✅      |
 
-### Security & Compliance
+## Security & Compliance
 
-| Capability | LangGraph | CrewAI | AutoGen | LlamaIndex | **Multigen** |
-| --- | :---: | :---: | :---: | :---: | :---: |
-| API key management (issue/validate/revoke/scope) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| HS256 JWT (sign/verify — stdlib, no PyJWT) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Data classification (PUBLIC → RESTRICTED labels) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Network policy (URL allowlist / denylist for agents) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Compliance scan (GDPR/HIPAA rules pre-workflow) | ✗ | ✗ | ✗ | ✗ | ✅ |
+| Capability                                                    | **Multigen** |
+| ------------------------------------------------------------- | :----------: |
+| API-key issuance, validation, revocation, and scoping         |       ✅      |
+| HS256 JWT signing and verification using the standard library |       ✅      |
+| Data classification from PUBLIC to RESTRICTED                 |       ✅      |
+| Agent network policies with URL allowlists and denylists      |       ✅      |
+| Pre-workflow GDPR and HIPAA compliance scanning               |       ✅      |
 
-### Enterprise Observability & Governance
+## Enterprise Observability & Governance
 
-| Capability | LangGraph | CrewAI | AutoGen | LlamaIndex | **Multigen** |
-| --- | :---: | :---: | :---: | :---: | :---: |
-| Causal attribution (backward blame propagation) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Epistemic debt scoring (accumulated uncertainty) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Counterfactual replay (what-if node patching) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Decision audit trail (human-readable log) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Agent SLA monitoring (latency/quality/error-rate) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Shadow execution (run new agent alongside primary) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Capability versioning + deprecation management | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Regression suites + golden datasets | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Score drift alerting (auto-rollback on drop) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Outcome ingestion API (delayed/deferred rewards) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Cross-workflow feedback aggregation (RRF) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Webhook routing (glob pattern event dispatch) | ✗ | ✗ | ✗ | ✗ | ✅ |
-| Document ingestion → agent context pipeline | ✗ | ✗ | ✗ | Partial | ✅ |
+| Capability                                                 | **Multigen** |
+| ---------------------------------------------------------- | :----------: |
+| Causal attribution with backward blame propagation         |       ✅      |
+| Epistemic debt scoring for accumulated uncertainty         |       ✅      |
+| Counterfactual replay through node patching                |       ✅      |
+| Human-readable decision audit trail                        |       ✅      |
+| Agent SLA monitoring for latency, quality, and error rates |       ✅      |
+| Shadow execution alongside primary agents                  |       ✅      |
+| Capability versioning and deprecation management           |       ✅      |
+| Regression suites and golden datasets                      |       ✅      |
+| Score-drift alerting with automatic rollback               |       ✅      |
+| Outcome-ingestion API for delayed and deferred rewards     |       ✅      |
+| Cross-workflow feedback aggregation using RRF              |       ✅      |
+| Webhook routing with glob-pattern event dispatch           |       ✅      |
+| Document-ingestion-to-agent-context pipeline               |       ✅      |
+
 
 ---
 
