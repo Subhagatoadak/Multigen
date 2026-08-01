@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Production-grade multi-agent orchestration: parallel execution, graph DAGs, MCMC state machines, and resilience patterns.">
+        <meta name="description" content="Python-native orchestration, runtime control, evaluation, epistemic transparency, and governance for complex multi-agent systems.">
       
       
         <meta name="author" content="Multigen Contributors">
@@ -15,6 +15,10 @@
         <link rel="canonical" href="https://subhagatoadak.github.io/Multigen/WHITEPAPER/">
       
       
+        <link rel="prev" href="../ROADMAP/">
+      
+      
+        <link rel="next" href="../architecture/">
       
       
         
@@ -25,7 +29,7 @@
     
     
       
-        <title>Multigen: A Technical Whitepaper - Multigen — Advanced Agentic Framework</title>
+        <title>Multigen: A Technical Whitepaper - Multigen — Governed Multi-Agent Orchestration</title>
       
     
     
@@ -116,21 +120,9 @@
       
     
     
-      <link rel="stylesheet" href="../stylesheets/extra.css">
-    
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
-  
-
-
-  
-  
-
-<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config","G-XXXXXXXXXX"),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","G-XXXXXXXXXX",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
-  
-    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
-  
 
     
     
@@ -186,7 +178,7 @@
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="Multigen — Advanced Agentic Framework" class="md-header__button md-logo" aria-label="Multigen — Advanced Agentic Framework" data-md-component="logo">
+    <a href=".." title="Multigen — Governed Multi-Agent Orchestration" class="md-header__button md-logo" aria-label="Multigen — Governed Multi-Agent Orchestration" data-md-component="logo">
       
   <img src="../assets/logo.png" alt="logo">
 
@@ -199,7 +191,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            Multigen — Advanced Agentic Framework
+            Multigen — Governed Multi-Agent Orchestration
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -323,7 +315,199 @@
   
     
   
-  Home
+  Multigen
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../Code_documentation/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Code documentation
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../DEV/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  DEV
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../INSTALLATION/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Multigen — Installation &amp; Setup Guide
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../ROADMAP/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Multigen — Strategic Roadmap to Market Leadership
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Multigen: A Technical Whitepaper
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../architecture/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Multigen Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../capabilities/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Capabilities
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../contributing/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Contributing to Multigen
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../example/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Example
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../meridian_mmm_multigen_usecases/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Marketing Mix Modeling with Google Meridian + Multigen
 
       </a>
     </li>
@@ -338,13 +522,57 @@
     
     
       <li class="md-tabs__item">
-        <a href="../getting-started/installation/" class="md-tabs__link">
+        <a href="../api/agents/" class="md-tabs__link">
           
   
   
     
   
-  Getting Started
+  Api
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../deployment/docker/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Deployment
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../getting-started/concepts/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Getting started
 
         </a>
       </li>
@@ -388,93 +616,11 @@
   
     
   
-  Use Cases
+  Use cases
 
         </a>
       </li>
     
-  
-
-      
-        
-  
-  
-  
-  
-    
-    
-      <li class="md-tabs__item">
-        <a href="../api/agents/" class="md-tabs__link">
-          
-  
-  
-    
-  
-  API Reference
-
-        </a>
-      </li>
-    
-  
-
-      
-        
-  
-  
-  
-  
-    
-    
-      <li class="md-tabs__item">
-        <a href="../deployment/local/" class="md-tabs__link">
-          
-  
-  
-    
-  
-  Deployment
-
-        </a>
-      </li>
-    
-  
-
-      
-        
-  
-  
-  
-  
-    <li class="md-tabs__item">
-      <a href="../comparison/" class="md-tabs__link">
-        
-  
-  
-    
-  
-  Framework Comparison
-
-      </a>
-    </li>
-  
-
-      
-        
-  
-  
-  
-  
-    <li class="md-tabs__item">
-      <a href="../contributing/" class="md-tabs__link">
-        
-  
-  
-    
-  
-  Contributing
-
-      </a>
-    </li>
   
 
       
@@ -506,12 +652,12 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="Multigen — Advanced Agentic Framework" class="md-nav__button md-logo" aria-label="Multigen — Advanced Agentic Framework" data-md-component="logo">
+    <a href=".." title="Multigen — Governed Multi-Agent Orchestration" class="md-nav__button md-logo" aria-label="Multigen — Governed Multi-Agent Orchestration" data-md-component="logo">
       
   <img src="../assets/logo.png" alt="logo">
 
     </a>
-    Multigen — Advanced Agentic Framework
+    Multigen — Governed Multi-Agent Orchestration
   </label>
   
     <div class="md-nav__source">
@@ -542,7 +688,7 @@
   <span class="md-ellipsis">
     
   
-    Home
+    Multigen
   
 
     
@@ -551,6 +697,2272 @@
   
 
       </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Code_documentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Code documentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DEV/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DEV
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../INSTALLATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multigen — Installation &amp; Setup Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ROADMAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multigen — Strategic Roadmap to Market Leadership
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multigen: A Technical Whitepaper
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multigen: A Technical Whitepaper
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+  
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#enterprise-grade-autonomous-multi-agent-orchestration-with-durable-execution-epistemic-transparency-and-human-governance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise-Grade Autonomous Multi-Agent Orchestration with Durable Execution, Epistemic Transparency, and Human Governance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#abstract" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Abstract
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table of Contents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-motivation-and-problem-space" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Motivation and Problem Space
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Motivation and Problem Space">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-the-state-of-multi-agent-frameworks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 The State of Multi-Agent Frameworks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-the-enterprise-requirements-gap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 The Enterprise Requirements Gap
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13-the-multigen-thesis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3 The Multigen Thesis
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-system-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. System Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. System Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-high-level-topology" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 High-Level Topology
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-data-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Data Flow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-component-responsibilities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 Component Responsibilities
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-workflow-execution-engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Workflow Execution Engine
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Workflow Execution Engine">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-complexsequenceworkflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 ComplexSequenceWorkflow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-reference-resolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Reference Resolution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-temporal-durability-guarantees" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 Temporal Durability Guarantees
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-graph-execution-and-runtime-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Graph Execution and Runtime Control
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Graph Execution and Runtime Control">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-graphworkflow-parallel-bfs-execution-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 GraphWorkflow Parallel BFS Execution Model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-signal-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 Signal Architecture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-query-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3 Query Architecture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#44-conditional-edge-evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.4 Conditional Edge Evaluation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#45-fan-out-consensus-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.5 Fan-Out Consensus Strategies
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-dynamic-agent-lifecycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Dynamic Agent Lifecycle
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Dynamic Agent Lifecycle">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-the-self-healing-problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 The Self-Healing Problem
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-lifecycle-state-machine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 Lifecycle State Machine
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-spec-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3 Spec Generation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#54-blueprintagent-creation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4 BlueprintAgent Creation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#55-sandbox-isolation-consideration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.5 Sandbox Isolation Consideration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-epistemic-transparency-engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Epistemic Transparency Engine
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Epistemic Transparency Engine">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61-philosophy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1 Philosophy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#62-epistemic-envelope-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.2 Epistemic Envelope Schema
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#63-uncertainty-propagation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.3 Uncertainty Propagation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#64-epistemicstatetracker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.4 EpistemicStateTracker
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#65-transparency-report" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.5 Transparency Report
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-reasoning-quality-mechanisms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Reasoning Quality Mechanisms
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Reasoning Quality Mechanisms">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-reflection-loops" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.1 Reflection Loops
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#72-fan-out-consensus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.2 Fan-Out Consensus
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#73-circuit-breaker-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.3 Circuit Breaker Pattern
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-observability-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Observability Layer
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Observability Layer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#81-opentelemetry-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.1 OpenTelemetry Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#82-prometheus-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.2 Prometheus Metrics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#83-temporal-observability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.3 Temporal Observability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#84-mongodb-cqrs-read-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.4 MongoDB CQRS Read Model
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-distributed-messaging-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Distributed Messaging Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. Distributed Messaging Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#91-kafka-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.1 Kafka Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#92-scalability-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.2 Scalability Model
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-sdk-and-developer-experience" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. SDK and Developer Experience
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="10. SDK and Developer Experience">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#101-python-sdk-design" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10.1 Python SDK Design
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#102-graphbuilder-dsl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10.2 GraphBuilder DSL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#103-error-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10.3 Error Mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-security-and-governance-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Security and Governance Model
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="11. Security and Governance Model">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#111-current-security-posture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11.1 Current Security Posture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#112-human-governance-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11.2 Human Governance Architecture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#113-epistemic-governance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11.3 Epistemic Governance
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-performance-characteristics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Performance Characteristics
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="12. Performance Characteristics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#121-latency-profile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12.1 Latency Profile
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#122-throughput-characteristics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12.2 Throughput Characteristics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#123-temporal-event-history-limits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12.3 Temporal Event History Limits
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-roadmap-to-market-leadership" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. Roadmap to Market Leadership
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="13. Roadmap to Market Leadership">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#phase-1-production-hardening-q2-2026" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1: Production Hardening (Q2 2026)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-2-parallel-execution-completed-march-2026" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2: Parallel Execution ✅ Completed (March 2026)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-3-developer-experience-q3-2026" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3: Developer Experience (Q3 2026)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-4-intelligence-layer-q3-q4-2026" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 4: Intelligence Layer (Q3-Q4 2026)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-5-enterprise-scale-q4-2026" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 5: Enterprise Scale (Q4 2026)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-6-ecosystem-2027" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 6: Ecosystem (2027)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#competitive-differentiation-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Competitive Differentiation Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11b-agent2agent-a2a-protocol-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11b. Agent2Agent (A2A) Protocol Integration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="11b. Agent2Agent (A2A) Protocol Integration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-inter-agent-communication-matters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Inter-Agent Communication Matters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a2a-protocol-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A2A Protocol Overview
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multigen-as-a2a-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multigen as A2A Server
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multigen-as-a2a-client" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multigen as A2A Client
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#skill-resolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Skill Resolution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a2a-dynamic-agent-lifecycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A2A + Dynamic Agent Lifecycle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a2a-sdk-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A2A SDK Methods
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interoperability-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interoperability Matrix
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conclusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conclusion
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-parallel-bfs-execution-dependency-tracking-and-streaming" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. Parallel BFS Execution, Dependency Tracking, and Streaming
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="14. Parallel BFS Execution, Dependency Tracking, and Streaming">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#141-the-sequential-bfs-problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14.1 The Sequential BFS Problem
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#142-the-double-enqueue-correctness-problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14.2 The Double-Enqueue Correctness Problem
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#143-dependency-tracking-depends_on" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14.3 Dependency Tracking: depends_on
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#144-partition-aware-fan-out" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14.4 Partition-Aware Fan-Out
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#145-sse-streaming-real-time-node-completion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14.5 SSE Streaming: Real-Time Node Completion
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="14.5 SSE Streaming: Real-Time Node Completion">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-problem-with-polling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Problem with Polling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#event-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Event format
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#polling-fallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Polling Fallback
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#146-performance-impact" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14.6 Performance Impact
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15-developer-experience-cli-hot-reload-type-safe-dsl-local-execution-and-versioning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15. Developer Experience: CLI, Hot Reload, Type-Safe DSL, Local Execution, and Versioning
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="15. Developer Experience: CLI, Hot Reload, Type-Safe DSL, Local Execution, and Versioning">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#151-the-multigen-cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15.1 The multigen CLI
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#152-multigen-init-scaffolding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15.2 multigen init Scaffolding
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#153-hot-reload-for-agents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15.3 Hot Reload for Agents
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#154-type-safe-dsl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15.4 Type-Safe DSL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#155-local-execution-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15.5 Local Execution Mode
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#156-workflow-versioning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15.6 Workflow Versioning
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#16-python-sdk-v03-zero-infrastructure-local-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16. Python SDK v0.3: Zero-Infrastructure Local Execution
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="16. Python SDK v0.3: Zero-Infrastructure Local Execution">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#161-design-philosophy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16.1 Design Philosophy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#162-agent-primitives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16.2 Agent Primitives
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#163-sequential-chains" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16.3 Sequential Chains
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#164-parallel-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16.4 Parallel Execution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#165-graph-dag-execution-local" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16.5 Graph DAG Execution (Local)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#166-mcmc-probabilistic-state-machines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16.6 MCMC Probabilistic State Machines
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="16.6 MCMC Probabilistic State Machines">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#transition-samplers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transition Samplers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#temperature-semantics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Temperature Semantics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adaptive-transitions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adaptive Transitions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ensemble-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ensemble Execution
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#167-communication-protocols-inmemorybus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16.7 Communication Protocols (InMemoryBus)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#168-runtime-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16.8 Runtime Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#17-advanced-features-from-frontier-research" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        17. Advanced Features from Frontier Research
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="17. Advanced Features from Frontier Research">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#171-reflexion-verbal-self-correction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        17.1 Reflexion: Verbal Self-Correction
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#172-mcts-lats-planning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        17.2 MCTS / LATS Planning
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#173-actor-model-autogen-04-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        17.3 Actor Model (AutoGen 0.4 Pattern)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#174-memory-taxonomy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        17.4 Memory Taxonomy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#175-otel-genai-semantic-conventions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        17.5 OTel GenAI Semantic Conventions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#176-prompt-injection-defense" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        17.6 Prompt Injection Defense
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#18-agent2agent-a2a-protocol-and-inter-framework-interoperability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        18. Agent2Agent (A2A) Protocol and Inter-Framework Interoperability
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="18. Agent2Agent (A2A) Protocol and Inter-Framework Interoperability">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#181-a2a-protocol-v03" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        18.1 A2A Protocol v0.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#182-model-context-protocol-mcp-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        18.2 Model Context Protocol (MCP) Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#19-framework-comparison-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        19. Framework Comparison Matrix
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="19. Framework Comparison Matrix">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#191-feature-comparison-multigen-vs-leading-frameworks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        19.1 Feature Comparison: Multigen vs. Leading Frameworks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#192-when-to-choose-multigen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        19.2 When to Choose Multigen
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20-use-cases-and-market-positioning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        20. Use Cases and Market Positioning
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="20. Use Cases and Market Positioning">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#201-financial-services" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        20.1 Financial Services
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="20.1 Financial Services">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#credit-risk-assessment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Credit Risk Assessment
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#equity-research-multi-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Equity Research (Multi-Manager)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#202-marketing-mix-modeling-mmm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        20.2 Marketing Mix Modeling (MMM)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#203-healthcare-and-clinical-decision-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        20.3 Healthcare and Clinical Decision Support
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#204-devops-and-aiops" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        20.4 DevOps and AIOps
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#205-legal-and-compliance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        20.5 Legal and Compliance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#206-research-and-hypothesis-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        20.6 Research and Hypothesis Generation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#21-deployment-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        21. Deployment Guide
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="21. Deployment Guide">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#211-local-development-zero-infrastructure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        21.1 Local Development (Zero Infrastructure)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#212-with-simulator-ui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        21.2 With Simulator UI
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#213-full-production-stack-docker-compose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        21.3 Full Production Stack (Docker Compose)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#214-event-ingestion-from-external-systems" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        21.4 Event Ingestion from External Systems
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#215-kubernetes-helm-roadmap-v05" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        21.5 Kubernetes (Helm) — Roadmap v0.5
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#22-roadmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        22. Roadmap
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="22. Roadmap">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#v04-q2-2026-security-and-protocols" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.4 (Q2 2026) — Security and Protocols
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#v05-q3-2026-planning-and-memory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.5 (Q3 2026) — Planning and Memory
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#v06-q4-2026-scale-and-enterprise" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.6 (Q4 2026) — Scale and Enterprise
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multigen Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../capabilities/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Capabilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing to Multigen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Example
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../meridian_mmm_multigen_usecases/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Marketing Mix Modeling with Google Meridian + Multigen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_12" id="__nav_12_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Api
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Api
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference — Agents
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/bus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference — Message Bus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/chain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference — Chain / Pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/graph/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference — Graph
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/parallel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference — Parallel Execution &amp; MapReduce
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/runtime/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference — Runtime
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/state_machine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference — State Machine &amp; MCMC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -585,17 +2997,17 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_13" >
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_13" id="__nav_13_label" tabindex="0">
             
   
   
   <span class="md-ellipsis">
     
   
-    Getting Started
+    Deployment
   
 
     
@@ -606,16 +3018,197 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13">
             <span class="md-nav__icon md-icon"></span>
             
   
-    Getting Started
+    Deployment
   
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployment/docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker Compose Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployment/local/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local Development Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployment/observability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Observability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_14" >
+        
+          
+          <label class="md-nav__link" for="__nav_14" id="__nav_14_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_14">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/concepts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Concepts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -673,34 +3266,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../getting-started/concepts/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Core Concepts
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -727,6 +3292,12 @@
       
         
       
+        
+      
+        
+      
+        
+      
     
     
     
@@ -742,10 +3313,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_15" >
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_15" id="__nav_15_label" tabindex="0">
             
   
   
@@ -763,8 +3334,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_15">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -788,7 +3359,7 @@
   <span class="md-ellipsis">
     
   
-    Agents
+    Tutorial — Agent Primitives
   
 
     
@@ -801,68 +3372,6 @@
   
 
               
-            
-              
-                
-  
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Execution
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Execution
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
             
               
                 
@@ -878,99 +3387,7 @@
   <span class="md-ellipsis">
     
   
-    Chains & Pipelines
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../tutorials/parallel/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Parallel Execution
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../tutorials/graph/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Graph (DAG)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../tutorials/state_machine/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    State Machines
+    Tutorial — Chains &amp; Sequential Pipelines
   
 
     
@@ -998,7 +3415,7 @@
   <span class="md-ellipsis">
     
   
-    Messaging
+    Tutorial — Event Bus &amp; Messaging
   
 
     
@@ -1018,39 +3435,15 @@
   
   
   
-    
-    
-      
+    <li class="md-nav__item">
+      <a href="../tutorials/graph/" class="md-nav__link">
         
-      
-        
-      
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_5" >
-        
-          
-          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
-            
   
   
   <span class="md-ellipsis">
     
   
-    Runtime
+    Tutorial — Graph (DAG) Execution
   
 
     
@@ -1058,19 +3451,11 @@
   
   
 
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_5">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Runtime
+      </a>
+    </li>
   
 
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
+              
             
               
                 
@@ -1079,14 +3464,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorials/runtime/" class="md-nav__link">
+      <a href="../tutorials/parallel/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Runtime & Simulator
+    Tutorial — Parallel Execution
   
 
     
@@ -1114,7 +3499,63 @@
   <span class="md-ellipsis">
     
   
-    Resilience Patterns
+    Tutorial — Resilience Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/runtime/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorial — Runtime &amp; Simulator Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tutorials/state_machine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorial — MCMC State Machines
   
 
     
@@ -1134,14 +3575,6 @@
     </li>
   
 
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
     
       
       
@@ -1151,6 +3584,8 @@
   
     
     
+      
+        
       
         
       
@@ -1177,17 +3612,17 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_16" >
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_16" id="__nav_16_label" tabindex="0">
             
   
   
   <span class="md-ellipsis">
     
   
-    Use Cases
+    Use cases
   
 
     
@@ -1198,12 +3633,12 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_16">
             <span class="md-nav__icon md-icon"></span>
             
   
-    Use Cases
+    Use cases
   
 
           </label>
@@ -1224,34 +3659,6 @@
     
   
     Credit Risk Assessment
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../use_cases/research/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Automated Research Pipeline
   
 
     
@@ -1349,83 +3756,6 @@
 
               
             
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
-        
-          
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    API Reference
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    API Reference
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
               
                 
   
@@ -1433,14 +3763,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/agents/" class="md-nav__link">
+      <a href="../use_cases/ma_due_diligence/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Agents
+    Autonomous M&amp;A Due Diligence
   
 
     
@@ -1461,154 +3791,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/chain/" class="md-nav__link">
+      <a href="../use_cases/research/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Chain / Pipeline
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api/parallel/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Parallel & MapReduce
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api/graph/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Graph
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api/state_machine/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    State Machine
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api/bus/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Message Bus
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api/runtime/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Runtime
+    Automated Research Pipeline
   
 
     
@@ -1625,213 +3815,6 @@
           </ul>
         </nav>
       
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
-        
-          
-          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Deployment
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_6">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Deployment
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../deployment/local/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Local Development
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../deployment/docker/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Docker Compose
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../deployment/observability/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Observability
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../comparison/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Framework Comparison
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../contributing/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Contributing
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -5935,8 +7918,6 @@ Clients increment <code>since</code> to <code>next_since</code> after each poll.
 
 
 
-  
-
 
 
 
@@ -5960,6 +7941,44 @@ Clients increment <code>since</code> to <code>next_since</code> after each poll.
       
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../ROADMAP/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Multigen — Strategic Roadmap to Market Leadership">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Multigen — Strategic Roadmap to Market Leadership
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../architecture/" class="md-footer__link md-footer__link--next" aria-label="Next: Multigen Architecture">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Multigen Architecture
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
     
   
   <div class="md-footer-meta md-typeset">
@@ -5999,7 +8018,7 @@ Clients increment <code>since</code> to <code>next_since</code> after each poll.
       
       
     
-    <a href="https://pypi.org/project/agentic-codex/" target="_blank" rel="noopener" title="pypi.org" class="md-social__link">
+    <a href="https://pypi.org/project/multigen-sdk/" target="_blank" rel="noopener" title="pypi.org" class="md-social__link">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.8 200.5c-7.7-30.9-22.3-54.2-53.4-54.2h-40.1v47.4c0 36.8-31.2 67.8-66.8 67.8H172.7c-29.2 0-53.4 25-53.4 54.3v101.8c0 29 25.2 46 53.4 54.3 33.8 9.9 66.3 11.7 106.8 0 26.9-7.8 53.4-23.5 53.4-54.3v-40.7H226.2v-13.6h160.2c31.1 0 42.6-21.7 53.4-54.2 11.2-33.5 10.7-65.7 0-108.6M286.2 444.7a20.4 20.4 0 1 1 0-40.7 20.4 20.4 0 1 1 0 40.7M167.8 248.1h106.8c29.7 0 53.4-24.5 53.4-54.3V91.9c0-29-24.4-50.7-53.4-55.6-35.8-5.9-74.7-5.6-106.8.1-45.2 8-53.4 24.7-53.4 55.6v40.7h106.9v13.6h-147c-31.1 0-58.3 18.7-66.8 54.2-9.8 40.7-10.2 66.1 0 108.6 7.6 31.6 25.7 54.2 56.8 54.2H101v-48.8c0-35.3 30.5-66.4 66.8-66.4m-6.6-183.4a20.4 20.4 0 1 1 0 40.8 20.4 20.4 0 1 1 0-40.8"/></svg>
     </a>
   
@@ -6022,12 +8041,6 @@ Clients increment <code>since</code> to <code>next_since</code> after each poll.
     
     
       <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
-      
-        <script src="../javascripts/mathjax.js"></script>
-      
-        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-      
-        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
       
     
   </body>

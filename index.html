@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Production-grade multi-agent orchestration: parallel execution, graph DAGs, MCMC state machines, and resilience patterns.">
+        <meta name="description" content="Python-native orchestration, runtime control, evaluation, epistemic transparency, and governance for complex multi-agent systems.">
       
       
         <meta name="author" content="Multigen Contributors">
@@ -16,7 +16,7 @@
       
       
       
-        <link rel="next" href="getting-started/installation/">
+        <link rel="next" href="Code_documentation/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Multigen — Advanced Agentic Framework</title>
+        <title>Multigen — Governed Multi-Agent Orchestration</title>
       
     
     
@@ -118,21 +118,9 @@
       
     
     
-      <link rel="stylesheet" href="stylesheets/extra.css">
-    
     <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
-  
-
-
-  
-  
-
-<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config","G-XXXXXXXXXX"),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","G-XXXXXXXXXX",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
-  
-    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
-  
 
     
     
@@ -155,7 +143,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#multigen-advanced-agentic-framework" class="md-skip">
+        <a href="#multigen" class="md-skip">
           Skip to content
         </a>
       
@@ -188,7 +176,7 @@
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="." title="Multigen — Advanced Agentic Framework" class="md-header__button md-logo" aria-label="Multigen — Advanced Agentic Framework" data-md-component="logo">
+    <a href="." title="Multigen — Governed Multi-Agent Orchestration" class="md-header__button md-logo" aria-label="Multigen — Governed Multi-Agent Orchestration" data-md-component="logo">
       
   <img src="assets/logo.png" alt="logo">
 
@@ -201,13 +189,13 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            Multigen — Advanced Agentic Framework
+            Multigen — Governed Multi-Agent Orchestration
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Home
+              Multigen
             
           </span>
         </div>
@@ -327,7 +315,197 @@
   
     
   
-  Home
+  Multigen
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="Code_documentation/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Code documentation
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="DEV/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  DEV
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="INSTALLATION/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Multigen — Installation &amp; Setup Guide
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="ROADMAP/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Multigen — Strategic Roadmap to Market Leadership
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="WHITEPAPER/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Multigen: A Technical Whitepaper
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="architecture/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Multigen Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="capabilities/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Capabilities
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="contributing/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Contributing to Multigen
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="example/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Example
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="meridian_mmm_multigen_usecases/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Marketing Mix Modeling with Google Meridian + Multigen
 
       </a>
     </li>
@@ -342,13 +520,57 @@
     
     
       <li class="md-tabs__item">
-        <a href="getting-started/installation/" class="md-tabs__link">
+        <a href="api/agents/" class="md-tabs__link">
           
   
   
     
   
-  Getting Started
+  Api
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="deployment/docker/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Deployment
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="getting-started/concepts/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Getting started
 
         </a>
       </li>
@@ -392,93 +614,11 @@
   
     
   
-  Use Cases
+  Use cases
 
         </a>
       </li>
     
-  
-
-      
-        
-  
-  
-  
-  
-    
-    
-      <li class="md-tabs__item">
-        <a href="api/agents/" class="md-tabs__link">
-          
-  
-  
-    
-  
-  API Reference
-
-        </a>
-      </li>
-    
-  
-
-      
-        
-  
-  
-  
-  
-    
-    
-      <li class="md-tabs__item">
-        <a href="deployment/local/" class="md-tabs__link">
-          
-  
-  
-    
-  
-  Deployment
-
-        </a>
-      </li>
-    
-  
-
-      
-        
-  
-  
-  
-  
-    <li class="md-tabs__item">
-      <a href="comparison/" class="md-tabs__link">
-        
-  
-  
-    
-  
-  Framework Comparison
-
-      </a>
-    </li>
-  
-
-      
-        
-  
-  
-  
-  
-    <li class="md-tabs__item">
-      <a href="contributing/" class="md-tabs__link">
-        
-  
-  
-    
-  
-  Contributing
-
-      </a>
-    </li>
   
 
       
@@ -510,12 +650,12 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="Multigen — Advanced Agentic Framework" class="md-nav__button md-logo" aria-label="Multigen — Advanced Agentic Framework" data-md-component="logo">
+    <a href="." title="Multigen — Governed Multi-Agent Orchestration" class="md-nav__button md-logo" aria-label="Multigen — Governed Multi-Agent Orchestration" data-md-component="logo">
       
   <img src="assets/logo.png" alt="logo">
 
     </a>
-    Multigen — Advanced Agentic Framework
+    Multigen — Governed Multi-Agent Orchestration
   </label>
   
     <div class="md-nav__source">
@@ -555,7 +695,7 @@
   <span class="md-ellipsis">
     
   
-    Home
+    Multigen
   
 
     
@@ -573,7 +713,7 @@
   <span class="md-ellipsis">
     
   
-    Home
+    Multigen
   
 
     
@@ -612,10 +752,93 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#6-key-differentiators" class="md-nav__link">
+  <a href="#core-capabilities" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6 Key Differentiators
+        Core capabilities
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core capabilities">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#composable-orchestration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Composable orchestration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#governed-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Governed execution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#epistemic-transparency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Epistemic transparency
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#runtime-control-and-recovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Runtime control and recovery
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#evaluation-and-observability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evaluation and observability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optional-infrastructure-integrations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional infrastructure integrations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#capability-maturity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Capability maturity
       
     </span>
   </a>
@@ -623,32 +846,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#quick-install" class="md-nav__link">
+  <a href="#install-the-sdk" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Quick Install
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#60-second-example" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        60-Second Example
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#framework-comparison" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Framework Comparison
+        Install the SDK
       
     </span>
   </a>
@@ -659,7 +860,7 @@
   <a href="#explore-the-documentation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Explore the Documentation
+        Explore the documentation
       
     </span>
   </a>
@@ -669,6 +870,549 @@
     </ul>
   
 </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="Code_documentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Code documentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="DEV/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DEV
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="INSTALLATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multigen — Installation &amp; Setup Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="ROADMAP/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multigen — Strategic Roadmap to Market Leadership
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="WHITEPAPER/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multigen: A Technical Whitepaper
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multigen Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="capabilities/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Capabilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing to Multigen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Example
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="meridian_mmm_multigen_usecases/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Marketing Mix Modeling with Google Meridian + Multigen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_12" id="__nav_12_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Api
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Api
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="api/agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference — Agents
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="api/bus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference — Message Bus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="api/chain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference — Chain / Pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="api/graph/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference — Graph
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="api/parallel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference — Parallel Execution &amp; MapReduce
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="api/runtime/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference — Runtime
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="api/state_machine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference — State Machine &amp; MCMC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
       
     </li>
   
@@ -704,17 +1448,17 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_13" >
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_13" id="__nav_13_label" tabindex="0">
             
   
   
   <span class="md-ellipsis">
     
   
-    Getting Started
+    Deployment
   
 
     
@@ -725,16 +1469,197 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13">
             <span class="md-nav__icon md-icon"></span>
             
   
-    Getting Started
+    Deployment
   
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="deployment/docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker Compose Deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="deployment/local/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local Development Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="deployment/observability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Observability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_14" >
+        
+          
+          <label class="md-nav__link" for="__nav_14" id="__nav_14_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_14">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="getting-started/concepts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Concepts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -792,34 +1717,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="getting-started/concepts/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Core Concepts
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -846,6 +1743,12 @@
       
         
       
+        
+      
+        
+      
+        
+      
     
     
     
@@ -861,10 +1764,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_15" >
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_15" id="__nav_15_label" tabindex="0">
             
   
   
@@ -882,8 +1785,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_15">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -907,7 +1810,7 @@
   <span class="md-ellipsis">
     
   
-    Agents
+    Tutorial — Agent Primitives
   
 
     
@@ -920,68 +1823,6 @@
   
 
               
-            
-              
-                
-  
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Execution
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Execution
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
             
               
                 
@@ -997,99 +1838,7 @@
   <span class="md-ellipsis">
     
   
-    Chains & Pipelines
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="tutorials/parallel/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Parallel Execution
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="tutorials/graph/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Graph (DAG)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="tutorials/state_machine/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    State Machines
+    Tutorial — Chains &amp; Sequential Pipelines
   
 
     
@@ -1117,7 +1866,7 @@
   <span class="md-ellipsis">
     
   
-    Messaging
+    Tutorial — Event Bus &amp; Messaging
   
 
     
@@ -1137,39 +1886,15 @@
   
   
   
-    
-    
-      
+    <li class="md-nav__item">
+      <a href="tutorials/graph/" class="md-nav__link">
         
-      
-        
-      
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_5" >
-        
-          
-          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
-            
   
   
   <span class="md-ellipsis">
     
   
-    Runtime
+    Tutorial — Graph (DAG) Execution
   
 
     
@@ -1177,19 +1902,11 @@
   
   
 
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_5">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Runtime
+      </a>
+    </li>
   
 
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
+              
             
               
                 
@@ -1198,14 +1915,14 @@
   
   
     <li class="md-nav__item">
-      <a href="tutorials/runtime/" class="md-nav__link">
+      <a href="tutorials/parallel/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Runtime & Simulator
+    Tutorial — Parallel Execution
   
 
     
@@ -1233,7 +1950,63 @@
   <span class="md-ellipsis">
     
   
-    Resilience Patterns
+    Tutorial — Resilience Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="tutorials/runtime/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorial — Runtime &amp; Simulator Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="tutorials/state_machine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorial — MCMC State Machines
   
 
     
@@ -1253,14 +2026,6 @@
     </li>
   
 
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
     
       
       
@@ -1270,6 +2035,8 @@
   
     
     
+      
+        
       
         
       
@@ -1296,17 +2063,17 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_16" >
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_16" id="__nav_16_label" tabindex="0">
             
   
   
   <span class="md-ellipsis">
     
   
-    Use Cases
+    Use cases
   
 
     
@@ -1317,12 +2084,12 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_16">
             <span class="md-nav__icon md-icon"></span>
             
   
-    Use Cases
+    Use cases
   
 
           </label>
@@ -1343,34 +2110,6 @@
     
   
     Credit Risk Assessment
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="use_cases/research/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Automated Research Pipeline
   
 
     
@@ -1468,83 +2207,6 @@
 
               
             
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
-        
-          
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    API Reference
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    API Reference
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
               
                 
   
@@ -1552,14 +2214,14 @@
   
   
     <li class="md-nav__item">
-      <a href="api/agents/" class="md-nav__link">
+      <a href="use_cases/ma_due_diligence/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Agents
+    Autonomous M&amp;A Due Diligence
   
 
     
@@ -1580,154 +2242,14 @@
   
   
     <li class="md-nav__item">
-      <a href="api/chain/" class="md-nav__link">
+      <a href="use_cases/research/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Chain / Pipeline
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="api/parallel/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Parallel & MapReduce
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="api/graph/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Graph
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="api/state_machine/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    State Machine
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="api/bus/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Message Bus
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="api/runtime/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Runtime
+    Automated Research Pipeline
   
 
     
@@ -1744,213 +2266,6 @@
           </ul>
         </nav>
       
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
-        
-          
-          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Deployment
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_6">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Deployment
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="deployment/local/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Local Development
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="deployment/docker/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Docker Compose
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="deployment/observability/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Observability
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="comparison/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Framework Comparison
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="contributing/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Contributing
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -1995,10 +2310,93 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#6-key-differentiators" class="md-nav__link">
+  <a href="#core-capabilities" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6 Key Differentiators
+        Core capabilities
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core capabilities">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#composable-orchestration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Composable orchestration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#governed-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Governed execution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#epistemic-transparency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Epistemic transparency
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#runtime-control-and-recovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Runtime control and recovery
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#evaluation-and-observability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evaluation and observability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optional-infrastructure-integrations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional infrastructure integrations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#capability-maturity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Capability maturity
       
     </span>
   </a>
@@ -2006,32 +2404,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#quick-install" class="md-nav__link">
+  <a href="#install-the-sdk" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Quick Install
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#60-second-example" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        60-Second Example
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#framework-comparison" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Framework Comparison
+        Install the SDK
       
     </span>
   </a>
@@ -2042,7 +2418,7 @@
   <a href="#explore-the-documentation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Explore the Documentation
+        Explore the documentation
       
     </span>
   </a>
@@ -2069,248 +2445,93 @@
   
 
 
-<h1 id="multigen-advanced-agentic-framework">Multigen — Advanced Agentic Framework<a class="headerlink" href="#multigen-advanced-agentic-framework" title="Permanent link">&para;</a></h1>
+<h1 id="multigen">Multigen<a class="headerlink" href="#multigen" title="Permanent link">&para;</a></h1>
 <div class="hero">
-<p><strong>Build production-grade multi-agent systems with composable primitives, parallel execution, MCMC state machines, and built-in resilience.</strong></p>
+<p><strong>A governed execution and control plane for complex multi-agent systems.</strong></p>
 <p><a class="md-button md-button--primary" href="getting-started/installation/">Get Started</a>
 <a class="md-button" href="https://github.com/Subhagatoadak/Multigen">View on GitHub</a></p>
 </div>
 <hr />
 <h2 id="what-is-multigen">What is Multigen?<a class="headerlink" href="#what-is-multigen" title="Permanent link">&para;</a></h2>
-<p>Multigen is a <strong>Python-native multi-agent orchestration framework</strong> built around the <code>agentic_codex</code> component library. It provides everything you need to build reliable, observable, and scalable agentic pipelines — from a single LLM call to enterprise workflows spanning dozens of specialised agents.</p>
-<p>Unlike low-level SDKs that force you to manage agent lifecycles manually, Multigen gives you:</p>
-<ul>
-<li><strong>High-level coordination patterns</strong> (Assembly, MapReduce, Swarm, Graph) that compose like building blocks</li>
-<li><strong>A stateful runtime</strong> that connects your agents to the Temporal workflow engine, event buses, and the visual Agentic Simulator</li>
-<li><strong>First-class observability</strong> via OpenTelemetry tracing, Prometheus metrics, and structured logging</li>
-<li><strong>Safety primitives</strong> baked in — circuit breakers, guardrails, two-person rules, and human-in-the-loop gates</li>
-</ul>
+<p>Multigen is a Python-native framework for composing, executing, observing, and governing multi-agent workflows. It brings orchestration, runtime control, epistemic transparency, evaluation, resilience, and human review into one system.</p>
+<p>The framework is intended for complex workflows where reliability, auditability, and controlled autonomy are important.</p>
+<h2 id="core-capabilities">Core capabilities<a class="headerlink" href="#core-capabilities" title="Permanent link">&para;</a></h2>
+<h3 id="composable-orchestration">Composable orchestration<a class="headerlink" href="#composable-orchestration" title="Permanent link">&para;</a></h3>
+<p>Build sequential, parallel, graph, DAG, fan-out, MapReduce, race, batch, and state-machine workflows from reusable primitives.</p>
+<h3 id="governed-execution">Governed execution<a class="headerlink" href="#governed-execution" title="Permanent link">&para;</a></h3>
+<p>Use approval gates, permissions, safety controls, deadlines, retries, fallbacks, and circuit breakers to bound agent behaviour.</p>
+<h3 id="epistemic-transparency">Epistemic transparency<a class="headerlink" href="#epistemic-transparency" title="Permanent link">&para;</a></h3>
+<p>Carry confidence, assumptions, limitations, evidence quality, known unknowns, and propagated uncertainty with workflow outputs.</p>
+<h3 id="runtime-control-and-recovery">Runtime control and recovery<a class="headerlink" href="#runtime-control-and-recovery" title="Permanent link">&para;</a></h3>
+<p>Design workflows that can be paused, resumed, replayed, rerouted, recovered, and inspected through snapshots and execution history.</p>
+<h3 id="evaluation-and-observability">Evaluation and observability<a class="headerlink" href="#evaluation-and-observability" title="Permanent link">&para;</a></h3>
+<p>Measure quality, latency, cost, tokens, regressions, and operational behaviour through evaluators, traces, metrics, profiling, and reports.</p>
+<h3 id="optional-infrastructure-integrations">Optional infrastructure integrations<a class="headerlink" href="#optional-infrastructure-integrations" title="Permanent link">&para;</a></h3>
+<p>Basic SDK use is in-process. Temporal, Kafka, MongoDB, OpenTelemetry, Prometheus, and model-provider integrations are optional and should be enabled according to workload requirements.</p>
 <hr />
-<h2 id="6-key-differentiators">6 Key Differentiators<a class="headerlink" href="#6-key-differentiators" title="Permanent link">&para;</a></h2>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:6"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><input id="__tabbed_1_4" name="__tabbed_1" type="radio" /><input id="__tabbed_1_5" name="__tabbed_1" type="radio" /><input id="__tabbed_1_6" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">1. Composable by Design</label><label for="__tabbed_1_2">2. MCMC State Machines</label><label for="__tabbed_1_3">3. 20+ Coordination Patterns</label><label for="__tabbed_1_4">4. Resilience First</label><label for="__tabbed_1_5">5. Visual Simulator</label><label for="__tabbed_1_6">6. Zero Lock-in LLM Layer</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<p>Every primitive — <code>Agent</code>, <code>Chain</code>, <code>Parallel</code>, <code>Graph</code>, <code>StateMachine</code> — implements the same <code>run(goal, inputs)</code> interface. You can nest them arbitrarily: a <code>Graph</code> node can be a <code>MapReduce</code>, which itself contains <code>SwarmCoordinator</code> workers.</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">agentic_codex</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentBuilder</span><span class="p">,</span> <span class="n">Context</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">agentic_codex.patterns</span><span class="w"> </span><span class="kn">import</span> <span class="n">MapReduceCoordinator</span><span class="p">,</span> <span class="n">GraphRunner</span><span class="p">,</span> <span class="n">GraphNodeSpec</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># A graph whose nodes are themselves coordinators</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">pipeline</span> <span class="o">=</span> <span class="n">GraphRunner</span><span class="p">(</span><span class="n">nodes</span><span class="o">=</span><span class="p">[</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">GraphNodeSpec</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;analyse&quot;</span><span class="p">,</span> <span class="n">coordinator</span><span class="o">=</span><span class="n">MapReduceCoordinator</span><span class="p">(</span><span class="n">mappers</span><span class="o">=</span><span class="p">[</span><span class="o">...</span><span class="p">],</span> <span class="n">reducer</span><span class="o">=...</span><span class="p">)),</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">GraphNodeSpec</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;report&quot;</span><span class="p">,</span>  <span class="n">coordinator</span><span class="o">=</span><span class="n">assembly_pipeline</span><span class="p">),</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p">])</span>
-</span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<p>Unique to Multigen: iterative refinement loops modelled as Markov chains. Your workflow can <strong>sample multiple execution paths</strong>, compute consensus, and only commit when confidence crosses your threshold.</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Run 5 independent chains, compute ensemble agreement</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">results</span> <span class="o">=</span> <span class="p">[</span><span class="n">run_pipeline</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">consensus</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;decision&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span> <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;decision&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">d</span><span class="p">))</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">agreement</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span> <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;decision&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">consensus</span><span class="p">)</span> <span class="o">/</span> <span class="mi">5</span>
-</span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<p>A curated catalogue of battle-tested multi-agent patterns:
-<code>AssemblyCoordinator</code>, <code>SwarmCoordinator</code>, <code>MapReduceCoordinator</code>, <code>DebateCoordinator</code>, <code>MinistryOfExperts</code>, <code>GuardrailSandwich</code>, <code>TwoPersonRuleCoordinator</code>, <code>GuildRouter</code>, <code>HubAndSpokeCoordinator</code>, and more.</p>
-</div>
-<div class="tabbed-block">
-<p><code>GuardrailSandwich</code> wraps any agent with pre/post validation. Circuit breakers auto-open on failure, degrade confidence scores gracefully, and close when the dependency recovers. Retry policies with exponential backoff are a one-liner.</p>
-</div>
-<div class="tabbed-block">
-<p>The bundled <code>agentic-simulator</code> provides a real-time dashboard: visualise agent networks, replay execution traces, run stress tests, and compare coordination strategies — all without touching production.</p>
-</div>
-<div class="tabbed-block">
-<p><code>FunctionAdapter</code> lets you build and test complete pipelines without any API key. When ready, swap to <code>EnvOpenAIAdapter</code>, your own adapter, or any <code>LLMAdapter</code> implementation. The coordination code is identical.</p>
-</div>
-</div>
-</div>
-<hr />
-<h2 id="quick-install">Quick Install<a class="headerlink" href="#quick-install" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>pip<span class="w"> </span>install<span class="w"> </span>agentic-codex
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="c1"># For all optional extras:</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;agentic-codex[openai,temporal,kafka]&quot;</span>
-</span></code></pre></div>
-<h2 id="60-second-example">60-Second Example<a class="headerlink" href="#60-second-example" title="Permanent link">&para;</a></h2>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">agentic_codex</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentBuilder</span><span class="p">,</span> <span class="n">Context</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">agentic_codex.core.schemas</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentStep</span><span class="p">,</span> <span class="n">Message</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">agentic_codex.patterns</span><span class="w"> </span><span class="kn">import</span> <span class="n">MapReduceCoordinator</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="c1"># Define a simple summariser agent (no LLM needed for this example)</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="k">def</span><span class="w"> </span><span class="nf">summarise</span><span class="p">(</span><span class="n">ctx</span><span class="p">:</span> <span class="n">Context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AgentStep</span><span class="p">:</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">text</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">scratch</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;current_shard&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="n">summary</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Summary of: </span><span class="si">{</span><span class="n">text</span><span class="p">[:</span><span class="mi">50</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="k">return</span> <span class="n">AgentStep</span><span class="p">(</span><span class="n">out_messages</span><span class="o">=</span><span class="p">[</span><span class="n">Message</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s2">&quot;assistant&quot;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">summary</span><span class="p">)],</span> <span class="n">state_updates</span><span class="o">=</span><span class="p">{},</span> <span class="n">stop</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="k">def</span><span class="w"> </span><span class="nf">combine</span><span class="p">(</span><span class="n">ctx</span><span class="p">:</span> <span class="n">Context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AgentStep</span><span class="p">:</span>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>    <span class="n">parts</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">scratch</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mapper_outputs&quot;</span><span class="p">,</span> <span class="p">[])</span>
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>    <span class="n">combined</span> <span class="o">=</span> <span class="s2">&quot; | &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span>
-</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>    <span class="k">return</span> <span class="n">AgentStep</span><span class="p">(</span><span class="n">out_messages</span><span class="o">=</span><span class="p">[</span><span class="n">Message</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s2">&quot;assistant&quot;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">combined</span><span class="p">)],</span> <span class="n">state_updates</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;result&quot;</span><span class="p">:</span> <span class="n">combined</span><span class="p">},</span> <span class="n">stop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>
-</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="n">summariser</span> <span class="o">=</span> <span class="n">AgentBuilder</span><span class="p">(</span><span class="s2">&quot;Summariser&quot;</span><span class="p">,</span> <span class="s2">&quot;summariser&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">with_step</span><span class="p">(</span><span class="n">summarise</span><span class="p">)</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
-</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="n">combiner</span>   <span class="o">=</span> <span class="n">AgentBuilder</span><span class="p">(</span><span class="s2">&quot;Combiner&quot;</span><span class="p">,</span>   <span class="s2">&quot;combiner&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">with_step</span><span class="p">(</span><span class="n">combine</span><span class="p">)</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
-</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>
-</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="n">pipeline</span> <span class="o">=</span> <span class="n">MapReduceCoordinator</span><span class="p">(</span><span class="n">mappers</span><span class="o">=</span><span class="p">[</span><span class="n">summariser</span><span class="p">,</span> <span class="n">summariser</span><span class="p">],</span> <span class="n">reducer</span><span class="o">=</span><span class="n">combiner</span><span class="p">)</span>
-</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a>
-</span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a><span class="n">result</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-</span><span id="__span-3-22"><a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a>    <span class="n">goal</span><span class="o">=</span><span class="s2">&quot;Summarise these documents&quot;</span><span class="p">,</span>
-</span><span id="__span-3-23"><a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a>    <span class="n">inputs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;shards&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Document A about ML&quot;</span><span class="p">,</span> <span class="s2">&quot;Document B about Python&quot;</span><span class="p">]}</span>
-</span><span id="__span-3-24"><a id="__codelineno-3-24" name="__codelineno-3-24" href="#__codelineno-3-24"></a><span class="p">)</span>
-</span><span id="__span-3-25"><a id="__codelineno-3-25" name="__codelineno-3-25" href="#__codelineno-3-25"></a><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">messages</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
-</span></code></pre></div>
-<hr />
-<h2 id="framework-comparison">Framework Comparison<a class="headerlink" href="#framework-comparison" title="Permanent link">&para;</a></h2>
+<h2 id="capability-maturity">Capability maturity<a class="headerlink" href="#capability-maturity" title="Permanent link">&para;</a></h2>
+<p>Multigen is under active development. Not every module has the same maturity level.</p>
 <table>
 <thead>
 <tr>
-<th>Feature</th>
-<th style="text-align: center;">Multigen</th>
-<th style="text-align: center;">LangGraph</th>
-<th style="text-align: center;">AutoGen</th>
-<th style="text-align: center;">CrewAI</th>
-<th style="text-align: center;">smolagents</th>
+<th>Status</th>
+<th>Meaning</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>No-LLM testing</td>
-<td style="text-align: center;">✅</td>
-<td style="text-align: center;">⚠️</td>
-<td style="text-align: center;">⚠️</td>
-<td style="text-align: center;">⚠️</td>
-<td style="text-align: center;">✅</td>
+<td><strong>Core</strong></td>
+<td>Stable framework primitive intended for regular use</td>
 </tr>
 <tr>
-<td>MCMC/ensemble patterns</td>
-<td style="text-align: center;">✅</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
+<td><strong>Integration</strong></td>
+<td>Requires an optional provider or infrastructure service</td>
 </tr>
 <tr>
-<td>20+ coord patterns</td>
-<td style="text-align: center;">✅</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">⚠️</td>
-<td style="text-align: center;">⚠️</td>
-<td style="text-align: center;">❌</td>
+<td><strong>Experimental</strong></td>
+<td>Implemented for exploration; APIs may change</td>
 </tr>
 <tr>
-<td>Visual simulator</td>
-<td style="text-align: center;">✅</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-</tr>
-<tr>
-<td>Temporal integration</td>
-<td style="text-align: center;">✅</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-</tr>
-<tr>
-<td>Circuit breakers</td>
-<td style="text-align: center;">✅</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-</tr>
-<tr>
-<td>MapReduce pattern</td>
-<td style="text-align: center;">✅</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">⚠️</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-</tr>
-<tr>
-<td>Pure Python API</td>
-<td style="text-align: center;">✅</td>
-<td style="text-align: center;">✅</td>
-<td style="text-align: center;">✅</td>
-<td style="text-align: center;">✅</td>
-<td style="text-align: center;">✅</td>
-</tr>
-<tr>
-<td>Safety (injection/PII)</td>
-<td style="text-align: center;">✅</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-</tr>
-<tr>
-<td>MCTS / ToT / GoT planning</td>
-<td style="text-align: center;">✅</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-</tr>
-<tr>
-<td>Deadline + workflow retry</td>
-<td style="text-align: center;">✅</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-</tr>
-<tr>
-<td>Token streaming</td>
-<td style="text-align: center;">✅</td>
-<td style="text-align: center;">⚠️</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-</tr>
-<tr>
-<td>Online prompt optimisation</td>
-<td style="text-align: center;">✅</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-</tr>
-<tr>
-<td>A/B testing + canary rollout</td>
-<td style="text-align: center;">✅</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
+<td><strong>Planned</strong></td>
+<td>Architectural direction that is not yet a guaranteed capability</td>
 </tr>
 </tbody>
 </table>
-<blockquote>
-<p>See the <a href="comparison/">full comparison</a> for a detailed breakdown.</p>
-</blockquote>
+<p>Production adoption should be based on the tests, examples, integration validation, and performance evidence for the exact modules being used.</p>
 <hr />
-<h2 id="explore-the-documentation">Explore the Documentation<a class="headerlink" href="#explore-the-documentation" title="Permanent link">&para;</a></h2>
+<h2 id="install-the-sdk">Install the SDK<a class="headerlink" href="#install-the-sdk" title="Permanent link">&para;</a></h2>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">cd</span><span class="w"> </span>sdk
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+</span></code></pre></div>
+<p>Install optional integrations as needed:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[openai]&quot;</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[temporal]&quot;</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[kafka]&quot;</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[all]&quot;</span>
+</span></code></pre></div>
+<hr />
+<h2 id="explore-the-documentation">Explore the documentation<a class="headerlink" href="#explore-the-documentation" title="Permanent link">&para;</a></h2>
 <div class="grid cards">
 <ul>
 <li>
 <p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m13.13 22.19-1.63-3.83c1.57-.58 3.04-1.36 4.4-2.27zM5.64 12.5l-3.83-1.63 6.1-2.77C7 9.46 6.22 10.93 5.64 12.5M21.61 2.39S16.66.269 11 5.93c-2.19 2.19-3.5 4.6-4.35 6.71-.28.75-.09 1.57.46 2.13l2.13 2.12c.55.56 1.37.74 2.12.46A19.1 19.1 0 0 0 18.07 13c5.66-5.66 3.54-10.61 3.54-10.61m-7.07 7.07c-.78-.78-.78-2.05 0-2.83s2.05-.78 2.83 0c.77.78.78 2.05 0 2.83s-2.05.78-2.83 0m-5.66 7.07-1.41-1.41zM6.24 22l3.64-3.64c-.34-.09-.67-.24-.97-.45L4.83 22zM2 22h1.41l4.77-4.76-1.42-1.41L2 20.59zm0-2.83 4.09-4.08c-.21-.3-.36-.62-.45-.97L2 17.76z"/></svg></span> <strong>Getting Started</strong></p>
-<p>Install, configure, and run your first multi-agent workflow in under 5 minutes.</p>
+<p>Install the SDK and run your first workflow.</p>
 <p><a href="getting-started/installation/">Installation →</a></p>
 </li>
 <li>
 <p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 3 1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4L12 17z"/></svg></span> <strong>Tutorials</strong></p>
-<p>Step-by-step guides for every major framework concept, from basic chains to MCMC state machines.</p>
-<p><a href="tutorials/agents/">Agents →</a></p>
+<p>Learn the orchestration, memory, reasoning, safety, and evaluation primitives.</p>
+<p><a href="tutorials/agents/">Tutorials →</a></p>
 </li>
 <li>
 <p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 2h4a2 2 0 0 1 2 2v2h4a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8c0-1.11.89-2 2-2h4V4c0-1.11.89-2 2-2m4 4V4h-4v2z"/></svg></span> <strong>Use Cases</strong></p>
-<p>Complete production-ready examples: credit risk, research pipelines, AIOps, clinical decision support, and legal analysis.</p>
-<p><a href="use_cases/credit_risk/">Credit Risk →</a></p>
+<p>Review applied workflow examples and domain demonstrations.</p>
+<p><a href="use_cases/credit_risk/">Use Cases →</a></p>
 </li>
 <li>
 <p><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.6 16.6 4.6-4.6-4.6-4.6L16 6l6 6-6 6zm-5.2 0L4.8 12l4.6-4.6L8 6l-6 6 6 6z"/></svg></span> <strong>API Reference</strong></p>
-<p>Full API documentation for every class, method, and parameter.</p>
-<p><a href="api/agents/">Agent API →</a></p>
+<p>Inspect classes, methods, inputs, outputs, and configuration.</p>
+<p><a href="api/agents/">API Reference →</a></p>
 </li>
 </ul>
 </div>
@@ -2322,8 +2543,6 @@
 
 
 
-
-  
 
 
 
@@ -2354,13 +2573,13 @@
         
         
           
-          <a href="getting-started/installation/" class="md-footer__link md-footer__link--next" aria-label="Next: Installation">
+          <a href="Code_documentation/" class="md-footer__link md-footer__link--next" aria-label="Next: Code documentation">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Installation
+                Code documentation
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -2409,7 +2628,7 @@
       
       
     
-    <a href="https://pypi.org/project/agentic-codex/" target="_blank" rel="noopener" title="pypi.org" class="md-social__link">
+    <a href="https://pypi.org/project/multigen-sdk/" target="_blank" rel="noopener" title="pypi.org" class="md-social__link">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.8 200.5c-7.7-30.9-22.3-54.2-53.4-54.2h-40.1v47.4c0 36.8-31.2 67.8-66.8 67.8H172.7c-29.2 0-53.4 25-53.4 54.3v101.8c0 29 25.2 46 53.4 54.3 33.8 9.9 66.3 11.7 106.8 0 26.9-7.8 53.4-23.5 53.4-54.3v-40.7H226.2v-13.6h160.2c31.1 0 42.6-21.7 53.4-54.2 11.2-33.5 10.7-65.7 0-108.6M286.2 444.7a20.4 20.4 0 1 1 0-40.7 20.4 20.4 0 1 1 0 40.7M167.8 248.1h106.8c29.7 0 53.4-24.5 53.4-54.3V91.9c0-29-24.4-50.7-53.4-55.6-35.8-5.9-74.7-5.6-106.8.1-45.2 8-53.4 24.7-53.4 55.6v40.7h106.9v13.6h-147c-31.1 0-58.3 18.7-66.8 54.2-9.8 40.7-10.2 66.1 0 108.6 7.6 31.6 25.7 54.2 56.8 54.2H101v-48.8c0-35.3 30.5-66.4 66.8-66.4m-6.6-183.4a20.4 20.4 0 1 1 0 40.8 20.4 20.4 0 1 1 0-40.8"/></svg>
     </a>
   
@@ -2432,12 +2651,6 @@
     
     
       <script src="assets/javascripts/bundle.d7400e89.min.js"></script>
-      
-        <script src="javascripts/mathjax.js"></script>
-      
-        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-      
-        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
       
     
   </body>
