@@ -1,5 +1,5 @@
-site_name: "Multigen — Advanced Agentic Framework"
-site_description: "Production-grade multi-agent orchestration: parallel execution, graph DAGs, MCMC state machines, and resilience patterns."
+site_name: "Multigen — Governed Multi-Agent Orchestration"
+site_description: "Python-native orchestration, runtime control, evaluation, epistemic transparency, and governance for complex multi-agent systems."
 site_author: "Multigen Contributors"
 site_url: "https://subhagatoadak.github.io/Multigen"
 repo_url: "https://github.com/Subhagatoadak/Multigen"
@@ -50,7 +50,7 @@ theme:
       info: octicons/info-16
       tip: octicons/squirrel-16
       success: octicons/check-16
-      question: octicons/question-16
+      question: octicons/squirrel-16
       warning: octicons/alert-16
       failure: octicons/x-circle-16
       danger: octicons/zap-16
@@ -111,54 +111,7 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/Subhagatoadak/Multigen
     - icon: fontawesome/brands/python
-      link: https://pypi.org/project/agentic-codex/
-  analytics:
-    provider: google
-    property: G-XXXXXXXXXX
-  announcement: "Multigen v0.1.0 — now with MCMC state machines and MapReduce coordinators!"
+      link: https://pypi.org/project/multigen-sdk/
+  announcement: "Multigen SDK 0.3.0 — governed multi-agent orchestration under active development."
 
 extra_css:
-  - stylesheets/extra.css
-
-extra_javascript:
-  - javascripts/mathjax.js
-  - https://polyfill.io/v3/polyfill.min.js?features=es6
-  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
-
-nav:
-  - Home: index.md
-  - Getting Started:
-    - getting-started/installation.md
-    - getting-started/quickstart.md
-    - getting-started/concepts.md
-  - Tutorials:
-    - Agents: tutorials/agents.md
-    - Execution:
-      - Chains & Pipelines: tutorials/chains.md
-      - Parallel Execution: tutorials/parallel.md
-      - Graph (DAG): tutorials/graph.md
-    - State Machines: tutorials/state_machine.md
-    - Messaging: tutorials/event_bus.md
-    - Runtime:
-      - Runtime & Simulator: tutorials/runtime.md
-      - Resilience Patterns: tutorials/resilience.md
-  - Use Cases:
-    - use_cases/credit_risk.md
-    - use_cases/research.md
-    - use_cases/devops.md
-    - use_cases/healthcare.md
-    - use_cases/legal.md
-  - API Reference:
-    - Agents: api/agents.md
-    - Chain / Pipeline: api/chain.md
-    - Parallel & MapReduce: api/parallel.md
-    - Graph: api/graph.md
-    - State Machine: api/state_machine.md
-    - Message Bus: api/bus.md
-    - Runtime: api/runtime.md
-  - Deployment:
-    - Local Development: deployment/local.md
-    - Docker Compose: deployment/docker.md
-    - Observability: deployment/observability.md
-  - Framework Comparison: comparison.md
-  - Contributing: contributing.md
