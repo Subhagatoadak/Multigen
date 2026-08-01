@@ -1,8 +1,8 @@
-# Multigen — Advanced Agentic Framework
+# Multigen
 
 <div class="hero" markdown>
 
-**Build production-grade multi-agent systems with composable primitives, parallel execution, MCMC state machines, and built-in resilience.**
+**A governed execution and control plane for complex multi-agent systems.**
 
 [Get Started](getting-started/installation.md){ .md-button .md-button--primary }
 [View on GitHub](https://github.com/Subhagatoadak/Multigen){ .md-button }
@@ -13,153 +13,97 @@
 
 ## What is Multigen?
 
-Multigen is a **Python-native multi-agent orchestration framework** built around the `agentic_codex` component library. It provides everything you need to build reliable, observable, and scalable agentic pipelines — from a single LLM call to enterprise workflows spanning dozens of specialised agents.
+Multigen is a Python-native framework for composing, executing, observing, and governing multi-agent workflows. It brings orchestration, runtime control, epistemic transparency, evaluation, resilience, and human review into one system.
 
-Unlike low-level SDKs that force you to manage agent lifecycles manually, Multigen gives you:
+The framework is intended for complex workflows where reliability, auditability, and controlled autonomy are important.
 
-- **High-level coordination patterns** (Assembly, MapReduce, Swarm, Graph) that compose like building blocks
-- **A stateful runtime** that connects your agents to the Temporal workflow engine, event buses, and the visual Agentic Simulator
-- **First-class observability** via OpenTelemetry tracing, Prometheus metrics, and structured logging
-- **Safety primitives** baked in — circuit breakers, guardrails, two-person rules, and human-in-the-loop gates
+## Core capabilities
 
----
+### Composable orchestration
 
-## 6 Key Differentiators
+Build sequential, parallel, graph, DAG, fan-out, MapReduce, race, batch, and state-machine workflows from reusable primitives.
 
-=== "1. Composable by Design"
+### Governed execution
 
-    Every primitive — `Agent`, `Chain`, `Parallel`, `Graph`, `StateMachine` — implements the same `run(goal, inputs)` interface. You can nest them arbitrarily: a `Graph` node can be a `MapReduce`, which itself contains `SwarmCoordinator` workers.
+Use approval gates, permissions, safety controls, deadlines, retries, fallbacks, and circuit breakers to bound agent behaviour.
 
-    ```python
-    from agentic_codex import AgentBuilder, Context
-    from agentic_codex.patterns import MapReduceCoordinator, GraphRunner, GraphNodeSpec
+### Epistemic transparency
 
-    # A graph whose nodes are themselves coordinators
-    pipeline = GraphRunner(nodes=[
-        GraphNodeSpec(id="analyse", coordinator=MapReduceCoordinator(mappers=[...], reducer=...)),
-        GraphNodeSpec(id="report",  coordinator=assembly_pipeline),
-    ])
-    ```
+Carry confidence, assumptions, limitations, evidence quality, known unknowns, and propagated uncertainty with workflow outputs.
 
-=== "2. MCMC State Machines"
+### Runtime control and recovery
 
-    Unique to Multigen: iterative refinement loops modelled as Markov chains. Your workflow can **sample multiple execution paths**, compute consensus, and only commit when confidence crosses your threshold.
+Design workflows that can be paused, resumed, replayed, rerouted, recovered, and inspected through snapshots and execution history.
 
-    ```python
-    # Run 5 independent chains, compute ensemble agreement
-    results = [run_pipeline(inputs) for _ in range(5)]
-    consensus = max(set(r['decision'] for r in results), key=lambda d: sum(1 for r in results if r['decision']==d))
-    agreement = sum(1 for r in results if r['decision']==consensus) / 5
-    ```
+### Evaluation and observability
 
-=== "3. 20+ Coordination Patterns"
+Measure quality, latency, cost, tokens, regressions, and operational behaviour through evaluators, traces, metrics, profiling, and reports.
 
-    A curated catalogue of battle-tested multi-agent patterns:
-    `AssemblyCoordinator`, `SwarmCoordinator`, `MapReduceCoordinator`, `DebateCoordinator`, `MinistryOfExperts`, `GuardrailSandwich`, `TwoPersonRuleCoordinator`, `GuildRouter`, `HubAndSpokeCoordinator`, and more.
+### Optional infrastructure integrations
 
-=== "4. Resilience First"
-
-    `GuardrailSandwich` wraps any agent with pre/post validation. Circuit breakers auto-open on failure, degrade confidence scores gracefully, and close when the dependency recovers. Retry policies with exponential backoff are a one-liner.
-
-=== "5. Visual Simulator"
-
-    The bundled `agentic-simulator` provides a real-time dashboard: visualise agent networks, replay execution traces, run stress tests, and compare coordination strategies — all without touching production.
-
-=== "6. Zero Lock-in LLM Layer"
-
-    `FunctionAdapter` lets you build and test complete pipelines without any API key. When ready, swap to `EnvOpenAIAdapter`, your own adapter, or any `LLMAdapter` implementation. The coordination code is identical.
+Basic SDK use is in-process. Temporal, Kafka, MongoDB, OpenTelemetry, Prometheus, and model-provider integrations are optional and should be enabled according to workload requirements.
 
 ---
 
-## Quick Install
+## Capability maturity
+
+Multigen is under active development. Not every module has the same maturity level.
+
+| Status | Meaning |
+| --- | --- |
+| **Core** | Stable framework primitive intended for regular use |
+| **Integration** | Requires an optional provider or infrastructure service |
+| **Experimental** | Implemented for exploration; APIs may change |
+| **Planned** | Architectural direction that is not yet a guaranteed capability |
+
+Production adoption should be based on the tests, examples, integration validation, and performance evidence for the exact modules being used.
+
+---
+
+## Install the SDK
 
 ```bash
-pip install agentic-codex
-# For all optional extras:
-pip install "agentic-codex[openai,temporal,kafka]"
+cd sdk
+python -m pip install -e .
 ```
 
-## 60-Second Example
+Install optional integrations as needed:
 
-```python
-from agentic_codex import AgentBuilder, Context
-from agentic_codex.core.schemas import AgentStep, Message
-from agentic_codex.patterns import MapReduceCoordinator
-
-# Define a simple summariser agent (no LLM needed for this example)
-def summarise(ctx: Context) -> AgentStep:
-    text = ctx.scratch.get("current_shard", "")
-    summary = f"Summary of: {text[:50]}..."
-    return AgentStep(out_messages=[Message(role="assistant", content=summary)], state_updates={}, stop=False)
-
-def combine(ctx: Context) -> AgentStep:
-    parts = ctx.scratch.get("mapper_outputs", [])
-    combined = " | ".join(parts)
-    return AgentStep(out_messages=[Message(role="assistant", content=combined)], state_updates={"result": combined}, stop=True)
-
-summariser = AgentBuilder("Summariser", "summariser").with_step(summarise).build()
-combiner   = AgentBuilder("Combiner",   "combiner").with_step(combine).build()
-
-pipeline = MapReduceCoordinator(mappers=[summariser, summariser], reducer=combiner)
-
-result = pipeline.run(
-    goal="Summarise these documents",
-    inputs={"shards": ["Document A about ML", "Document B about Python"]}
-)
-print(result.messages[-1].content)
+```bash
+python -m pip install -e ".[openai]"
+python -m pip install -e ".[temporal]"
+python -m pip install -e ".[kafka]"
+python -m pip install -e ".[all]"
 ```
 
 ---
 
-## Framework Comparison
-
-| Feature | Multigen | LangGraph | AutoGen | CrewAI | smolagents |
-|---------|:--------:|:---------:|:-------:|:------:|:----------:|
-| No-LLM testing | ✅ | ⚠️ | ⚠️ | ⚠️ | ✅ |
-| MCMC/ensemble patterns | ✅ | ❌ | ❌ | ❌ | ❌ |
-| 20+ coord patterns | ✅ | ❌ | ⚠️ | ⚠️ | ❌ |
-| Visual simulator | ✅ | ❌ | ❌ | ❌ | ❌ |
-| Temporal integration | ✅ | ❌ | ❌ | ❌ | ❌ |
-| Circuit breakers | ✅ | ❌ | ❌ | ❌ | ❌ |
-| MapReduce pattern | ✅ | ❌ | ⚠️ | ❌ | ❌ |
-| Pure Python API | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Safety (injection/PII) | ✅ | ❌ | ❌ | ❌ | ❌ |
-| MCTS / ToT / GoT planning | ✅ | ❌ | ❌ | ❌ | ❌ |
-| Deadline + workflow retry | ✅ | ❌ | ❌ | ❌ | ❌ |
-| Token streaming | ✅ | ⚠️ | ❌ | ❌ | ❌ |
-| Online prompt optimisation | ✅ | ❌ | ❌ | ❌ | ❌ |
-| A/B testing + canary rollout | ✅ | ❌ | ❌ | ❌ | ❌ |
-
-> See the [full comparison](comparison.md) for a detailed breakdown.
-
----
-
-## Explore the Documentation
+## Explore the documentation
 
 <div class="grid cards" markdown>
 
 -   :material-rocket-launch: **Getting Started**
 
-    Install, configure, and run your first multi-agent workflow in under 5 minutes.
+    Install the SDK and run your first workflow.
 
     [Installation →](getting-started/installation.md)
 
 -   :material-school: **Tutorials**
 
-    Step-by-step guides for every major framework concept, from basic chains to MCMC state machines.
+    Learn the orchestration, memory, reasoning, safety, and evaluation primitives.
 
-    [Agents →](tutorials/agents.md)
+    [Tutorials →](tutorials/agents.md)
 
 -   :material-briefcase: **Use Cases**
 
-    Complete production-ready examples: credit risk, research pipelines, AIOps, clinical decision support, and legal analysis.
+    Review applied workflow examples and domain demonstrations.
 
-    [Credit Risk →](use_cases/credit_risk.md)
+    [Use Cases →](use_cases/credit_risk.md)
 
 -   :material-code-tags: **API Reference**
 
-    Full API documentation for every class, method, and parameter.
+    Inspect classes, methods, inputs, outputs, and configuration.
 
-    [Agent API →](api/agents.md)
+    [API Reference →](api/agents.md)
 
 </div>

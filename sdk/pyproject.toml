@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "multigen-sdk"
 version = "0.3.0"
-description = "The most advanced open-source agentic framework — chains, graphs, MCMC state machines, pub/sub, parallel execution, and optional Temporal/Kafka backends"
+description = "Governed multi-agent orchestration with composable workflows, runtime controls, evaluation, and optional distributed backends"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
@@ -25,7 +25,9 @@ dev      = ["pytest", "pytest-asyncio", "respx", "openai>=1.0"]
 
 [project.urls]
 Homepage = "https://github.com/Subhagatoadak/Multigen"
-Documentation = "https://github.com/Subhagatoadak/Multigen/wiki"
+Documentation = "https://subhagatoadak.github.io/Multigen"
+Repository = "https://github.com/Subhagatoadak/Multigen"
+Issues = "https://github.com/Subhagatoadak/Multigen/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]
